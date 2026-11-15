@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CryptoBill Forge — Freelance Crypto &amp; PayPal Invoice Builder</title>
+  <meta name="description" content="Create A4 print-ready crypto and PayPal invoices with offline QR codes and serverless shareable client payment links.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/cryptobill.html">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='28' font-weight='800'%3ECB%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="cryptobill">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">CB</span>
+        <span>CryptoBill Forge</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <span id="cbProStatusPill" class="fs-badge fs-badge-muted">FREE TIER</span>
+        <button type="button" id="cbUpgradeProBtn" class="fs-btn fs-btn-sm fs-btn-primary">Unlock Pro ($15)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="cb-toolbar">
+    <div class="fs-container cb-toolbar-inner">
+      <div class="cb-toolbar-actions">
+        <button type="button" id="cbLoadDemoBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Load Sample Data</button>
+        <button type="button" id="cbExportJsonBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Export JSON</button>
+        <label class="fs-btn fs-btn-sm fs-btn-secondary cb-file-btn">
+          Import JSON
+          <input type="file" id="cbImportJsonInput" accept="application/json,.json">
+        </label>
+        <button type="button" id="cbDownloadQrBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Download QR PNG</button>
+      </div>
+      <div class="cb-toolbar-actions">
+        <button type="button" id="cbPreviewClientModeBtn" class="fs-btn fs-btn-sm fs-btn-ghost">Preview Client Link</button>
+        <button type="button" id="cbCopyShareLinkBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Copy Shareable Link</button>
+        <button type="button" id="cbPrintPdfBtn" class="fs-btn fs-btn-sm fs-btn-primary">Print / Save PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <main id="cryptobillApp" class="fs-container">
+    <div id="cbTierNotice" class="cb-tier-notice"></div>
+
+    <div id="cbClientViewBanner" class="cb-client-banner" hidden>
+      <div>
+        <span class="fs-badge fs-badge-accent">CLIENT READ-ONLY VIEW</span>
+        <strong style="margin-left:8px;">Shared Invoice Link</strong>
+        <span class="inv-muted" style="margin-left:8px;">Inspect invoice details and pay via the verified rails below.</span>
+      </div>
+      <button type="button" id="cbSwitchToEditorBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Edit a Copy in Studio</button>
+    </div>
+
+    <div id="cbWorkspaceShell" class="cb-workspace">
+      <!-- LEFT EDITOR PANE -->
+      <section id="cbEditorPane" class="cb-editor-pane" aria-label="Invoice Editor Controls">
+        <!-- Business & Client -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Business &amp; Client Details</h2>
+            <span class="fs-badge fs-badge-muted">AUTO-SAVED</span>
+          </div>
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">Your Business / Freelancer Name</span>
+              <input type="text" id="cbBusinessName" class="fs-input" placeholder="Your Studio LLC">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Your Contact Email</span>
+              <input type="email" id="cbBusinessEmail" class="fs-input" placeholder="billing@studio.com">
+            </label>
+          </div>
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">Client Name / Company</span>
+              <input type="text" id="cbClientName" class="fs-input" placeholder="Acme Corp">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Client Email</span>
+              <input type="email" id="cbClientEmail" class="fs-input" placeholder="accounts@acme.com">
+            </label>
+          </div>
+          <div class="cb-grid-3">
+            <label class="fs-field">
+              <span class="fs-field-label">Invoice #</span>
+              <input type="text" id="cbInvoiceNumber" class="fs-input" placeholder="INV-2026-001">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Issue Date</span>
+              <input type="date" id="cbIssueDate" class="fs-input">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Due Date</span>
+              <input type="date" id="cbDueDate" class="fs-input">
+            </label>
+          </div>
+        </div>
+
+        <!-- Line Items & Totals -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Line Items &amp; Taxes</h2>
+            <span id="cbItemsLimitBadge" class="fs-badge fs-badge-muted">2 / 3 Free Limit</span>
+          </div>
+          <div id="cbLineItemsWrap" style="display:grid;gap:10px;"></div>
+          <div>
+            <button type="button" id="cbAddLineItemBtn" class="fs-btn fs-btn-sm fs-btn-secondary">+ Add Line Item</button>
+          </div>
+          <div class="cb-grid-3">
+            <label class="fs-field">
+              <span class="fs-field-label">Currency</span>
+              <select id="cbCurrency" class="fs-select">
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="USDT">USDT (₮)</option>
+              </select>
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Discount (%)</span>
+              <input type="number" id="cbDiscountPercent" class="fs-input" min="0" max="100" step="0.5" value="0">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Tax (%)</span>
+              <input type="number" id="cbTaxPercent" class="fs-input" min="0" max="100" step="0.5" value="0">
+            </label>
+          </div>
+          <label class="fs-field">
+            <span class="fs-field-label">Notes &amp; Payment Terms</span>
+            <textarea id="cbNotes" class="fs-textarea" placeholder="Payment terms, delivery milestones, or thank you message..."></textarea>
+          </label>
+        </div>
+
+        <!-- Freelancer Payment Methods -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>3. Your Receiving Payment Methods</h2>
+            <span class="fs-badge fs-badge-accent">OFFLINE QR</span>
+          </div>
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">Your USDT (BEP20 / BSC) Address</span>
+              <input type="text" id="cbPayBep20" class="fs-input" placeholder="0x...">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Your USDT (TRC20 / TRON) Address</span>
+              <input type="text" id="cbPayTrc20" class="fs-input" placeholder="T...">
+            </label>
+          </div>
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">Your PayPal Email</span>
+              <input type="email" id="cbPayPaypal" class="fs-input" placeholder="you@paypal-email.com">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Your Binance Pay ID</span>
+              <input type="text" id="cbPayBinance" class="fs-input" placeholder="e.g. 123456789">
+            </label>
+          </div>
+          <label class="fs-field">
+            <span class="fs-field-label">Primary QR Code on Invoice Sheet</span>
+            <select id="cbQrMethod" class="fs-select">
+              <option value="auto">Auto (first configured payment rail)</option>
+              <option value="bep20">USDT (BEP20)</option>
+              <option value="trc20">USDT (TRC20)</option>
+              <option value="paypal">PayPal Checkout URL</option>
+              <option value="binance">Binance Pay ID</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- Pro Branding -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>4. Brand Customization (Pro)</h2>
+            <span class="fs-badge fs-badge-warn">PRO</span>
+          </div>
+          <div id="cbProBrandingLock" class="cb-pro-lock">
+            Pro Feature: Custom accent color, monogram logo text, and removing the footer badge require a Pro license ($15 lifetime).
+          </div>
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">Accent Color</span>
+              <input type="color" id="cbAccentColor" class="fs-input" value="#2563eb" style="height:40px;padding:4px;">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Logo Monogram (max 6 chars)</span>
+              <input type="text" id="cbLogoText" class="fs-input" maxlength="6" placeholder="FS">
+            </label>
+          </div>
+          <label style="display:flex;align-items:center;gap:10px;font-size:0.88rem;cursor:pointer;">
+            <input type="checkbox" id="cbHideBadge">
+            <span>Remove &ldquo;Created with CryptoBill Forge&rdquo; footer badge</span>
+          </label>
+        </div>
+
+        <!-- Saved Templates -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>5. Saved Templates</h2>
+            <span id="cbTemplatesCountBadge" class="fs-badge fs-badge-muted">0 / 2 Free</span>
+          </div>
+          <div class="fs-input-row">
+            <input type="text" id="cbTemplateNameInput" class="fs-input" placeholder="Template name (e.g. Monthly Retainer)">
+            <button type="button" id="cbSaveTemplateBtn" class="fs-btn fs-btn-sm fs-btn-primary">Save</button>
+          </div>
+          <div id="cbSavedTemplatesList" style="display:grid;gap:8px;"></div>
+        </div>
+
+        <!-- Pro Bulk Batch Presets -->
+        <div class="cb-panel" id="cbProPresetsCard">
+          <div class="cb-panel-head">
+            <h2>6. Bulk Batch JSON Presets (Pro)</h2>
+            <span class="fs-badge fs-badge-warn">PRO</span>
+          </div>
+          <div class="fs-input-row">
+            <select id="cbProPresetSelect" class="fs-select"></select>
+            <button type="button" id="cbLoadProPresetBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Load Preset</button>
+          </div>
+          <div class="cb-toolbar-actions">
+            <button type="button" id="cbExportBatchBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Export Batch JSON</button>
+            <label class="fs-btn fs-btn-sm fs-btn-secondary cb-file-btn">
+              Import Batch JSON Array
+              <input type="file" id="cbBatchImportInput" accept="application/json,.json">
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT LIVE INVOICE PREVIEW -->
+      <section class="cb-preview-pane" aria-label="Live A4 Invoice Preview">
+        <div id="cbClientPaymentPanel" hidden></div>
+        <article id="cbInvoiceSheet" class="cb-invoice-paper"></article>
+      </section>
+    </div>
+
+    <canvas id="cbQrExportCanvas" hidden></canvas>
+    <div id="cbToast" class="cb-toast" hidden aria-live="polite"></div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>CryptoBill Forge</strong> · Part of <a href="./">ForgeSuite Studio</a> by <code>youthmy11-ai</code>
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/cryptobill.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page Not Found | ForgeSuite Studio</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">FS</span>
+        <span>ForgeSuite Studio</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-secondary">Storefront</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-primary">Open CryptoBill Forge</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-404-wrap">
+    <div class="fs-404-card">
+      <span class="fs-badge fs-badge-warn">ERROR 404</span>
+      <h1 style="margin:14px 0 10px;font-size:2rem;">Page not found</h1>
+      <p style="color:var(--text-muted);margin:0 0 24px;">
+        The page you requested does not exist or moved. Return to ForgeSuite Studio or launch CryptoBill Forge directly.
+      </p>
+      <div class="fs-card-actions" style="justify-content:center;">
+        <a href="./" class="fs-btn fs-btn-primary">Back to Storefront</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-secondary">Launch CryptoBill Forge</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div><strong>ForgeSuite Studio</strong> by <code>youthmy11-ai</code></div>
+      <div class="fs-footer-links">
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    try {
+      var saved = localStorage.getItem("forgesuite_theme");
+      if (saved === "light" || saved === "dark") {
+        document.documentElement.dataset.theme = saved;
+      }
+    } catch (e) {}
+  </script>
+</body>
+</html>
