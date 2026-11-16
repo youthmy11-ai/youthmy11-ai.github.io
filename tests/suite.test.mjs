@@ -37,6 +37,12 @@ import {
   recordsToCsv,
   recordsToMarkdownTable,
 } from "../assets/json2sheet.js";
+import {
+  buildMilestoneInvoicePayload,
+  computeSowTotals,
+  renderSowMarkdown,
+  SOW_PRESETS,
+} from "../assets/sowbuilder.js";
 
 function padAddressTopic(address) {
   return "0x" + "0".repeat(24) + address.replace(/^0x/i, "").toLowerCase();
@@ -715,4 +721,28 @@ test("recordsToCsv and recordsToMarkdownTable apply PII masking and formula guar
   assert.ok(md.startsWith("| email | ip | token | formula |"));
   assert.match(md, /\[REDACTED_EMAIL\]/);
   assert.equal(maskSensitiveText("Call +84 912 345 678 now", { phones: true }), "Call [REDACTED_PHONE] now");
+});
+
+/* ============================================================================
+ * 8. ScopeGuard SOW & Milestone Escrow Builder Tests
+ * ========================================================================== */
+
+test("computeSowTotals, renderSowMarkdown, and buildMilestoneInvoicePayload stay aligned", () => {
+  const preset = SOW_PRESETS.ai_mvp;
+  const calc = computeSowTotals(preset);
+  assert.equal(calc.isBalanced, true);
+  assert.equal(calc.totalPercent, 100);
+  assert.equal(calc.allocatedUsd, 2400);
+  assert.equal(calc.milestones[0].amountUsd, 960);
+
+  const md = renderSowMarkdown(preset);
+  assert.match(md, /STATEMENT OF WORK & MILESTONE ESCROW AGREEMENT/);
+  assert.match(md, /Acme SaaS Labs Inc\./);
+  assert.match(md, /\$960\.00/);
+
+  const inv = buildMilestoneInvoicePayload(preset, 0);
+  const decoded = decodeInvoicePayload(encodeInvoicePayload(inv));
+  assert.equal(decoded.clientName, "Acme SaaS Labs Inc.");
+  const totals = calculateInvoiceTotals(decoded.items, decoded.taxPercent, decoded.discountPercent);
+  assert.equal(totals.grandTotal, 960);
 });

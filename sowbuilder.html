@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScopeGuard SOW — Freelance &amp; Web3 Milestone Contract Builder</title>
+  <meta name="description" content="Free browser-based Statement of Work (SOW) &amp; milestone contract builder for AI engineers, Chrome extension builders, and Web3 auditors with 1-click CryptoBill USDT/Solana invoicing.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/sowbuilder.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/sowbuilder.html">
+  <meta property="og:title" content="ScopeGuard SOW — Freelance &amp; Web3 Milestone Contract Builder">
+  <meta property="og:description" content="Generate clean IP-safe Statements of Work, split milestones, and launch pre-filled CryptoBill USDT invoices locally in zero seconds.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ScopeGuard SOW — Web3 &amp; AI Milestone SOW Generator">
+  <meta name="twitter:description" content="Offline Statement of Work generator with milestone splits and instant CryptoBill Forge invoice export.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310b981'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='24' font-weight='800'%3ESW%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ScopeGuard SOW Builder",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "url": "https://youthmy11-ai.github.io/sowbuilder.html",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free offline freelance and Web3 Statement of Work generator with milestone splits and CryptoBill invoice integration."
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="sowbuilder">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">SW</span>
+        <span>ScopeGuard SOW</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill</a>
+        <a href="tokencalc.html" class="fs-btn fs-btn-sm fs-btn-secondary">TokenCost</a>
+        <a href="json2sheet.html" class="fs-btn fs-btn-sm fs-btn-secondary">JSON2Sheet</a>
+        <button type="button" id="sowBundleBtn" class="fs-btn fs-btn-sm fs-btn-primary">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 60px;">
+    <div class="fs-section-head" style="margin-bottom:20px;">
+      <div>
+        <span class="fs-badge fs-badge-accent">CLIENT-SIDE SOW · MILESTONE SPLITS · 1-CLICK CRYPTOBILL</span>
+        <h1 style="margin-top:10px;">Freelance &amp; Web3 Milestone Contract Builder</h1>
+        <p class="fs-lead" style="margin-top:6px;">
+          Lock clear deliverables, revision limits, and IP transfer triggers into a clean Markdown Statement of Work—and export any milestone directly to a payable <strong>CryptoBill Forge</strong> USDT/Solana invoice.
+        </p>
+      </div>
+    </div>
+
+    <div class="cb-workspace">
+      <section class="cb-editor-pane" aria-label="Contract Scope & Milestones">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Scope &amp; Parties</h2>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-sow-preset="ai_mvp">AI Workflow</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-sow-preset="web3_audit">Web3 Audit</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-sow-preset="chrome_ext">Chrome Ext</button>
+            </div>
+          </div>
+
+          <div class="cb-grid-2">
+            <label class="fs-field" style="grid-column:1 / -1;">
+              <span class="fs-field-label">Project Title</span>
+              <input id="sowProjectTitle" type="text" class="fs-input">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Provider Name</span>
+              <input id="sowProviderName" type="text" class="fs-input">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Client Organization</span>
+              <input id="sowClientName" type="text" class="fs-input">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Total Contract Budget (USD)</span>
+              <input id="sowBudgetUsd" type="number" min="0" step="50" class="fs-input">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Settlement Rail</span>
+              <select id="sowRailSelect" class="fs-select">
+                <option value="usdt-bep20">USDT (BSC / BEP20)</option>
+                <option value="usdt-trc20">USDT (TRON / TRC20)</option>
+                <option value="sol-usdc">USDC / SOL (Solana)</option>
+                <option value="binance-pay">Binance Pay (UID)</option>
+                <option value="paypal">PayPal Invoice</option>
+              </select>
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Included Revision Rounds</span>
+              <input id="sowRevisions" type="number" min="0" max="10" class="fs-input">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Pause Notice Period (Days)</span>
+              <input id="sowNoticeDays" type="number" min="1" max="30" class="fs-input">
+            </label>
+          </div>
+
+          <label class="fs-field" style="margin-top:10px;">
+            <span class="fs-field-label">Deliverables Checklist (Markdown bullet list)</span>
+            <textarea id="sowDeliverables" class="fs-textarea" rows="4" spellcheck="false"></textarea>
+          </label>
+        </div>
+
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Milestone Payment Schedule</h2>
+            <span id="sowBalanceBadge" class="fs-badge fs-badge-success">100% BALANCED</span>
+          </div>
+          <div id="sowMilestonesList"></div>
+          <div style="margin-top:10px;">
+            <button type="button" id="sowAddMilestoneBtn" class="fs-btn fs-btn-sm fs-btn-secondary">+ Add Milestone</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="cb-preview-pane" aria-label="Generated Statement of Work">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>Generated Agreement (Markdown)</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button type="button" id="sowCopyBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Copy Markdown</button>
+              <button type="button" id="sowDownloadBtn" class="fs-btn fs-btn-sm fs-btn-primary">Download .md</button>
+            </div>
+          </div>
+          <textarea id="sowPreviewOutput" class="fs-textarea" rows="16" readonly spellcheck="false"></textarea>
+        </div>
+
+        <div class="cb-panel" style="margin-top:18px;">
+          <div class="cb-panel-head">
+            <h3>3. Bill a Milestone Immediately</h3>
+            <span class="fs-badge fs-badge-success">1-CLICK CRYPTOBILL</span>
+          </div>
+          <p class="inv-muted" style="margin:6px 0 12px;">
+            Convert your kickoff deposit or final milestone straight into a shareable invoice, or unlock white-label PDF branding &amp; batch client tools with <strong>CryptoBill Pro ($15)</strong> / <strong>Bundle ($35)</strong>.
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <select id="sowMilestoneInvoiceSelect" class="fs-select" style="flex:1;min-width:220px;"></select>
+            <button type="button" id="sowSendInvoiceBtn" class="fs-btn fs-btn-primary">Open in CryptoBill Forge →</button>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+            <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="CB">Unlock CryptoBill Pro ($15)</button>
+            <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="BUNDLE">All-Access Bundle ($35)</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="json2sheet.html">JSON2Sheet Lab</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/sowbuilder.js"></script>
+</body>
+</html>
