@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON2Sheet &amp; PII Masker — Flatten Nested JSON to CSV &amp; Markdown Tables</title>
+  <meta name="description" content="Free client-side nested JSON to CSV, TSV, and Markdown Table converter with Excel formula injection protection and instant email/IP/API-key PII redaction.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/json2sheet.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/json2sheet.html">
+  <meta property="og:title" content="JSON2Sheet &amp; PII Masker — Nested JSON to CSV &amp; Markdown Table">
+  <meta property="og:description" content="Flatten API JSON payloads into CSV, TSV, or Markdown tables 100% locally while masking sensitive emails, IPs, and Bearer/API tokens.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JSON2Sheet &amp; PII Masker — Nested JSON to Clean CSV">
+  <meta name="twitter:description" content="Zero-backend nested JSON flattener with CSV formula guard and PII redaction.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='26' font-weight='800'%3EJ2%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "JSON2Sheet & PII Masker",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "url": "https://youthmy11-ai.github.io/json2sheet.html",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free offline nested JSON flattener to RFC-4180 CSV, TSV, and Markdown tables with PII redaction."
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="json2sheet">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">J2</span>
+        <span>JSON2Sheet Lab</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill</a>
+        <a href="tokencalc.html" class="fs-btn fs-btn-sm fs-btn-secondary">TokenCost</a>
+        <button type="button" id="j2sBundleBtn" class="fs-btn fs-btn-sm fs-btn-primary">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 60px;">
+    <div class="fs-section-head" style="margin-bottom:20px;">
+      <div>
+        <span class="fs-badge fs-badge-accent">ZERO UPLOAD · RFC-4180 CSV · PII REDACTION</span>
+        <h1 style="margin-top:10px;">Nested JSON to Clean CSV &amp; Markdown Table</h1>
+        <p class="fs-lead" style="margin-top:6px;">
+          Flatten nested API payloads into Excel-safe spreadsheets or GitHub Markdown tables locally in your browser—with 1-click PII masking for emails, IPv4 addresses, and API tokens.
+        </p>
+      </div>
+    </div>
+
+    <div class="cb-workspace">
+      <section class="cb-editor-pane" aria-label="JSON Input and Options">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Raw JSON / API Payload</h2>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-j2s-sample="stripe">API List Sample</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-j2s-sample="webhook">Webhook Secrets</button>
+            </div>
+          </div>
+          <label class="fs-field">
+            <span class="fs-field-label">Paste JSON array, wrapper object (`data`/`items`), or single JSON record</span>
+            <textarea id="j2sJsonInput" class="fs-textarea" rows="12" spellcheck="false" placeholder="[{&quot;id&quot;: 1, &quot;user&quot;: {&quot;email&quot;: &quot;a@b.com&quot;}}]"></textarea>
+          </label>
+          <div id="j2sParseStatus" style="margin-top:8px;font-size:0.88rem;"></div>
+        </div>
+
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Export &amp; Privacy Guards</h2>
+            <span class="fs-badge fs-badge-muted" id="j2sStatsPill">0 ROWS</span>
+          </div>
+          <div class="cb-grid-2">
+            <label class="fs-field" style="grid-column:1 / -1;">
+              <span class="fs-field-label">Output Format</span>
+              <select id="j2sFormatSelect" class="fs-select">
+                <option value="csv">CSV (Comma-Separated · Excel Ready)</option>
+                <option value="tsv">TSV (Tab-Separated · Google Sheets Paste)</option>
+                <option value="md">Markdown Table (GitHub / Docs Ready)</option>
+              </select>
+            </label>
+            <label class="fs-field" style="display:flex;align-items:center;gap:8px;">
+              <input id="j2sMaskPii" type="checkbox" checked>
+              <span class="fs-field-label" style="margin:0;">Mask Emails, IPs &amp; API Keys</span>
+            </label>
+            <label class="fs-field" style="display:flex;align-items:center;gap:8px;">
+              <input id="j2sGuardFormula" type="checkbox" checked>
+              <span class="fs-field-label" style="margin:0;">CSV Formula Guard (`=,+,-,@`)</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="cb-preview-pane" aria-label="Converted Table Output">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>Converted Output</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button type="button" id="j2sCopyOutBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Copy Output</button>
+              <button type="button" id="j2sDownloadCsvBtn" class="fs-btn fs-btn-sm fs-btn-primary">Download File</button>
+            </div>
+          </div>
+          <textarea id="j2sOutputText" class="fs-textarea" rows="15" readonly spellcheck="false"></textarea>
+        </div>
+
+        <div class="cb-panel" style="margin-top:18px;">
+          <div class="cb-panel-head">
+            <h3>Need Automated Web Table &amp; Contact Extraction?</h3>
+            <span class="fs-badge fs-badge-success">CHROME EXTENSION</span>
+          </div>
+          <p class="inv-muted" style="margin:6px 0 12px;">
+            Stop copying JSON manually. Install <strong>WebLead &amp; Table Extractor Pro ($15)</strong> to extract HTML tables, directories, and emails directly from any live site, or grab all 3 Pro apps in the <strong>All-Access Bundle ($35)</strong> via BSC USDT, TRC20, Binance Pay, or PayPal.
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="button" class="fs-btn fs-btn-primary" data-checkout-sku="WL">Get WebLead Extractor Pro ($15)</button>
+            <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="BUNDLE">All-Access Bundle ($35)</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="json2sheet.html">JSON2Sheet Lab</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/json2sheet.js"></script>
+</body>
+</html>

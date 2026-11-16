@@ -30,6 +30,13 @@ import {
   estimateTokenCount,
   MODEL_PRICING,
 } from "../assets/tokencalc.js";
+import {
+  extractRecordArray,
+  flattenObject,
+  maskSensitiveText,
+  recordsToCsv,
+  recordsToMarkdownTable,
+} from "../assets/json2sheet.js";
 
 function padAddressTopic(address) {
   return "0x" + "0".repeat(24) + address.replace(/^0x/i, "").toLowerCase();
@@ -668,4 +675,44 @@ test("calculateRunCosts prices cached vs uncached tokens and builds CryptoBill h
   assert.equal(decoded.items.length, 2);
   const totals = calculateInvoiceTotals(decoded.items, decoded.taxPercent, decoded.discountPercent);
   assert.ok(Math.abs(totals.grandTotal - res.monthlyClientQuote) < 0.02);
+});
+
+/* ============================================================================
+ * 7. JSON2Sheet & PII Privacy Masker Tests
+ * ========================================================================== */
+
+test("extractRecordArray flattens nested wrappers and arrays cleanly", () => {
+  const payload = {
+    data: [
+      { id: 1, customer: { name: "Ada", contact: { email: "ada@example.org" } }, tags: ["a", "b"] },
+      { id: 2, customer: { name: "Bob" }, extra: "=HYPERLINK(1)" },
+    ],
+  };
+  const flat = extractRecordArray(payload);
+  assert.equal(flat.length, 2);
+  assert.equal(flat[0]["customer.contact.email"], "ada@example.org");
+  assert.equal(flat[0].tags, "a; b");
+  assert.deepEqual(flattenObject({ a: { b: 2 } }), { "a.b": 2 });
+});
+
+test("recordsToCsv and recordsToMarkdownTable apply PII masking and formula guard", () => {
+  const rows = extractRecordArray([
+    {
+      email: "user@secret.io",
+      ip: "192.168.1.55",
+      token: "Bearer abcdef1234567890xyz",
+      formula: "=SUM(A1:A9)",
+    },
+  ]);
+
+  const csv = recordsToCsv(rows, { maskPii: true, guardFormula: true });
+  assert.match(csv.text, /\[REDACTED_EMAIL\]/);
+  assert.match(csv.text, /\[REDACTED_IP\]/);
+  assert.match(csv.text, /\[REDACTED_TOKEN\]/);
+  assert.match(csv.text, /'=SUM\(A1:A9\)/);
+
+  const md = recordsToMarkdownTable(rows, { maskPii: true });
+  assert.ok(md.startsWith("| email | ip | token | formula |"));
+  assert.match(md, /\[REDACTED_EMAIL\]/);
+  assert.equal(maskSensitiveText("Call +84 912 345 678 now", { phones: true }), "Call [REDACTED_PHONE] now");
 });
