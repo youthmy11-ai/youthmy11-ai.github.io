@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TokenCost Lab — LLM Token Counter &amp; AI Agent API Cost Calculator</title>
+  <meta name="description" content="Free client-side LLM token counter and monthly AI API cost estimator across GPT-5, Claude 4.5, Gemini 2.5, and DeepSeek V3 with 1-click CryptoBill client invoicing.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/tokencalc.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/tokencalc.html">
+  <meta property="og:title" content="TokenCost Lab — Free LLM Token Counter &amp; AI Pricing Calculator">
+  <meta property="og:description" content="Estimate prompt tokens, cached savings, monthly agent costs across 7 models, and export quotes directly into CryptoBill Forge.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TokenCost Lab — LLM Token &amp; Cost Calculator">
+  <meta name="twitter:description" content="Client-side AI token counter, model pricing comparison, and client invoice builder.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='26' font-weight='800'%3ETC%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TokenCost Lab",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "url": "https://youthmy11-ai.github.io/tokencalc.html",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free offline LLM token estimator and multi-model API cost planner with instant CryptoBill Forge invoice export."
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="tokencalc">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">TC</span>
+        <span>TokenCost Lab</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill App</a>
+        <button type="button" id="tcUpgradeBundleBtn" class="fs-btn fs-btn-sm fs-btn-primary">All-Access Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 60px;">
+    <div class="fs-section-head" style="margin-bottom:20px;">
+      <div>
+        <span class="fs-badge fs-badge-accent">100% CLIENT-SIDE · ZERO DATA LEAVES YOUR BROWSER</span>
+        <h1 style="margin-top:10px;">LLM Token Counter &amp; AI Agent Cost Estimator</h1>
+        <p class="fs-lead" style="margin-top:6px;">
+          Measure prompt size, compare 7 leading frontier models, factor in prompt-cache discounts &amp; agency retainer margins, and generate a client crypto/PayPal invoice in 1 click.
+        </p>
+      </div>
+    </div>
+
+    <div class="cb-workspace">
+      <!-- LEFT INPUT & MODEL CONTROLS -->
+      <section class="cb-editor-pane" aria-label="Prompt and Workload Parameters">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Prompt / System Context</h2>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-tc-preset="support">Support JSON</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-tc-preset="coding">Code Review</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-tc-preset="rag">RAG Context</button>
+            </div>
+          </div>
+          <label class="fs-field">
+            <span class="fs-field-label">Paste prompt, JSON schema, code, or document sample</span>
+            <textarea id="tcPromptInput" class="fs-textarea" rows="8" placeholder="Paste prompt text here..."></textarea>
+          </label>
+          <div class="fs-kpi-strip" style="margin-top:12px;">
+            <span>Tokens: <strong id="tcStatTokens">0</strong></span>
+            <span>Words: <strong id="tcStatWords">0</strong></span>
+            <span>Chars: <strong id="tcStatChars">0</strong></span>
+            <span>UTF-8: <strong id="tcStatBytes">0 B</strong></span>
+          </div>
+        </div>
+
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Model &amp; Scale Assumptions</h2>
+            <span class="fs-badge fs-badge-muted">USD / 1M TOKENS</span>
+          </div>
+          <div class="cb-grid-2">
+            <label class="fs-field" style="grid-column:1 / -1;">
+              <span class="fs-field-label">Primary Model</span>
+              <select id="tcModelSelect" class="fs-select"></select>
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Expected Output Tokens / Req</span>
+              <input id="tcOutputTokens" type="number" class="fs-input" value="600" min="0" step="50">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Prompt Cache Hit Rate (%)</span>
+              <input id="tcCachedPct" type="number" class="fs-input" value="30" min="0" max="100" step="5">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Requests / Day</span>
+              <input id="tcReqPerDay" type="number" class="fs-input" value="500" min="0" step="50">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Active Days / Month</span>
+              <input id="tcDaysPerMonth" type="number" class="fs-input" value="30" min="1" max="31">
+            </label>
+            <label class="fs-field" style="grid-column:1 / -1;">
+              <span class="fs-field-label">Agency / Freelance Retainer Margin Multiplier (e.g. 1.4 = 40% markup)</span>
+              <input id="tcMarginMult" type="number" class="fs-input" value="1.4" min="1" step="0.1">
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT RESULTS & COMPARISON -->
+      <section class="cb-preview-pane" aria-label="Cost Breakdown and Client Invoice Export">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>Estimated Budget</h2>
+            <span class="fs-badge fs-badge-success" id="tcContextFill">0%</span>
+          </div>
+          <div class="cb-grid-2" style="margin-bottom:14px;">
+            <div class="fs-rail-box" style="padding:14px;">
+              <div class="fs-field-label">Raw API Cost / Request</div>
+              <div style="font-size:1.35rem;font-weight:700;margin-top:4px;" id="tcCostPerReq">$0.0000</div>
+            </div>
+            <div class="fs-rail-box" style="padding:14px;">
+              <div class="fs-field-label">Daily API Spend</div>
+              <div style="font-size:1.35rem;font-weight:700;margin-top:4px;" id="tcDailyCost">$0.00</div>
+            </div>
+            <div class="fs-rail-box" style="padding:14px;">
+              <div class="fs-field-label">Monthly Raw API Spend</div>
+              <div style="font-size:1.35rem;font-weight:700;margin-top:4px;" id="tcMonthlyRaw">$0.00</div>
+            </div>
+            <div class="fs-rail-box" style="padding:14px;border-color:rgba(59,130,246,0.5);">
+              <div class="fs-field-label">Recommended Client Quote</div>
+              <div style="font-size:1.35rem;font-weight:700;color:#60a5fa;margin-top:4px;" id="tcMonthlyQuote">$0.00</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="button" id="tcSendToCryptoBillBtn" class="fs-btn fs-btn-primary">
+              1-Click Send Quote to CryptoBill Forge →
+            </button>
+            <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="CB">
+              Unlock CryptoBill Pro ($15)
+            </button>
+          </div>
+        </div>
+
+        <div class="cb-panel" style="margin-top:18px;overflow-x:auto;">
+          <div class="cb-panel-head">
+            <h2>Cross-Model Cost Comparison</h2>
+            <span class="fs-badge fs-badge-muted">LIVE RECALCULATION</span>
+          </div>
+          <table class="inv-table" style="width:100%;font-size:0.9rem;">
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Model</th>
+                <th>Context</th>
+                <th>Per Req</th>
+                <th>Raw / Mo</th>
+                <th>Client / Mo</th>
+              </tr>
+            </thead>
+            <tbody id="tcComparisonBody"></tbody>
+          </table>
+        </div>
+
+        <div class="cb-panel" style="margin-top:18px;">
+          <div class="cb-panel-head">
+            <h3>Need Offline Freelance Tools Without Subscriptions?</h3>
+            <span class="fs-badge fs-badge-accent">ONE-TIME LICENSE</span>
+          </div>
+          <p class="inv-muted" style="margin:6px 0 12px;">
+            Unlock <strong>CryptoBill Forge Pro</strong> ($15), <strong>AutoShorts Studio Pro</strong> ($19), and <strong>WebLead Extractor Pro</strong> ($15) in one $35 Bundle via instant BSC USDT, TRC20, Binance Pay, or PayPal.
+          </p>
+          <button type="button" class="fs-btn fs-btn-primary" data-checkout-sku="BUNDLE">
+            Get All-Access Bundle ($35 · Save $14)
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/tokencalc.js"></script>
+</body>
+</html>

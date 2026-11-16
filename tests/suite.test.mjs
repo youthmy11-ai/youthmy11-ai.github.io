@@ -24,6 +24,12 @@ import {
 } from "../assets/cryptobill.js";
 
 import { encodeQr, generateQrMatrix, renderQrSvg } from "../assets/qr.js";
+import {
+  buildCryptoBillQuotePayload,
+  calculateRunCosts,
+  estimateTokenCount,
+  MODEL_PRICING,
+} from "../assets/tokencalc.js";
 
 function padAddressTopic(address) {
   return "0x" + "0".repeat(24) + address.replace(/^0x/i, "").toLowerCase();
@@ -611,4 +617,55 @@ test("validateLicenseKeyFormat accepts generated keys and rejects guesses or tam
       `Expected invalid key "${bad}" to be rejected`
     );
   }
+});
+
+/* ============================================================================
+ * 6. TokenCost Lab Estimator & CryptoBill Quote Handoff Tests
+ * ========================================================================== */
+
+test("estimateTokenCount handles empty, ASCII prose, code, and Unicode consistently", () => {
+  const empty = estimateTokenCount("");
+  assert.equal(empty.tokens, 0);
+  assert.equal(empty.bytesUtf8, 0);
+
+  const code = estimateTokenCount("export function sum(a: number, b: number) { return a + b; }");
+  assert.ok(code.tokens >= 10 && code.tokens <= 30);
+  assert.equal(code.lines, 1);
+
+  const vi = estimateTokenCount("Hệ thống thanh toán hóa đơn tự động");
+  assert.ok(vi.tokens > 5);
+  assert.ok(vi.bytesUtf8 > vi.chars);
+});
+
+test("calculateRunCosts prices cached vs uncached tokens and builds CryptoBill handoff", () => {
+  const gpt5 = MODEL_PRICING.find((m) => m.id === "gpt-5");
+  const res = calculateRunCosts({
+    model: gpt5,
+    inputTokens: 2000,
+    cachedRatioPct: 50,
+    outputTokens: 500,
+    requestsPerDay: 1000,
+    daysPerMonth: 30,
+    marginMultiplier: 1.5,
+  });
+
+  // 1000 uncached ($1.25/1M) + 1000 cached ($0.125/1M) + 500 output ($10/1M)
+  const expectedPerReq = 0.00125 + 0.000125 + 0.005;
+  assert.ok(Math.abs(res.costPerReqTotal - expectedPerReq) < 1e-9);
+  assert.ok(Math.abs(res.monthlyRawCost - expectedPerReq * 30_000) < 1e-6);
+  assert.ok(Math.abs(res.monthlyClientQuote - res.monthlyRawCost * 1.5) < 1e-6);
+
+  const inv = buildCryptoBillQuotePayload({
+    modelName: res.modelName,
+    requestsPerDay: 1000,
+    daysPerMonth: 30,
+    inputTokens: 2000,
+    outputTokens: 500,
+    monthlyRawCost: res.monthlyRawCost,
+    monthlyClientQuote: res.monthlyClientQuote,
+  });
+  const decoded = decodeInvoicePayload(encodeInvoicePayload(inv));
+  assert.equal(decoded.items.length, 2);
+  const totals = calculateInvoiceTotals(decoded.items, decoded.taxPercent, decoded.discountPercent);
+  assert.ok(Math.abs(totals.grandTotal - res.monthlyClientQuote) < 0.02);
 });
