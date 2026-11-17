@@ -54,6 +54,60 @@ import {
   scanSecrets,
   shannonEntropy,
 } from "../assets/envshield.js";
+import {
+  verifySolanaUsdcTx,
+  verifySolanaUsdcTxOnChain,
+} from "../assets/checkout.js";
+
+test("verifySolanaUsdcTx and verifySolanaUsdcTxOnChain validate SPL USDC transfers and issue keys", async () => {
+  const sampleTx = {
+    transaction: {
+      signatures: ["5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d"],
+    },
+    meta: {
+      err: null,
+      preTokenBalances: [
+        {
+          accountIndex: 2,
+          mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          owner: "BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx",
+          uiTokenAmount: { amount: "10000000", decimals: 6 },
+        },
+      ],
+      postTokenBalances: [
+        {
+          accountIndex: 2,
+          mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          owner: "BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx",
+          uiTokenAmount: { amount: "45000000", decimals: 6 },
+        },
+      ],
+    },
+  };
+
+  const ok = verifySolanaUsdcTx(sampleTx, 35);
+  assert.equal(ok.verified, true);
+  assert.equal(ok.amountUsd, 35);
+  assert.equal(ok.tier, "BUNDLE");
+  assert.match(ok.licenseKey, /^FS-PRO-BUNDLE-[A-Z0-9]{8}-[0-9A-F]{4}$/);
+
+  const low = verifySolanaUsdcTx(sampleTx, 50);
+  assert.equal(low.verified, false);
+  assert.match(low.reason, /Insufficient USDC/);
+
+  const rpcRes = await verifySolanaUsdcTxOnChain(
+    sampleTx.transaction.signatures[0],
+    35,
+    {
+      fetchImpl: async () => ({
+        ok: true,
+        json: async () => ({ jsonrpc: "2.0", id: 1, result: sampleTx }),
+      }),
+    }
+  );
+  assert.equal(rpcRes.verified, true);
+  assert.equal(rpcRes.licenseKey, ok.licenseKey);
+});
 
 function padAddressTopic(address) {
   return "0x" + "0".repeat(24) + address.replace(/^0x/i, "").toLowerCase();

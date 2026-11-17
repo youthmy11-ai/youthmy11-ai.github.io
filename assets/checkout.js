@@ -9,6 +9,8 @@ export const OFFICIAL_CHANNELS = Object.freeze({
   bscUsdtContract: "0x55d398326f99059fF775485246999027B3197955",
   bscChainId: 56,
   usdtDecimals: 18,
+  solanaUsdc: "BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx",
+  solanaUsdcMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
   usdtTrc20: "TGVUMYRwTqrCGzrPNW5V2bhrBNtsKgFcn7",
   binanceUid: "1179819899",
   binanceNickname: "vin9",
@@ -19,6 +21,10 @@ export const OFFICIAL_CHANNELS = Object.freeze({
 export const BSC_RPC_ENDPOINTS = Object.freeze([
   "https://bsc-dataseed.binance.org",
   "https://bsc-dataseed1.defibit.io",
+]);
+
+export const SOLANA_RPC_ENDPOINTS = Object.freeze([
+  "https://api.mainnet-beta.solana.com",
 ]);
 
 export const ERC20_TRANSFER_TOPIC0 =
@@ -430,6 +436,173 @@ export async function verifyBscUsdtTxOnChain(
 }
 
 /**
+ * Pure, deterministic verifier for Solana SPL USDC transfers via `getTransaction` result.
+ * Validates `meta.err === null`, USDC mint, official Solana wallet owner, and 6-decimal net credit.
+ *
+ * @param {object} txResult
+ * @param {number} expectedAmountUsd
+ * @param {string} [expectedOwner]
+ * @param {{ tier?: string, tolerancePct?: number, signature?: string }} [options]
+ */
+export function verifySolanaUsdcTx(
+  txResult,
+  expectedAmountUsd,
+  expectedOwner = OFFICIAL_CHANNELS.solanaUsdc,
+  options = {}
+) {
+  if (!txResult || typeof txResult !== "object" || !txResult.meta) {
+    return { verified: false, reason: "Solana transaction payload is empty or invalid." };
+  }
+  if (txResult.meta.err !== null && txResult.meta.err !== undefined) {
+    return { verified: false, reason: "Solana transaction failed on-chain (meta.err !== null)." };
+  }
+  if (!Number.isFinite(Number(expectedAmountUsd)) || Number(expectedAmountUsd) <= 0) {
+    return { verified: false, reason: "Expected payment amount must be greater than 0." };
+  }
+
+  const targetOwner = String(expectedOwner || OFFICIAL_CHANNELS.solanaUsdc).trim();
+  const targetMint = OFFICIAL_CHANNELS.solanaUsdcMint;
+  const preList = Array.isArray(txResult.meta.preTokenBalances)
+    ? txResult.meta.preTokenBalances
+    : [];
+  const postList = Array.isArray(txResult.meta.postTokenBalances)
+    ? txResult.meta.postTokenBalances
+    : [];
+
+  const preByIndex = new Map();
+  for (const b of preList) {
+    if (b && b.mint === targetMint && b.owner === targetOwner && b.uiTokenAmount?.amount != null) {
+      preByIndex.set(b.accountIndex, BigInt(b.uiTokenAmount.amount));
+    }
+  }
+
+  let totalCreditedMicro = 0n;
+  for (const b of postList) {
+    if (!b || b.mint !== targetMint || b.owner !== targetOwner || b.uiTokenAmount?.amount == null) {
+      continue;
+    }
+    const postAmt = BigInt(b.uiTokenAmount.amount);
+    const preAmt = preByIndex.get(b.accountIndex) ?? 0n;
+    if (postAmt > preAmt) {
+      totalCreditedMicro += postAmt - preAmt;
+    }
+  }
+
+  if (totalCreditedMicro === 0n) {
+    return {
+      verified: false,
+      reason: `No SPL USDC credit to official Solana wallet ${targetOwner} found in this transaction.`,
+    };
+  }
+
+  const expectedMicro = BigInt(Math.round(Number(expectedAmountUsd) * 1_000_000));
+  const tolerancePct = typeof options.tolerancePct === "number" ? options.tolerancePct : 0.005;
+  const bpsKeep = BigInt(Math.max(0, Math.round((1 - tolerancePct) * 10000)));
+  const minRequiredMicro = (expectedMicro * bpsKeep) / 10000n;
+
+  if (totalCreditedMicro < minRequiredMicro) {
+    const received = Number(totalCreditedMicro) / 1_000_000;
+    return {
+      verified: false,
+      reason: `Insufficient USDC amount (${received.toFixed(2)} USDC received, expected $${Number(expectedAmountUsd).toFixed(2)}).`,
+    };
+  }
+
+  const amountUsd = Number(totalCreditedMicro) / 1_000_000;
+  const tier = inferTierFromAmount(Number(expectedAmountUsd), options.tier);
+  const sig = String(
+    options.signature || txResult.transaction?.signatures?.[0] || ""
+  ).trim();
+  const seed = `${tier}|SOL|${sig}|${totalCreditedMicro.toString()}`;
+  const licenseKey = generateLicenseKey(tier, seed);
+
+  return {
+    verified: true,
+    amountUsd,
+    amountMicro: totalCreditedMicro.toString(),
+    txHash: sig,
+    to: targetOwner,
+    token: "USDC-SOLANA",
+    mint: targetMint,
+    tier,
+    licenseKey,
+  };
+}
+
+/**
+ * Fetches Solana transaction via JSON-RPC `getTransaction` and verifies SPL USDC payment.
+ */
+export async function verifySolanaUsdcTxOnChain(
+  signature,
+  expectedAmountUsd,
+  options = {}
+) {
+  const cleanSig = String(signature || "").trim();
+  if (!/^[1-9A-HJ-NP-Za-km-z]{64,92}$/.test(cleanSig)) {
+    return {
+      verified: false,
+      reason: "Invalid Solana transaction signature format (base58 string expected).",
+    };
+  }
+
+  const fetchImpl = options.fetchImpl || globalThis.fetch;
+  if (typeof fetchImpl !== "function") {
+    return { verified: false, reason: "Fetch API is unavailable in this environment." };
+  }
+
+  const endpoints =
+    Array.isArray(options.endpoints) && options.endpoints.length > 0
+      ? options.endpoints
+      : SOLANA_RPC_ENDPOINTS;
+
+  let lastError = null;
+  for (const endpoint of endpoints) {
+    try {
+      const response = await fetchImpl(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "getTransaction",
+          params: [cleanSig, { encoding: "jsonParsed", maxSupportedTransactionVersion: 0 }],
+        }),
+      });
+      if (!response.ok) {
+        lastError = `Solana RPC HTTP ${response.status}`;
+        continue;
+      }
+      const payload = await response.json();
+      if (payload && payload.error) {
+        lastError = payload.error.message || "Solana RPC error";
+        continue;
+      }
+      if (!payload || payload.result === null || payload.result === undefined) {
+        return {
+          verified: false,
+          pending: true,
+          reason:
+            "Transaction is not finalized yet on Solana mainnet. Wait a few seconds and retry.",
+        };
+      }
+      return verifySolanaUsdcTx(
+        payload.result,
+        expectedAmountUsd,
+        options.expectedToAddress || OFFICIAL_CHANNELS.solanaUsdc,
+        { ...options, signature: cleanSig }
+      );
+    } catch (err) {
+      lastError = err && err.message ? err.message : "Network error";
+    }
+  }
+
+  return {
+    verified: false,
+    reason: `Unable to reach Solana RPC nodes (${lastError || "connection failed"}). Retry or email signature to ${OFFICIAL_CHANNELS.supportEmail}.`,
+  };
+}
+
+/**
  * Builds the official PayPal.com checkout redirect URL targeting min4444st@gmail.com.
  * @param {{ itemName: string, amountUsd: number|string, sku?: string, businessEmail?: string, currencyCode?: string }} params
  * @returns {string}
@@ -677,6 +850,7 @@ function ensureCheckoutModalElement() {
 
       <div class="fs-tabs" role="tablist" aria-label="Payment Methods">
         <button type="button" class="fs-tab is-active" data-pay-tab="bep20">USDT (BEP20 Auto)</button>
+        <button type="button" class="fs-tab" data-pay-tab="solana">USDC (Solana Auto)</button>
         <button type="button" class="fs-tab" data-pay-tab="trc20">USDT (TRC20)</button>
         <button type="button" class="fs-tab" data-pay-tab="binance">Binance Pay</button>
         <button type="button" class="fs-tab" data-pay-tab="paypal">PayPal</button>
@@ -710,6 +884,35 @@ function ensureCheckoutModalElement() {
               <button type="button" class="fs-btn fs-btn-primary" id="fsVerifyBscBtn">Verify On-Chain &amp; Unlock</button>
             </div>
             <div id="fsVerifyStatus" class="fs-status-msg" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <!-- SOLANA USDC AUTO VERIFY -->
+        <div class="fs-tab-panel" data-pay-panel="solana">
+          <div class="fs-notice fs-notice-info">
+            <strong>Instant Solana Auto-Verification:</strong> Send exact <strong>USDC (SPL)</strong> on <strong>Solana Mainnet</strong>, then paste your Transaction Signature below to verify via Solana RPC and unlock immediately.
+          </div>
+          <div class="fs-pay-grid">
+            <div class="fs-qr-box" id="fsQrSolana"></div>
+            <div class="fs-pay-details">
+              <div class="fs-field-label">Network &amp; Token</div>
+              <div class="fs-mono-chip">Solana Mainnet · SPL USDC (${OFFICIAL_CHANNELS.solanaUsdcMint.slice(0, 6)}...)</div>
+              <div class="fs-field-label">Official Solana Address</div>
+              <div class="fs-copy-row">
+                <code class="fs-code-val" id="fsSolanaAddr">${OFFICIAL_CHANNELS.solanaUsdc}</code>
+                <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-copy-val="${OFFICIAL_CHANNELS.solanaUsdc}">Copy</button>
+              </div>
+              <div class="fs-field-label">Amount to Send</div>
+              <div class="fs-mono-chip" id="fsSolanaAmount">15.00 USDC</div>
+            </div>
+          </div>
+          <div class="fs-verify-box">
+            <label for="fsSolTxSig" class="fs-field-label">Paste Solana Transaction Signature (Base58)</label>
+            <div class="fs-input-row">
+              <input id="fsSolTxSig" type="text" class="fs-input" placeholder="5x... (Solana tx signature)" spellcheck="false" autocomplete="off">
+              <button type="button" class="fs-btn fs-btn-primary" id="fsVerifySolBtn">Verify Solana Tx &amp; Unlock</button>
+            </div>
+            <div id="fsVerifySolStatus" class="fs-status-msg" aria-live="polite"></div>
           </div>
         </div>
 
@@ -858,6 +1061,7 @@ export function openCheckoutModal(sku = "CB", options = {}) {
   modal.querySelector("#fsCheckoutSubtitle").textContent = product.tagline;
   modal.querySelector("#fsCheckoutPrice").textContent = `$${product.priceUsd}`;
   modal.querySelector("#fsBep20Amount").textContent = `${product.priceUsd.toFixed(2)} USDT`;
+  modal.querySelector("#fsSolanaAmount").textContent = `${product.priceUsd.toFixed(2)} USDC`;
   modal.querySelector("#fsTrc20Amount").textContent = `${product.priceUsd.toFixed(2)} USDT`;
   modal.querySelector("#fsBinanceAmount").textContent = `${product.priceUsd.toFixed(2)} USDT`;
 
@@ -866,6 +1070,11 @@ export function openCheckoutModal(sku = "CB", options = {}) {
     size: 136,
     margin: 2,
     label: "USDT BEP20 Address QR",
+  });
+  modal.querySelector("#fsQrSolana").innerHTML = renderQrSvg(OFFICIAL_CHANNELS.solanaUsdc, {
+    size: 136,
+    margin: 2,
+    label: "Solana USDC Address QR",
   });
   modal.querySelector("#fsQrTrc20").innerHTML = renderQrSvg(OFFICIAL_CHANNELS.usdtTrc20, {
     size: 136,
@@ -1081,6 +1290,41 @@ export function openCheckoutModal(sku = "CB", options = {}) {
       if (result.verified) {
         statusEl.className = "fs-status-msg is-success";
         statusEl.textContent = `Confirmed ${result.amountUsd.toFixed(2)} USDT-BEP20! License issued.`;
+        const saved = saveVerifiedLicense({
+          key: result.licenseKey,
+          txHash: result.txHash,
+          token: result.token,
+          amountUsd: result.amountUsd,
+        });
+        if (modal._onShowUnlocked) modal._onShowUnlocked(saved);
+      } else {
+        statusEl.className = "fs-status-msg is-error";
+        statusEl.textContent = result.reason;
+      }
+    });
+
+    modal.querySelector("#fsVerifySolBtn").addEventListener("click", async () => {
+      const currentSku = modal.dataset.activeSku || "CB";
+      const activeProduct = PRODUCTS[currentSku] || PRODUCTS.CB;
+      const sig = modal.querySelector("#fsSolTxSig").value.trim();
+      const statusEl = modal.querySelector("#fsVerifySolStatus");
+      const btn = modal.querySelector("#fsVerifySolBtn");
+
+      btn.disabled = true;
+      btn.textContent = "Verifying on Solana...";
+      statusEl.className = "fs-status-msg is-loading";
+      statusEl.textContent = "Querying Solana RPC for SPL USDC transfer...";
+
+      const result = await verifySolanaUsdcTxOnChain(sig, activeProduct.priceUsd, {
+        tier: activeProduct.sku,
+      });
+
+      btn.disabled = false;
+      btn.textContent = "Verify Solana Tx & Unlock";
+
+      if (result.verified) {
+        statusEl.className = "fs-status-msg is-success";
+        statusEl.textContent = `Confirmed ${result.amountUsd.toFixed(2)} USDC-SOLANA! License issued.`;
         const saved = saveVerifiedLicense({
           key: result.licenseKey,
           txHash: result.txHash,
