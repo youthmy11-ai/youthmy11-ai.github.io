@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calldata Lens — Offline EVM ABI &amp; Token Approval Decoder</title>
+  <meta name="description" content="Free client-side Ethereum / BSC calldata decoder for ERC-20 transfers, infinite approvals, Permit2, ERC-4626 vaults, and Safe multisig payloads with zero RPC tracking.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/txdecode.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/txdecode.html">
+  <meta property="og:title" content="Calldata Lens — Offline EVM Calldata &amp; Approval Inspector">
+  <meta property="og:description" content="Inspect 4-byte selectors, infinite MAX_UINT256 approvals, and raw 32-byte ABI words locally before signing.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Calldata Lens — Offline EVM Calldata &amp; Approval Inspector">
+  <meta name="twitter:description" content="Zero-backend Ethereum &amp; BSC hex calldata decoder for engineers and Web3 auditors.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%238b5cf6'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='22' font-weight='800'%3E0x%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Calldata Lens",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "url": "https://youthmy11-ai.github.io/txdecode.html",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free offline EVM calldata and ERC-20 / ERC-4626 / Safe ABI payload inspector."
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="txdecode">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">0x</span>
+        <span>Calldata Lens</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill</a>
+        <a href="sowbuilder.html" class="fs-btn fs-btn-sm fs-btn-secondary">SOW Builder</a>
+        <a href="json2sheet.html" class="fs-btn fs-btn-sm fs-btn-secondary">JSON2Sheet</a>
+        <button type="button" id="txdBundleBtn" class="fs-btn fs-btn-sm fs-btn-primary">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 60px;">
+    <div class="fs-section-head" style="margin-bottom:20px;">
+      <div>
+        <span class="fs-badge fs-badge-accent">OFFLINE ABI PARSER · APPROVAL RISK GUARD · ZERO RPC LOGGING</span>
+        <h1 style="margin-top:10px;">EVM Calldata &amp; Token Approval Inspector</h1>
+        <p class="fs-lead" style="margin-top:6px;">
+          Decode raw hex payloads for ERC-20 transfers, <code>MAX_UINT256</code> approvals, EIP-2612 permits, ERC-4626 vaults, and Safe transactions locally in your browser before signing.
+        </p>
+      </div>
+    </div>
+
+    <div class="cb-workspace">
+      <section class="cb-editor-pane" aria-label="Hex Calldata Input">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Raw Transaction Hex Input</h2>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-txd-sample="usdt_transfer">USDT Transfer</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-txd-sample="max_approve">Max Approve</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-txd-sample="vault_deposit">4626 Deposit</button>
+            </div>
+          </div>
+          <label class="fs-field">
+            <span class="fs-field-label">Paste 0x hex calldata (4-byte selector + 32-byte ABI words)</span>
+            <textarea id="txdInputHex" class="fs-textarea" rows="8" spellcheck="false" placeholder="0xa9059cbb..."></textarea>
+          </label>
+          <div id="txdStatusMsg" style="margin-top:8px;font-size:0.88rem;"></div>
+        </div>
+
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h3>Web3 Freelance &amp; Security Workflow</h3>
+            <span class="fs-badge fs-badge-success">ALL-IN-ONE SUITE</span>
+          </div>
+          <p class="inv-muted" style="margin:6px 0 12px;">
+            Auditing smart contracts or delivering DeFi integrations? Draft milestone contracts in <strong>ScopeGuard SOW</strong>, invoice your review straight into <strong>CryptoBill Forge</strong>, or unlock all 3 Pro apps for <strong>$35 lifetime</strong>.
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="button" id="txdSendInvoiceBtn" class="fs-btn fs-btn-primary">Bill Security Review ($150) →</button>
+            <a href="sowbuilder.html" class="fs-btn fs-btn-secondary">Draft Audit SOW</a>
+            <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="BUNDLE">All-Access Bundle ($35)</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="cb-preview-pane" aria-label="Decoded Arguments">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Decoded Signature &amp; Slots</h2>
+            <span id="txdRiskBadge" class="fs-badge fs-badge-muted">READY</span>
+          </div>
+          <p style="margin:8px 0 14px;"><code id="txdSigLabel"></code></p>
+          <div style="overflow-x:auto;">
+            <table class="fs-table">
+              <thead>
+                <tr>
+                  <th>Slot</th>
+                  <th>Parameter</th>
+                  <th>Decoded Value</th>
+                  <th>Unit / Check</th>
+                </tr>
+              </thead>
+              <tbody id="txdArgsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="json2sheet.html">JSON2Sheet Lab</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="txdecode.html">Calldata Lens</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/txdecode.js"></script>
+</body>
+</html>

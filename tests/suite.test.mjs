@@ -43,6 +43,11 @@ import {
   renderSowMarkdown,
   SOW_PRESETS,
 } from "../assets/sowbuilder.js";
+import {
+  buildReviewInvoicePayload,
+  CALLDATA_SAMPLES,
+  decodeCalldata,
+} from "../assets/txdecode.js";
 
 function padAddressTopic(address) {
   return "0x" + "0".repeat(24) + address.replace(/^0x/i, "").toLowerCase();
@@ -745,4 +750,28 @@ test("computeSowTotals, renderSowMarkdown, and buildMilestoneInvoicePayload stay
   assert.equal(decoded.clientName, "Acme SaaS Labs Inc.");
   const totals = calculateInvoiceTotals(decoded.items, decoded.taxPercent, decoded.discountPercent);
   assert.equal(totals.grandTotal, 960);
+});
+
+/* ============================================================================
+ * 9. Calldata Lens EVM ABI & Approval Risk Decoder Tests
+ * ========================================================================== */
+
+test("decodeCalldata parses ERC-20 transfer, detects MAX_UINT256 approvals, and builds invoice payload", () => {
+  const tx = decodeCalldata(CALLDATA_SAMPLES.usdt_transfer);
+  assert.equal(tx.ok, true);
+  assert.equal(tx.selector, "0xa9059cbb");
+  assert.equal(tx.args[0].formatted, "0x0a1e9c96755a7962306cf2ca9a80113a61559852");
+  assert.match(tx.args[1].note, /18dp: 35/);
+
+  const inf = decodeCalldata(CALLDATA_SAMPLES.max_approve);
+  assert.equal(inf.ok, true);
+  assert.equal(inf.risk, "ALLOWANCE");
+  assert.match(inf.args[1].formatted, /MAX_UINT256/);
+  assert.match(inf.args[1].note, /UNLIMITED/);
+
+  assert.equal(decodeCalldata("not-hex").ok, false);
+
+  const inv = buildReviewInvoicePayload(tx);
+  const roundtrip = decodeInvoicePayload(encodeInvoicePayload(inv));
+  assert.equal(roundtrip.items[0].unitPrice, 150);
 });
