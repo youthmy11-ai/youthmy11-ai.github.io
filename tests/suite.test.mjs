@@ -48,6 +48,12 @@ import {
   CALLDATA_SAMPLES,
   decodeCalldata,
 } from "../assets/txdecode.js";
+import {
+  buildSanitizationInvoice,
+  ENVSHIELD_SAMPLES,
+  scanSecrets,
+  shannonEntropy,
+} from "../assets/envshield.js";
 
 function padAddressTopic(address) {
   return "0x" + "0".repeat(24) + address.replace(/^0x/i, "").toLowerCase();
@@ -774,4 +780,32 @@ test("decodeCalldata parses ERC-20 transfer, detects MAX_UINT256 approvals, and 
   const inv = buildReviewInvoicePayload(tx);
   const roundtrip = decodeInvoicePayload(encodeInvoicePayload(inv));
   assert.equal(roundtrip.items[0].unitPrice, 150);
+});
+
+/* ============================================================================
+ * 10. EnvShield Secret Leak Scanner & Safe Redactor Tests
+ * ========================================================================== */
+
+test("scanSecrets detects keys/URIs/private keys deterministically, masks previews, and builds invoice payload", () => {
+  const dirty = scanSecrets(ENVSHIELD_SAMPLES.agent_env);
+  assert.equal(dirty.totalFindings, 6);
+  assert.equal(dirty.criticalCount, 3);
+  assert.equal(dirty.highCount, 3);
+  assert.match(dirty.redactedText, /<REDACTED:OPENAI_KEY>/);
+  assert.match(dirty.redactedText, /<REDACTED:GITHUB_TOKEN>/);
+  assert.match(dirty.redactedText, /<REDACTED:EVM_PRIVATE_KEY>/);
+  assert.match(dirty.redactedText, /<REDACTED:DB_URI_CREDENTIALS>/);
+  assert.match(dirty.redactedText, /<REDACTED:TELEGRAM_BOT_TOKEN>/);
+  assert.match(dirty.redactedText, /<REDACTED:HIGH_ENTROPY_SECRET>/);
+  assert.doesNotMatch(dirty.redactedText, /4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318/);
+  assert.doesNotMatch(dirty.redactedText, /S3cur3Passw0rd/);
+
+  const clean = scanSecrets(ENVSHIELD_SAMPLES.clean_config);
+  assert.equal(clean.totalFindings, 0);
+  assert.ok(shannonEntropy("aaaaaaaaaa") === 0);
+  assert.ok(shannonEntropy("k9QmL8vX2pR7nW4zJ6cT1bY5hF3sD0aG") > 4.0);
+
+  const inv = buildSanitizationInvoice(dirty);
+  const roundtrip = decodeInvoicePayload(encodeInvoicePayload(inv));
+  assert.equal(roundtrip.items[0].unitPrice, 95);
 });

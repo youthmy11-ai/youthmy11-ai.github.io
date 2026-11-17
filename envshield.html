@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EnvShield — Offline .env, API Key &amp; Private Key Leak Scanner</title>
+  <meta name="description" content="Free offline client-side .env, JSON, and AI transcript secret scanner. Detect and redact OpenAI, Anthropic, GitHub, AWS, EVM private keys, and DB URIs locally with zero server uploads.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/envshield.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/envshield.html">
+  <meta property="og:title" content="EnvShield — Offline Secret Leak Scanner &amp; Redactor">
+  <meta property="og:description" content="Catch leaked API keys, private keys, JWTs, and database credentials in browser memory before pasting into chat or GitHub.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="EnvShield — Offline Secret Leak Scanner &amp; Redactor">
+  <meta name="twitter:description" content="100% browser-side .env &amp; private key redactor for developers, Web3 engineers, and AI builders.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310b981'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23090d16' font-family='sans-serif' font-size='22' font-weight='800'%3E**%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "EnvShield",
+    "applicationCategory": "SecurityApplication",
+    "operatingSystem": "Web",
+    "url": "https://youthmy11-ai.github.io/envshield.html",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free offline browser secret scanner and redactor for .env files, JSON configs, and private keys."
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="envshield">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">ES</span>
+        <span>EnvShield</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill</a>
+        <a href="txdecode.html" class="fs-btn fs-btn-sm fs-btn-secondary">Calldata Lens</a>
+        <a href="json2sheet.html" class="fs-btn fs-btn-sm fs-btn-secondary">JSON2Sheet</a>
+        <button type="button" id="envBundleBtn" class="fs-btn fs-btn-sm fs-btn-primary">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 60px;">
+    <div class="fs-section-head" style="margin-bottom:20px;">
+      <div>
+        <span class="fs-badge fs-badge-success">100% BROWSER MEMORY · ZERO NETWORK UPLOADS · SECRET GUARD</span>
+        <h1 style="margin-top:10px;">Offline <code>.env</code>, API Key &amp; Private Key Leak Scanner</h1>
+        <p class="fs-lead" style="margin-top:6px;">
+          Scan config files, LLM transcripts, JSON dumps, or Git diffs locally before sharing. Automatically detects API keys, EVM hex private keys, mnemonics, JWTs, and database passwords — and produces safely redacted text in one click.
+        </p>
+      </div>
+    </div>
+
+    <div class="cb-workspace">
+      <section class="cb-editor-pane" aria-label="Raw Config Input">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Paste Raw Config, Logs or <code>.env</code></h2>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-env-sample="agent_env">Sample Leaked .env</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-env-sample="clean_config">Clean Public Config</button>
+            </div>
+          </div>
+          <label class="fs-field">
+            <span class="fs-field-label">Raw text scanned purely inside your browser tab</span>
+            <textarea id="envInputText" class="fs-textarea" rows="10" spellcheck="false" placeholder="OPENAI_API_KEY=..."></textarea>
+          </label>
+          <div id="envStatusMsg" style="margin-top:8px;font-size:0.88rem;"></div>
+        </div>
+
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Detected Secret Signatures</h2>
+            <span id="envSummaryBadge" class="fs-badge fs-badge-muted">READY</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="fs-table">
+              <thead>
+                <tr>
+                  <th>Line</th>
+                  <th>Detector</th>
+                  <th>Severity</th>
+                  <th>Masked Sample</th>
+                </tr>
+              </thead>
+              <tbody id="envFindingsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="cb-preview-pane" aria-label="Sanitized Output">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>3. Safely Redacted Output</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button type="button" id="envCopyRedactedBtn" class="fs-btn fs-btn-sm fs-btn-primary">Copy Redacted Output</button>
+              <button type="button" id="envDownloadRedactedBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Download .txt</button>
+            </div>
+          </div>
+          <label class="fs-field">
+            <span class="fs-field-label">Safe to paste into GitHub issues, bug reports, or AI prompts</span>
+            <textarea id="envRedactedOut" class="fs-textarea" rows="13" readonly spellcheck="false"></textarea>
+          </label>
+        </div>
+
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h3>DevSecOps &amp; Security Billing Workflow</h3>
+            <span class="fs-badge fs-badge-success">ALL-IN-ONE SUITE</span>
+          </div>
+          <p class="inv-muted" style="margin:6px 0 12px;">
+            Doing secret hygiene audits or DevSecOps hardening for clients? Draft scope milestones in <strong>ScopeGuard SOW</strong>, invoice your engagement straight into <strong>CryptoBill Forge</strong>, or unlock all Pro tools for <strong>$35 lifetime</strong>.
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="button" id="envSendInvoiceBtn" class="fs-btn fs-btn-primary">Invoice Hygiene Audit ($95) →</button>
+            <a href="sowbuilder.html" class="fs-btn fs-btn-secondary">Draft Security SOW</a>
+            <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="BUNDLE">All-Access Bundle ($35)</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="json2sheet.html">JSON2Sheet Lab</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="txdecode.html">Calldata Lens</a>
+        <a href="envshield.html">EnvShield</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/envshield.js"></script>
+</body>
+</html>
