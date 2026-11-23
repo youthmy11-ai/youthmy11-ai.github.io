@@ -1,0 +1,36 @@
+# ForgeSuite Studio
+
+> Zero-backend, privacy-first micro-SaaS and developer tool portfolio by youthmy11-ai. Offers 6 free 100% client-side web applications, 2 open-core desktop/browser tools (AutoShorts Studio and WebLead & Table Extractor), and an All-Access Lifetime Pro Bundle ($15–$49 pricing, zero subscriptions, zero server uploads) with instant client-side on-chain BSC USDT (BEP20) and Solana SPL USDC auto-unlock plus TRC20, Binance Pay, and PayPal checkout.
+
+ForgeSuite Studio is designed for solo founders, independent freelancers, AI engineers, content creators, and Web3 builders who want fast local-first software without recurring subscriptions or cloud tracking.
+
+- **Offline Privacy Guarantee**: All 6 web applications run 100% in local browser memory with zero backend servers, zero analytics, and zero data uploads. QR codes are rendered offline via pure ES module JavaScript (`assets/qr.js`), and CryptoBill invoices share state via client-only `#inv=` URL fragments.
+- **Transparent Lifetime Pricing**: 6 web utilities are free to use immediately; Pro lifetime licenses are $15 (CryptoBill Forge Pro), $19 (AutoShorts Studio Pro), $15 (WebLead & Table Extractor Pro), or $35 for the All-Access Bundle (compare at $49, save $14).
+- **Instant Crypto & PayPal Checkout**: Automatic client-side RPC verification on BNB Smart Chain (`USDT BEP20`) and Solana Mainnet (`SPL USDC`) issues deterministic checksummed offline license keys (`FS-PRO-...`) in seconds. Manual rails (`USDT TRC20`, `Binance Pay`, `PayPal`) are supported via `youthmy11@gmail.com`.
+
+## Live Browser Applications (100% Client-Side)
+
+- [ForgeSuite Studio Hub & Storefront](https://youthmy11-ai.github.io/): Catalog of all 9 tools and bundle offerings, interactive CryptoBill QR sandbox, transparent pricing table, and instant on-chain license verifier.
+- [CryptoBill Forge](https://youthmy11-ai.github.io/cryptobill.html): Free + $15 Pro lifetime serverless crypto & PayPal freelance invoice builder with A4 PDF export, deterministic offline QR codes, and shareable `#inv=` client payment links.
+- [TokenCost Lab](https://youthmy11-ai.github.io/tokencalc.html): Free ($0) offline LLM token counter and monthly AI agent API budget calculator comparing 7 frontier models (GPT-5, Claude 4.5, Gemini 2.5, DeepSeek V3) with 1-click CryptoBill quote export.
+- [JSON2Sheet & PII Masker](https://youthmy11-ai.github.io/json2sheet.html): Free ($0) offline nested JSON flattener to RFC-4180 CSV, TSV, and GitHub Markdown tables with Excel formula-injection protection and instant email/IP/token PII redaction.
+- [ScopeGuard SOW Builder](https://youthmy11-ai.github.io/sowbuilder.html): Free ($0) offline freelance, AI engineering, and Web3 audit Statement of Work generator with 100%-balanced milestone splits and 1-click CryptoBill USDT invoicing.
+- [Calldata Lens](https://youthmy11-ai.github.io/txdecode.html): Free ($0) offline Ethereum & BSC EVM hex calldata decoder for ERC-20 transfers, infinite `MAX_UINT256` approval risk alerts, EIP-2612 permits, ERC-4626 vaults, and Safe multisig payloads.
+- [EnvShield Secret Scanner](https://youthmy11-ai.github.io/envshield.html): Free ($0) offline `.env`, JSON, and AI transcript secret scanner & redactor detecting OpenAI, Anthropic, GitHub, AWS, Telegram, JWT, DB URI passwords, EVM private keys, and high-entropy credentials.
+
+## Open-Core Packaged Tools & Lifetime Bundle
+
+- [AutoShorts Studio](https://github.com/youthmy11-ai/autoshorts-studio): Free MIT Community Edition + $19 Pro lifetime Python/FFmpeg desktop GUI & CLI for 9:16/16:9/1:1 batch short-form video assembly, SHA-256 SQLite deduplication, beat-milestone audio trimming, and beat-synced `.srt` subtitles.
+- [WebLead & Table Extractor](https://github.com/youthmy11-ai/weblead-extractor): Free MIT Lite Edition + $15 Pro lifetime privacy-first Chrome Manifest V3 extension extracting HTML tables, ARIA grids, Schema.org JSON-LD entities, public emails, and links to RFC-4180 CSV, JSON, and Markdown.
+- [All-Access Creator & Freelancer Bundle](https://youthmy11-ai.github.io/#pricing): $35 lifetime all-access license key (compare at $49, save $14) unlocking CryptoBill Forge Pro ($15), AutoShorts Studio Pro ($19), and WebLead & Table Extractor Pro ($15).
+
+## Reference & Machine-Readable Documentation
+
+- [Full Portfolio Documentation (llms-full.txt)](https://youthmy11-ai.github.io/llms-full.txt): Complete self-contained technical specification of all 9 offerings, pricing tiers, CLI/extension instructions, privacy guarantees, and instant crypto/PayPal checkout endpoints.
+- [XML Sitemap](https://youthmy11-ai.github.io/sitemap.xml): Complete index of live web pages and machine-readable metadata.
+
+## Optional
+
+- [GitHub Profile (youthmy11-ai)](https://github.com/youthmy11-ai): Source repositories, tagged releases, and automated test suites.
+- [MIT License](https://github.com/youthmy11-ai/youthmy11-ai.github.io/blob/main/LICENSE): Open-source storefront and community edition license terms.
+- [Support & License Verification](mailto:youthmy11@gmail.com): Direct support for PayPal, USDT TRC20, Binance Pay receipts, and desktop/extension Pro packages.

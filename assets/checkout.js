@@ -21,9 +21,12 @@ export const OFFICIAL_CHANNELS = Object.freeze({
 export const BSC_RPC_ENDPOINTS = Object.freeze([
   "https://bsc-dataseed.binance.org",
   "https://bsc-dataseed1.defibit.io",
+  "https://bsc-rpc.publicnode.com",
 ]);
 
 export const SOLANA_RPC_ENDPOINTS = Object.freeze([
+  "https://solana-rpc.publicnode.com",
+  "https://api.zan.top/solana-mainnet",
   "https://api.mainnet-beta.solana.com",
 ]);
 
@@ -389,6 +392,7 @@ export async function verifyBscUsdtTxOnChain(
       : BSC_RPC_ENDPOINTS;
 
   let lastError = null;
+  let sawNullResult = false;
   for (const endpoint of endpoints) {
     try {
       const response = await fetchImpl(endpoint, {
@@ -411,12 +415,8 @@ export async function verifyBscUsdtTxOnChain(
         continue;
       }
       if (!payload || payload.result === null || payload.result === undefined) {
-        return {
-          verified: false,
-          pending: true,
-          reason:
-            "Transaction is not indexed or still pending confirmation on BSC. Wait ~5–10 seconds and try again.",
-        };
+        sawNullResult = true;
+        continue;
       }
       return verifyBscUsdtReceipt(
         payload.result,
@@ -429,6 +429,15 @@ export async function verifyBscUsdtTxOnChain(
     }
   }
 
+  if (sawNullResult) {
+    return {
+      verified: false,
+      pending: true,
+      reason:
+        "Transaction is not indexed or still pending confirmation on BSC. Wait ~5–10 seconds and try again.",
+    };
+  }
+
   return {
     verified: false,
     reason: `Unable to reach BSC RPC nodes (${lastError || "connection failed"}). Please retry or email your TxHash to ${OFFICIAL_CHANNELS.supportEmail}.`,
@@ -438,6 +447,7 @@ export async function verifyBscUsdtTxOnChain(
 /**
  * Pure, deterministic verifier for Solana SPL USDC transfers via `getTransaction` result.
  * Validates `meta.err === null`, USDC mint, official Solana wallet owner, and 6-decimal net credit.
+ * Handles newly created destination ATAs (absent from `preTokenBalances`) and prevents self-transfer inflation.
  *
  * @param {object} txResult
  * @param {number} expectedAmountUsd
@@ -469,24 +479,34 @@ export function verifySolanaUsdcTx(
     ? txResult.meta.postTokenBalances
     : [];
 
-  const preByIndex = new Map();
+  let totalPreMicro = 0n;
   for (const b of preList) {
-    if (b && b.mint === targetMint && b.owner === targetOwner && b.uiTokenAmount?.amount != null) {
-      preByIndex.set(b.accountIndex, BigInt(b.uiTokenAmount.amount));
+    if (
+      b &&
+      b.mint === targetMint &&
+      b.owner === targetOwner &&
+      b.uiTokenAmount?.amount != null &&
+      /^\d+$/.test(String(b.uiTokenAmount.amount))
+    ) {
+      totalPreMicro += BigInt(b.uiTokenAmount.amount);
     }
   }
 
-  let totalCreditedMicro = 0n;
+  let totalPostMicro = 0n;
   for (const b of postList) {
-    if (!b || b.mint !== targetMint || b.owner !== targetOwner || b.uiTokenAmount?.amount == null) {
-      continue;
-    }
-    const postAmt = BigInt(b.uiTokenAmount.amount);
-    const preAmt = preByIndex.get(b.accountIndex) ?? 0n;
-    if (postAmt > preAmt) {
-      totalCreditedMicro += postAmt - preAmt;
+    if (
+      b &&
+      b.mint === targetMint &&
+      b.owner === targetOwner &&
+      b.uiTokenAmount?.amount != null &&
+      /^\d+$/.test(String(b.uiTokenAmount.amount))
+    ) {
+      totalPostMicro += BigInt(b.uiTokenAmount.amount);
     }
   }
+
+  const totalCreditedMicro =
+    totalPostMicro > totalPreMicro ? totalPostMicro - totalPreMicro : 0n;
 
   if (totalCreditedMicro === 0n) {
     return {
@@ -502,9 +522,13 @@ export function verifySolanaUsdcTx(
 
   if (totalCreditedMicro < minRequiredMicro) {
     const received = Number(totalCreditedMicro) / 1_000_000;
+    const receivedStr =
+      received > 0 && received < 0.01
+        ? received.toFixed(6).replace(/0+$/, "")
+        : received.toFixed(2);
     return {
       verified: false,
-      reason: `Insufficient USDC amount (${received.toFixed(2)} USDC received, expected $${Number(expectedAmountUsd).toFixed(2)}).`,
+      reason: `Insufficient USDC amount (${receivedStr} USDC received, expected $${Number(expectedAmountUsd).toFixed(2)}).`,
     };
   }
 
@@ -530,7 +554,8 @@ export function verifySolanaUsdcTx(
 }
 
 /**
- * Fetches Solana transaction via JSON-RPC `getTransaction` and verifies SPL USDC payment.
+ * Fetches Solana transaction via CORS-enabled JSON-RPC `getTransaction` with automatic multi-node fallback
+ * and verifies SPL USDC payment.
  */
 export async function verifySolanaUsdcTxOnChain(
   signature,
@@ -556,6 +581,7 @@ export async function verifySolanaUsdcTxOnChain(
       : SOLANA_RPC_ENDPOINTS;
 
   let lastError = null;
+  let sawNullResult = false;
   for (const endpoint of endpoints) {
     try {
       const response = await fetchImpl(endpoint, {
@@ -565,7 +591,14 @@ export async function verifySolanaUsdcTxOnChain(
           jsonrpc: "2.0",
           id: 1,
           method: "getTransaction",
-          params: [cleanSig, { encoding: "jsonParsed", maxSupportedTransactionVersion: 0 }],
+          params: [
+            cleanSig,
+            {
+              encoding: "jsonParsed",
+              commitment: "confirmed",
+              maxSupportedTransactionVersion: 0,
+            },
+          ],
         }),
       });
       if (!response.ok) {
@@ -578,12 +611,8 @@ export async function verifySolanaUsdcTxOnChain(
         continue;
       }
       if (!payload || payload.result === null || payload.result === undefined) {
-        return {
-          verified: false,
-          pending: true,
-          reason:
-            "Transaction is not finalized yet on Solana mainnet. Wait a few seconds and retry.",
-        };
+        sawNullResult = true;
+        continue;
       }
       return verifySolanaUsdcTx(
         payload.result,
@@ -594,6 +623,15 @@ export async function verifySolanaUsdcTxOnChain(
     } catch (err) {
       lastError = err && err.message ? err.message : "Network error";
     }
+  }
+
+  if (sawNullResult) {
+    return {
+      verified: false,
+      pending: true,
+      reason:
+        "Transaction is not confirmed or indexed yet on Solana mainnet. Wait a few seconds and retry.",
+    };
   }
 
   return {
@@ -1097,10 +1135,15 @@ export function openCheckoutModal(sku = "CB", options = {}) {
 
   // Reset status banners
   const verifyStatus = modal.querySelector("#fsVerifyStatus");
+  const verifySolStatus = modal.querySelector("#fsVerifySolStatus");
   const keyStatus = modal.querySelector("#fsKeyStatus");
   const unlockBox = modal.querySelector("#fsUnlockSuccess");
   verifyStatus.textContent = "";
   verifyStatus.className = "fs-status-msg";
+  if (verifySolStatus) {
+    verifySolStatus.textContent = "";
+    verifySolStatus.className = "fs-status-msg";
+  }
   keyStatus.textContent = "";
   keyStatus.className = "fs-status-msg";
   unlockBox.hidden = true;

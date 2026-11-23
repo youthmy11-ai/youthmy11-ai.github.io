@@ -1,0 +1,147 @@
+# ForgeSuite Studio — Full Portfolio Reference (`llms-full.txt`)
+
+> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 9 catalog offerings (6 live client-side web apps, 2 open-core packaged GitHub tools, and 1 All-Access Lifetime Bundle), transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict offline privacy guarantees, and zero-backend crypto + PayPal checkout.
+
+---
+
+## 1. Architecture & Offline Privacy Guarantees
+
+ForgeSuite Studio is engineered as a **zero-backend, local-first software suite** hosted on static GitHub Pages (`https://youthmy11-ai.github.io/`) and open-source GitHub repositories (`https://github.com/youthmy11-ai`):
+
+1. **Zero Data Uploads & Zero Telemetry**: All 6 web tools execute purely inside local browser memory (`HTML5 + ES Modules`). No prompts, invoices, API payloads, contracts, EVM calldata, or `.env` secrets are ever transmitted to any ForgeSuite server.
+2. **Offline Pure-JS QR Generation (`assets/qr.js`)**: Every payment QR code across the storefront and CryptoBill Forge is generated deterministically in-browser using a custom ISO/IEC 18004 Version 1–10 pure JavaScript encoder with zero external QR image APIs.
+3. **Serverless URL-Fragment Sharing (`#inv=`)**: CryptoBill Forge encodes shareable client invoices directly into UTF-8 Base64URL hash fragments (`#inv=...`) so clients can inspect read-only A4 invoices and scan payment QR codes without any database.
+4. **Deterministic Offline License Keys (`FS-PRO-...`)**: Pro licenses use a shared 4-hex-digit FNV-1a 32-bit folded checksum (`^FS-PRO-(CB|AS|WL|BUNDLE)-[A-Z0-9]{8}-[0-9A-F]{4}$`) verified 100% offline across the web storefront, AutoShorts Studio (Python), and WebLead Extractor (Chrome MV3).
+
+---
+
+## 2. Pricing Matrix (One-Time Lifetime — No Subscriptions)
+
+| # | Product / Offering | Platform | Free / Community Tier | Pro Lifetime Price | SKU |
+| :-: | :--- | :--- | :--- | :---: | :---: |
+| 1 | **CryptoBill Forge** | Live Web App (`cryptobill.html`) | Full A4 PDF, offline QR, `#inv=` links (up to 3 line items, 2 templates) | **$15** | `CB` |
+| 2 | **AutoShorts Studio** | Windows/macOS/Linux Python GUI + CLI | MIT Community Edition (unlimited SHA-256 dedup, beat slicer, up to 5 outputs/run) | **$19** | `AS` |
+| 3 | **WebLead & Table Extractor** | Chrome/Edge/Brave MV3 Extension | MIT Lite Edition (HTML/ARIA/JSON-LD tables, emails, Markdown, up to 25 rows/table) | **$15** | `WL` |
+| 4 | **All-Access Creator & Freelancer Bundle** | Universal Lifetime Key (`CB + AS + WL`) | Access all Free & Community releases | **$35** *(Compare at $49 · Save $14)* | `BUNDLE` |
+| 5 | **TokenCost Lab** | Live Web App (`tokencalc.html`) | 100% Free ($0) — 7 frontier models, prompt-cache math, CryptoBill quote handoff | **$0** | Free |
+| 6 | **JSON2Sheet & PII Masker** | Live Web App (`json2sheet.html`) | 100% Free ($0) — nested JSON to CSV/TSV/Markdown, formula guard, PII redaction | **$0** | Free |
+| 7 | **ScopeGuard SOW Builder** | Live Web App (`sowbuilder.html`) | 100% Free ($0) — AI/Web3/Chrome SOW templates, milestone splits, CryptoBill export | **$0** | Free |
+| 8 | **Calldata Lens** | Live Web App (`txdecode.html`) | 100% Free ($0) — offline EVM ABI decoder & `MAX_UINT256` approval risk alerts | **$0** | Free |
+| 9 | **EnvShield Secret Scanner** | Live Web App (`envshield.html`) | 100% Free ($0) — 13 secret detectors + Shannon entropy scanner & 1-click redactor | **$0** | Free |
+
+---
+
+## 3. Detailed Tool Specifications
+
+### 3.1 CryptoBill Forge (`https://youthmy11-ai.github.io/cryptobill.html`)
+- **Category**: BusinessApplication (Web)
+- **Pricing**: Free Tier ($0) + Pro Lifetime License ($15, SKU `CB`)
+- **Capabilities**:
+  - A4 print-ready invoice layout (`@media print` to PDF) with live editor preview and automatic `localStorage` draft saving.
+  - Supports USD, EUR, and USDT currency formatting, line-item quantity/price math, percentage discounts, and tax calculation.
+  - Multi-rail freelancer receiving config: USDT (BEP20/BSC), USDT (TRC20/TRON), PayPal Direct URL, and Binance Pay ID with offline SVG/PNG QR generation.
+  - Read-only Client Payment View via serverless `#inv=<base64url>` shareable URLs.
+  - JSON export/import backup of single invoices or bulk templates.
+  - **Pro Unlocks ($15 Lifetime)**: Unlimited line items (Free caps at 3), unlimited saved templates (Free caps at 2), white-label PDF (remove footer badge), custom brand accent color & monogram, and bulk batch JSON template presets.
+
+### 3.2 AutoShorts Studio (`https://github.com/youthmy11-ai/autoshorts-studio`)
+- **Category**: MultimediaApplication (Windows, macOS, Linux — Python 3.10+ & FFmpeg)
+- **Pricing**: MIT Community Edition ($0) + Pro Lifetime License ($19, SKU `AS`)
+- **Capabilities**:
+  - Content-addressed **SQLite WAL SHA-256 deduplication** ensures source media clips are never recycled across batch runs.
+  - **Beat-milestone audio slicer** (`MM:SS`, `HH:MM:SS`, seconds, or cumulative durations) with fade-in/fade-out envelopes and montage synchronization.
+  - **Beat-synced SubRip (`.srt`) subtitle generator** (`python -m autoshorts_studio.cli subtitles-srt`) aligning caption lines directly to beat timestamps.
+  - **Multi-aspect FFmpeg render pipeline**: `9:16` (`1080x1920` blurred ambient pillarbox or smart crop), `16:9` (`1920x1080`), `1:1` (`1080x1080`), smooth Ken Burns motion for static images, and optional EBU R128 (`-14 LUFS`) loudness normalization.
+  - Includes dark-slate Tkinter Desktop GUI (`launch_studio.bat` / `python -m autoshorts_studio.gui`) and scriptable CLI (`scan`, `build`, `slice-audio`, `subtitles-srt`, `check-license`).
+  - **Pro Unlocks ($19 Lifetime)**: Simultaneous multi-preset rendering, custom brand watermark overlay hook, and batch queue limit raised from 5 to 500 outputs/run.
+
+### 3.3 WebLead & Table Extractor (`https://github.com/youthmy11-ai/weblead-extractor`)
+- **Category**: BrowserApplication (Chrome, Edge, Brave Manifest V3 Extension)
+- **Pricing**: MIT Lite Edition ($0) + Pro Lifetime License ($15, SKU `WL`)
+- **Capabilities**:
+  - Minimal permissions (`activeTab` + on-demand `scripting` only when clicked); zero remote servers, zero persistent background scripts, zero DOM mutation.
+  - Extracts standard HTML `<table>` elements (expanding `colspan` and `rowspan` cleanly), modern ARIA `[role="table"]` / `[role="grid"]` widgets, and embedded `<script type="application/ld+json">` Schema.org entities (`Organization`, `LocalBusiness`, `@graph`).
+  - Deduplicates public `mailto:` and plain-text emails (automatically rejecting retina asset false positives like `logo@2x.png`), phone candidates, and social/website links.
+  - Exports strict RFC-4180 CSV (with optional UTF-8 BOM for Excel international text), JSON, and GitHub-Flavored Markdown (`Copy MD`).
+  - **Pro Unlocks ($15 Lifetime)**: Unlimited exported rows per table (Lite caps at 25 rows), live regex row filtering, and offline key activation (`FS-PRO-WL-...` / `FS-PRO-BUNDLE-...`).
+
+### 3.4 All-Access Creator & Freelancer Bundle (`https://youthmy11-ai.github.io/#pricing`)
+- **Pricing**: **$35 Lifetime** (Compare at $49 individual total — Save $14, SKU `BUNDLE`).
+- **Scope**: Issues one universal `FS-PRO-BUNDLE-...` key that instantly unlocks CryptoBill Forge Pro in-browser and activates both AutoShorts Studio Pro and WebLead & Table Extractor Pro offline, including v1.x updates and priority email support.
+
+### 3.5 TokenCost Lab (`https://youthmy11-ai.github.io/tokencalc.html`)
+- **Category**: DeveloperApplication (Web — 100% Free)
+- **Capabilities**:
+  - Local prompt token estimator (tokens, words, chars, UTF-8 bytes, lines) for English prose, source code, JSON, and Unicode/CJK/Vietnamese text.
+  - Compares per-request and monthly AI agent API costs across 7 frontier models (GPT-5, Claude 4.5, Gemini 2.5, DeepSeek V3, etc.) with configurable prompt-cache hit ratios, daily request volume, and agency margin multipliers.
+  - 1-click export of client quotes directly into CryptoBill Forge (`cryptobill.html#inv=...`).
+
+### 3.6 JSON2Sheet & PII Masker (`https://youthmy11-ai.github.io/json2sheet.html`)
+- **Category**: DeveloperApplication (Web — 100% Free)
+- **Capabilities**:
+  - Automatically unwraps API list containers (`data`, `items`, etc.) and flattens deeply nested JSON objects/arrays via dot notation.
+  - Exports Excel-safe RFC-4180 CSV, Google Sheets-ready TSV, or GitHub Markdown tables.
+  - Built-in **CSV Formula Injection Guard** neutralizes cells beginning with `=`, `+`, `-`, or `@`.
+  - 1-click local **PII & Secret Masking** redacts emails (`[REDACTED_EMAIL]`), IPv4 addresses (`[REDACTED_IP]`), Bearer/API tokens (`[REDACTED_TOKEN]`), and phone numbers (`[REDACTED_PHONE]`) before sharing with clients or AI chats.
+
+### 3.7 ScopeGuard SOW Builder (`https://youthmy11-ai.github.io/sowbuilder.html`)
+- **Category**: BusinessApplication (Web — 100% Free)
+- **Capabilities**:
+  - Built-in project presets for AI Workflow MVPs, Web3 Smart Contract Audits, and Chrome Extension builds.
+  - Enforces 100%-balanced milestone percentage splits with explicit revision caps, scope change rules, and IP-transfer-upon-settlement clauses.
+  - Generates clean copyable/downloadable Markdown SOW documents and exports any individual milestone straight into a payable CryptoBill Forge invoice (`#inv=`).
+
+### 3.8 Calldata Lens (`https://youthmy11-ai.github.io/txdecode.html`)
+- **Category**: DeveloperApplication (Web — 100% Free)
+- **Capabilities**:
+  - Decodes raw `0x` Ethereum and BNB Smart Chain hex calldata offline with zero RPC tracking.
+  - Recognizes standard 4-byte selectors and ABI words for ERC-20 `transfer`/`approve`/`transferFrom`, EIP-2612 `permit`, ERC-4626 vaults, AccessControl, and Safe multisig calls.
+  - Automatically flags high-risk unlimited `MAX_UINT256` token approvals and formats 18-decimal / 6-decimal token units clearly.
+  - 1-click handoff to bill a Web3 security review in CryptoBill Forge or draft an audit contract in ScopeGuard SOW.
+
+### 3.9 EnvShield Secret Scanner (`https://youthmy11-ai.github.io/envshield.html`)
+- **Category**: SecurityApplication (Web — 100% Free)
+- **Capabilities**:
+  - Scans `.env` files, JSON configs, shell logs, Git diffs, and AI chat transcripts strictly inside browser memory.
+  - Combines 13 deterministic signature detectors (OpenAI, Anthropic, GitHub PATs, AWS keys, Google API keys, Telegram bot tokens, JWTs, database URI credentials, 64-hex EVM private keys, mnemonics) with a Shannon entropy detector.
+  - Produces safely redacted output (`<REDACTED:...>`) for 1-click copy or sanitized file download.
+
+---
+
+## 4. Instant Crypto & PayPal Checkout Channels (`assets/checkout.js`)
+
+ForgeSuite Studio supports **two automatic client-side on-chain auto-unlock rails** plus **three global payment rails**:
+
+1. **USDT (BEP20 / BNB Smart Chain — Instant Auto-Unlock)**
+   - Chain ID: `56`
+   - Official Receiving Address: `0x0a1e9c96755a7962306cf2ca9a80113a61559852`
+   - Verified BSC USDT Contract (18 decimals): `0x55d398326f99059fF775485246999027B3197955`
+   - Verification: Browser queries public BSC JSON-RPC nodes (`eth_getTransactionReceipt`) with multi-node fallback, validates `status === "0x1"`, official USDT contract, ERC-20 `Transfer` topic0, recipient address, and amount (0.5% tolerance), and immediately issues a deterministic `FS-PRO-...` license key.
+
+2. **USDC (SPL / Solana Mainnet — Instant Auto-Unlock)**
+   - Network: Solana Mainnet (`confirmed` commitment)
+   - Official Receiving Wallet: `BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx`
+   - Verified SPL USDC Mint (6 decimals): `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
+   - Verification: Browser queries CORS-enabled Solana Mainnet JSON-RPC nodes (`getTransaction` with `encoding: "jsonParsed"`, `commitment: "confirmed"`, `maxSupportedTransactionVersion: 0`) with multi-provider fallback (`solana-rpc.publicnode.com`, `api.zan.top/solana-mainnet`, `api.mainnet-beta.solana.com`), validates `meta.err === null` and net SPL USDC credit across `preTokenBalances`/`postTokenBalances` (including newly initialized destination ATAs), and immediately issues a deterministic `FS-PRO-...` license key.
+
+3. **USDT (TRC20 / TRON)**
+   - Official Receiving Address: `TGVUMYRwTqrCGzrPNW5V2bhrBNtsKgFcn7`
+   - Fulfillment: Submit TxHash via pre-filled `mailto:youthmy11@gmail.com` receipt link.
+
+4. **Binance Pay / Internal Transfer (Zero Fee)**
+   - Binance UID: `1179819899` (Nickname: `vin9`)
+   - Fulfillment: Submit Order ID via pre-filled `mailto:youthmy11@gmail.com` receipt link.
+
+5. **PayPal Direct Checkout**
+   - Official Merchant Account: `min4444st@gmail.com` (`https://www.paypal.com/cgi-bin/webscr?cmd=_xclick...`)
+   - Fulfillment: Submit PayPal Transaction ID via `mailto:youthmy11@gmail.com` for license key & package delivery.
+
+---
+
+## 5. Contact & Official Links
+
+- **Storefront**: https://youthmy11-ai.github.io/
+- **Concise LLM Index**: https://youthmy11-ai.github.io/llms.txt
+- **GitHub Organization / Developer**: https://github.com/youthmy11-ai
+- **Support & Receipt Verification Email**: youthmy11@gmail.com
+- **License**: MIT License

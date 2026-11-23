@@ -1,4 +1,11 @@
+# ForgeSuite Studio — Open indexing for search engines & AI assistants
+# Machine-readable summaries:
+#   https://youthmy11-ai.github.io/llms.txt
+#   https://youthmy11-ai.github.io/llms-full.txt
+
 User-agent: *
 Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
 
 Sitemap: https://youthmy11-ai.github.io/sitemap.xml

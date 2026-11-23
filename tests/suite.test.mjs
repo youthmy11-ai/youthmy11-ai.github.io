@@ -1,5 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import {
   BSC_RPC_ENDPOINTS,
@@ -55,6 +58,7 @@ import {
   shannonEntropy,
 } from "../assets/envshield.js";
 import {
+  SOLANA_RPC_ENDPOINTS,
   verifySolanaUsdcTx,
   verifySolanaUsdcTxOnChain,
 } from "../assets/checkout.js";
@@ -107,6 +111,120 @@ test("verifySolanaUsdcTx and verifySolanaUsdcTxOnChain validate SPL USDC transfe
   );
   assert.equal(rpcRes.verified, true);
   assert.equal(rpcRes.licenseKey, ok.licenseKey);
+});
+
+test("verifySolanaUsdcTx handles newly created destination ATA (real mainnet shape), blocks self-transfer inflation, and falls back across RPC errors/nulls", async () => {
+  // Real Solana Mainnet tx shape where destination ATA (accountIndex 2) is created in-tx and absent from preTokenBalances
+  const mainnetNewAtaSig =
+    "Axbuzxysfc819mEoCPCHA7st4xN4oE1JEfw9d9YRmF6vmg2vuLwTAzGVQS2Bu4X5Wc7XS2MmhFgJa3BrnZT6cXi";
+  const mainnetNewAtaTx = {
+    slot: 473085555,
+    version: "legacy",
+    transaction: { signatures: [mainnetNewAtaSig] },
+    meta: {
+      err: null,
+      preTokenBalances: [
+        {
+          accountIndex: 1,
+          mint: OFFICIAL_CHANNELS.solanaUsdcMint,
+          owner: "4zRgaH7p9zSRnKR8Yyj6irjZT7hLPjjf2VzYVT5EX3RQ",
+          uiTokenAmount: { amount: "609001383", decimals: 6, uiAmountString: "609.001383" },
+        },
+      ],
+      postTokenBalances: [
+        {
+          accountIndex: 1,
+          mint: OFFICIAL_CHANNELS.solanaUsdcMint,
+          owner: "4zRgaH7p9zSRnKR8Yyj6irjZT7hLPjjf2VzYVT5EX3RQ",
+          uiTokenAmount: { amount: "608751383", decimals: 6, uiAmountString: "608.751383" },
+        },
+        {
+          accountIndex: 2,
+          mint: OFFICIAL_CHANNELS.solanaUsdcMint,
+          owner: OFFICIAL_CHANNELS.solanaUsdc,
+          uiTokenAmount: { amount: "250000", decimals: 6, uiAmountString: "0.25" },
+        },
+      ],
+    },
+  };
+
+  const verifiedNewAta = verifySolanaUsdcTx(mainnetNewAtaTx, 0.25);
+  assert.equal(verifiedNewAta.verified, true);
+  assert.equal(verifiedNewAta.amountUsd, 0.25);
+  assert.equal(verifiedNewAta.amountMicro, "250000");
+  assert.equal(verifiedNewAta.to, OFFICIAL_CHANNELS.solanaUsdc);
+  assert.equal(validateLicenseKeyFormat(verifiedNewAta.licenseKey), true);
+
+  // Underpayment check against $15 Pro tier
+  const underpaid = verifySolanaUsdcTx(mainnetNewAtaTx, 15);
+  assert.equal(underpaid.verified, false);
+  assert.match(underpaid.reason, /0\.25 USDC received, expected \$15\.00/);
+
+  // Self-transfer between two ATAs of the same owner yields 0 net credit and must be rejected
+  const selfTransferTx = {
+    transaction: { signatures: [mainnetNewAtaSig] },
+    meta: {
+      err: null,
+      preTokenBalances: [
+        {
+          accountIndex: 1,
+          mint: OFFICIAL_CHANNELS.solanaUsdcMint,
+          owner: OFFICIAL_CHANNELS.solanaUsdc,
+          uiTokenAmount: { amount: "20000000", decimals: 6 },
+        },
+      ],
+      postTokenBalances: [
+        {
+          accountIndex: 1,
+          mint: OFFICIAL_CHANNELS.solanaUsdcMint,
+          owner: OFFICIAL_CHANNELS.solanaUsdc,
+          uiTokenAmount: { amount: "5000000", decimals: 6 },
+        },
+        {
+          accountIndex: 2,
+          mint: OFFICIAL_CHANNELS.solanaUsdcMint,
+          owner: OFFICIAL_CHANNELS.solanaUsdc,
+          uiTokenAmount: { amount: "15000000", decimals: 6 },
+        },
+      ],
+    },
+  };
+  assert.equal(verifySolanaUsdcTx(selfTransferTx, 15).verified, false);
+
+  // Multi-endpoint CORS-safe default list + fallback across HTTP 403 and pruned null result
+  assert.ok(SOLANA_RPC_ENDPOINTS.length >= 2);
+  assert.notEqual(
+    SOLANA_RPC_ENDPOINTS[0],
+    "https://api.mainnet-beta.solana.com",
+    "Primary Solana RPC must be browser-CORS friendly instead of 403-blocking api.mainnet-beta.solana.com"
+  );
+
+  const calls = [];
+  let capturedBody = null;
+  const fallbackRes = await verifySolanaUsdcTxOnChain(mainnetNewAtaSig, 0.25, {
+    endpoints: ["https://rpc-403.test", "https://rpc-pruned.test", "https://rpc-ok.test"],
+    fetchImpl: async (url, init) => {
+      calls.push(url);
+      capturedBody = JSON.parse(init.body);
+      if (url === "https://rpc-403.test") {
+        return { ok: false, status: 403, json: async () => ({ error: { code: 403 } }) };
+      }
+      if (url === "https://rpc-pruned.test") {
+        return { ok: true, status: 200, json: async () => ({ jsonrpc: "2.0", id: 1, result: null }) };
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ jsonrpc: "2.0", id: 1, result: mainnetNewAtaTx }),
+      };
+    },
+  });
+  assert.deepEqual(calls, ["https://rpc-403.test", "https://rpc-pruned.test", "https://rpc-ok.test"]);
+  assert.equal(capturedBody.params[1].commitment, "confirmed");
+  assert.equal(capturedBody.params[1].encoding, "jsonParsed");
+  assert.equal(capturedBody.params[1].maxSupportedTransactionVersion, 0);
+  assert.equal(fallbackRes.verified, true);
+  assert.equal(fallbackRes.licenseKey, verifiedNewAta.licenseKey);
 });
 
 function padAddressTopic(address) {
@@ -862,4 +980,70 @@ test("scanSecrets detects keys/URIs/private keys deterministically, masks previe
   const inv = buildSanitizationInvoice(dirty);
   const roundtrip = decodeInvoicePayload(encodeInvoicePayload(inv));
   assert.equal(roundtrip.items[0].unitPrice, 95);
+});
+
+/* ============================================================================
+ * 11. AI-Search (llms.txt) & Per-Page SEO / JSON-LD Integrity Tests
+ * ========================================================================== */
+
+test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry valid SEO and JSON-LD metadata", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+  const llmsTxt = fs.readFileSync(path.join(repoRoot, "llms.txt"), "utf8");
+  const llmsFull = fs.readFileSync(path.join(repoRoot, "llms-full.txt"), "utf8");
+  assert.ok(llmsTxt.startsWith("# ForgeSuite Studio\n"), "llms.txt must start with H1 per llmstxt.org");
+  assert.match(llmsTxt, /^> /m, "llms.txt must contain blockquote summary per llmstxt.org");
+  assert.match(llmsFull, /CryptoBill Forge/);
+  assert.match(llmsFull, /AutoShorts Studio/);
+  assert.match(llmsFull, /WebLead & Table Extractor/);
+  assert.match(llmsFull, /All-Access Creator & Freelancer Bundle/);
+  assert.match(llmsFull, /TokenCost Lab/);
+  assert.match(llmsFull, /JSON2Sheet & PII Masker/);
+  assert.match(llmsFull, /ScopeGuard SOW Builder/);
+  assert.match(llmsFull, /Calldata Lens/);
+  assert.match(llmsFull, /EnvShield Secret Scanner/);
+  assert.match(llmsFull, /BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx/);
+
+  const robots = fs.readFileSync(path.join(repoRoot, "robots.txt"), "utf8");
+  assert.match(robots, /Allow:\s*\/llms\.txt/);
+  assert.match(robots, /Sitemap:\s*https:\/\/youthmy11-ai\.github\.io\/sitemap\.xml/);
+
+  const sitemap = fs.readFileSync(path.join(repoRoot, "sitemap.xml"), "utf8");
+  assert.match(sitemap, /https:\/\/youthmy11-ai\.github\.io\/llms\.txt/);
+  assert.match(sitemap, /https:\/\/youthmy11-ai\.github\.io\/llms-full\.txt/);
+
+  const toolPages = [
+    { file: "cryptobill.html", url: "https://youthmy11-ai.github.io/cryptobill.html", category: "BusinessApplication" },
+    { file: "tokencalc.html", url: "https://youthmy11-ai.github.io/tokencalc.html", category: "DeveloperApplication" },
+    { file: "json2sheet.html", url: "https://youthmy11-ai.github.io/json2sheet.html", category: "DeveloperApplication" },
+    { file: "sowbuilder.html", url: "https://youthmy11-ai.github.io/sowbuilder.html", category: "BusinessApplication" },
+    { file: "txdecode.html", url: "https://youthmy11-ai.github.io/txdecode.html", category: "DeveloperApplication" },
+    { file: "envshield.html", url: "https://youthmy11-ai.github.io/envshield.html", category: "SecurityApplication" },
+  ];
+
+  for (const page of toolPages) {
+    const html = fs.readFileSync(path.join(repoRoot, page.file), "utf8");
+    assert.ok(html.includes(`<link rel="canonical" href="${page.url}">`), `${page.file} missing canonical`);
+    assert.match(html, /<meta property="og:title" content="[^"]+">/, `${page.file} missing og:title`);
+    assert.match(html, /<meta property="og:description" content="[^"]+">/, `${page.file} missing og:description`);
+    assert.ok(html.includes(`<meta property="og:url" content="${page.url}">`), `${page.file} missing og:url`);
+    assert.match(html, /<meta property="og:type" content="website">/, `${page.file} missing og:type`);
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image">/, `${page.file} missing twitter:card`);
+    assert.ok(sitemap.includes(`<loc>${page.url}</loc>`), `sitemap.xml missing ${page.url}`);
+
+    const ldMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+    assert.ok(ldMatch, `${page.file} missing JSON-LD script`);
+    const ld = JSON.parse(ldMatch[1]);
+    assert.equal(ld["@type"], "SoftwareApplication", `${page.file} JSON-LD must be SoftwareApplication`);
+    assert.equal(ld.url, page.url, `${page.file} JSON-LD url mismatch`);
+    assert.equal(ld.applicationCategory, page.category, `${page.file} JSON-LD category mismatch`);
+    assert.ok(ld.offers, `${page.file} JSON-LD missing offers`);
+  }
+
+  const indexHtml = fs.readFileSync(path.join(repoRoot, "index.html"), "utf8");
+  assert.ok(indexHtml.includes('<link rel="canonical" href="https://youthmy11-ai.github.io/">'));
+  const indexLdMatch = indexHtml.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+  assert.ok(indexLdMatch, "index.html missing JSON-LD script");
+  const indexLd = JSON.parse(indexLdMatch[1]);
+  assert.ok(Array.isArray(indexLd["@graph"]) && indexLd["@graph"].length >= 9, "index.html @graph should list WebSite + all products");
 });
