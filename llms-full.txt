@@ -28,6 +28,7 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 | 7 | **ScopeGuard SOW Builder** | Live Web App (`sowbuilder.html`) | 100% Free ($0) — AI/Web3/Chrome SOW templates, milestone splits, CryptoBill export | **$0** | Free |
 | 8 | **Calldata Lens** | Live Web App (`txdecode.html`) | 100% Free ($0) — offline EVM ABI decoder & `MAX_UINT256` approval risk alerts | **$0** | Free |
 | 9 | **EnvShield Secret Scanner** | Live Web App (`envshield.html`) | 100% Free ($0) — 13 secret detectors + Shannon entropy scanner & 1-click redactor | **$0** | Free |
+| 10 | **ForgeSuite MCP Server** | Node 22+ Stdio MCP (`mcp.html` / `mcp/forgesuite-mcp.mjs`) | 100% Free ($0, MIT) — zero-dep offline MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`) | **$0** | Free |
 
 ---
 
@@ -105,6 +106,13 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
   - Scans `.env` files, JSON configs, shell logs, Git diffs, and AI chat transcripts strictly inside browser memory.
   - Combines 13 deterministic signature detectors (OpenAI, Anthropic, GitHub PATs, AWS keys, Google API keys, Telegram bot tokens, JWTs, database URI credentials, 64-hex EVM private keys, mnemonics) with a Shannon entropy detector.
   - Produces safely redacted output (`<REDACTED:...>`) for 1-click copy or sanitized file download.
+
+### 3.10 ForgeSuite MCP Server (`https://youthmy11-ai.github.io/mcp.html`)
+- **Category**: DeveloperApplication (Windows, macOS, Linux — Node.js 22+, 0 npm dependencies, MIT Free)
+- **Download URL**: `https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs`
+- **Capabilities**:
+  - Single-file zero-dependency JSON-RPC 2.0 Model Context Protocol (MCP) stdio server (`initialize`, `notifications/initialized`, `ping`, `tools/list`, `tools/call`) compatible with Claude Code, Cursor, Antigravity, and Windsurf.
+  - Exposes 4 100% offline tools: `envshield_scan` (secret leak detection & redaction), `calldata_decode` (ERC-20/Permit2/Uniswap/Safe ABI decoding + `MaxUint256` unlimited approval warnings), `tokencost_estimate` (multi-turn LLM cost & retainer estimation across Claude/GPT-5/Gemini/DeepSeek), and `cryptobill_quote` (Markdown/JSON crypto invoice + live serverless `cryptobill.html#inv=` URL).
 
 ---
 

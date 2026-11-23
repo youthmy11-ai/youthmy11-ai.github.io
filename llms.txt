@@ -17,6 +17,7 @@ ForgeSuite Studio is designed for solo founders, independent freelancers, AI eng
 - [ScopeGuard SOW Builder](https://youthmy11-ai.github.io/sowbuilder.html): Free ($0) offline freelance, AI engineering, and Web3 audit Statement of Work generator with 100%-balanced milestone splits and 1-click CryptoBill USDT invoicing.
 - [Calldata Lens](https://youthmy11-ai.github.io/txdecode.html): Free ($0) offline Ethereum & BSC EVM hex calldata decoder for ERC-20 transfers, infinite `MAX_UINT256` approval risk alerts, EIP-2612 permits, ERC-4626 vaults, and Safe multisig payloads.
 - [EnvShield Secret Scanner](https://youthmy11-ai.github.io/envshield.html): Free ($0) offline `.env`, JSON, and AI transcript secret scanner & redactor detecting OpenAI, Anthropic, GitHub, AWS, Telegram, JWT, DB URI passwords, EVM private keys, and high-entropy credentials.
+- [ForgeSuite MCP Server](https://youthmy11-ai.github.io/mcp.html): Free ($0) zero-dependency single-file Node 22+ JSON-RPC 2.0 stdio MCP server (`https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs`) for Claude Code, Cursor, Antigravity, and Windsurf exposing 4 offline tools: `envshield_scan`, `calldata_decode`, `tokencost_estimate`, and `cryptobill_quote`.
 
 ## Open-Core Packaged Tools & Lifetime Bundle
 

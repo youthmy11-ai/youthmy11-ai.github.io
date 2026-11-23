@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -1002,6 +1003,8 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsFull, /ScopeGuard SOW Builder/);
   assert.match(llmsFull, /Calldata Lens/);
   assert.match(llmsFull, /EnvShield Secret Scanner/);
+  assert.match(llmsFull, /ForgeSuite MCP Server/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/mcp\.html/);
   assert.match(llmsFull, /BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx/);
 
   const robots = fs.readFileSync(path.join(repoRoot, "robots.txt"), "utf8");
@@ -1019,6 +1022,7 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
     { file: "sowbuilder.html", url: "https://youthmy11-ai.github.io/sowbuilder.html", category: "BusinessApplication" },
     { file: "txdecode.html", url: "https://youthmy11-ai.github.io/txdecode.html", category: "DeveloperApplication" },
     { file: "envshield.html", url: "https://youthmy11-ai.github.io/envshield.html", category: "SecurityApplication" },
+    { file: "mcp.html", url: "https://youthmy11-ai.github.io/mcp.html", category: "DeveloperApplication" },
   ];
 
   for (const page of toolPages) {
@@ -1045,5 +1049,260 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   const indexLdMatch = indexHtml.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
   assert.ok(indexLdMatch, "index.html missing JSON-LD script");
   const indexLd = JSON.parse(indexLdMatch[1]);
-  assert.ok(Array.isArray(indexLd["@graph"]) && indexLd["@graph"].length >= 9, "index.html @graph should list WebSite + all products");
+  assert.ok(Array.isArray(indexLd["@graph"]) && indexLd["@graph"].length >= 11, "index.html @graph should list WebSite + all products including MCP Server");
+});
+
+/* ============================================================================
+ * 12. ForgeSuite MCP Server End-to-End Stdio JSON-RPC 2.0 Tests
+ * ========================================================================== */
+
+function runMcpStdioSession(rawWrites) {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const serverPath = path.join(repoRoot, "mcp", "forgesuite-mcp.mjs");
+
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [serverPath], {
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.setEncoding("utf8");
+    child.stderr.setEncoding("utf8");
+    child.stdout.on("data", (d) => {
+      stdout += d;
+    });
+    child.stderr.on("data", (d) => {
+      stderr += d;
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      const lines = stdout
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter(Boolean);
+      try {
+        const messages = lines.map((l) => JSON.parse(l));
+        resolve({ code, stderr, messages });
+      } catch (err) {
+        reject(new Error(`Invalid JSON on MCP stdout: ${stdout}\nErr: ${err.message}`));
+      }
+    });
+
+    for (const chunk of rawWrites) {
+      child.stdin.write(chunk);
+    }
+    child.stdin.end();
+  });
+}
+
+test("ForgeSuite MCP stdio server handles initialize, notifications/initialized, ping, and tools/list", async () => {
+  const writes = [
+    JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: {
+        protocolVersion: "2024-11-05",
+        capabilities: {},
+        clientInfo: { name: "test-harness", version: "1.0.0" },
+      },
+    }) + "\n",
+    // Notification (no id) must NOT produce any response
+    JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\n",
+    JSON.stringify({ jsonrpc: "2.0", id: 2, method: "ping" }) + "\n",
+    JSON.stringify({ jsonrpc: "2.0", id: 3, method: "tools/list" }) + "\n",
+  ];
+
+  const { code, stderr, messages } = await runMcpStdioSession(writes);
+  assert.equal(code, 0);
+  assert.equal(stderr, "");
+  assert.equal(messages.length, 3, "Notification must produce zero responses");
+
+  assert.equal(messages[0].id, 1);
+  assert.equal(messages[0].result.protocolVersion, "2024-11-05");
+  assert.equal(messages[0].result.serverInfo.name, "forgesuite-mcp");
+  assert.ok(messages[0].result.capabilities.tools);
+
+  assert.equal(messages[1].id, 2);
+  assert.deepEqual(messages[1].result, {});
+
+  assert.equal(messages[2].id, 3);
+  const toolNames = messages[2].result.tools.map((t) => t.name).sort();
+  assert.deepEqual(toolNames, [
+    "calldata_decode",
+    "cryptobill_quote",
+    "envshield_scan",
+    "tokencost_estimate",
+  ]);
+  for (const tool of messages[2].result.tools) {
+    assert.equal(tool.inputSchema.type, "object");
+    assert.ok(tool.description.length > 20);
+  }
+});
+
+test("ForgeSuite MCP stdio server executes all 4 offline tools end-to-end", async () => {
+  const uniswapV2Swap =
+    "0x38ed1739" +
+    "0000000000000000000000000000000000000000000000000de0b6b3a7640000" +
+    "0000000000000000000000000000000000000000000000000000000005f5e100" +
+    "00000000000000000000000000000000000000000000000000000000000000a0" +
+    "0000000000000000000000000a1e9c96755a7962306cf2ca9a80113a61559852" +
+    "0000000000000000000000000000000000000000000000000000000067890abc";
+
+  const envSampleWithJwtAndMnemonic = [
+    ENVSHIELD_SAMPLES.agent_env,
+    "SEED_PHRASE=\"abandon ability able about above absent absorb abstract absurd abuse access accident\"",
+    "JWT=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
+  ].join("\n");
+
+  const reqs = [
+    {
+      jsonrpc: "2.0",
+      id: "env",
+      method: "tools/call",
+      params: { name: "envshield_scan", arguments: { text: envSampleWithJwtAndMnemonic } },
+    },
+    {
+      jsonrpc: "2.0",
+      id: "approve",
+      method: "tools/call",
+      params: { name: "calldata_decode", arguments: { calldata: CALLDATA_SAMPLES.max_approve } },
+    },
+    {
+      jsonrpc: "2.0",
+      id: "swap",
+      method: "tools/call",
+      params: { name: "calldata_decode", arguments: { calldata: uniswapV2Swap } },
+    },
+    {
+      jsonrpc: "2.0",
+      id: "tokens",
+      method: "tools/call",
+      params: {
+        name: "tokencost_estimate",
+        arguments: {
+          inputTokens: 2000,
+          outputTokens: 500,
+          turns: 4,
+          cachedRatioPct: 50,
+          requestsPerDay: 200,
+          daysPerMonth: 30,
+          marginMultiplier: 1.5,
+        },
+      },
+    },
+    {
+      jsonrpc: "2.0",
+      id: "quote",
+      method: "tools/call",
+      params: {
+        name: "cryptobill_quote",
+        arguments: {
+          businessName: "Forge AI Labs",
+          clientName: "Protocol DAO",
+          invoiceNumber: "INV-MCP-2026",
+          currency: "USDT",
+          discountPercent: 10,
+          taxPercent: 0,
+          items: [
+            { description: "Smart Contract Security Audit", qty: 1, unitPrice: 1000 },
+            { description: "MCP Automation Setup", qty: 2, unitPrice: 250 },
+          ],
+          paymentMethods: {
+            bep20: OFFICIAL_CHANNELS.usdtBep20,
+            solanaUsdc: OFFICIAL_CHANNELS.solanaUsdc,
+          },
+        },
+      },
+    },
+  ];
+
+  const { code, stderr, messages } = await runMcpStdioSession(
+    reqs.map((r) => JSON.stringify(r) + "\n")
+  );
+  assert.equal(code, 0);
+  assert.equal(stderr, "");
+  assert.equal(messages.length, 5);
+
+  // 1. envshield_scan
+  const envRes = messages[0].result;
+  assert.equal(envRes.isError, false);
+  assert.equal(envRes.structuredContent.totalFindings, 8);
+  assert.match(envRes.structuredContent.redactedText, /<REDACTED:OPENAI_KEY>/);
+  assert.match(envRes.structuredContent.redactedText, /<REDACTED:EVM_PRIVATE_KEY>/);
+  assert.match(envRes.structuredContent.redactedText, /<REDACTED:MNEMONIC_PHRASE>/);
+  assert.match(envRes.structuredContent.redactedText, /<REDACTED:JWT_TOKEN>/);
+  assert.match(envRes.structuredContent.redactedText, /<REDACTED:DB_URI_CREDENTIALS>/);
+  assert.doesNotMatch(envRes.structuredContent.redactedText, /S3cur3Passw0rd/);
+  assert.doesNotMatch(envRes.structuredContent.redactedText, /abandon ability able/);
+
+  // 2. calldata_decode (MaxUint256 unlimited approval)
+  const approveRes = messages[1].result;
+  assert.equal(approveRes.isError, false);
+  assert.equal(approveRes.structuredContent.selector, "0x095ea7b3");
+  assert.equal(approveRes.structuredContent.unlimitedApprovalRisk, true);
+  assert.equal(approveRes.structuredContent.risk, "UNLIMITED_APPROVAL_RISK");
+  assert.ok(approveRes.structuredContent.warnings.length >= 1);
+  assert.match(approveRes.content[0].text, /MAX_UINT256/);
+
+  // 3. calldata_decode (Uniswap V2 swapExactTokensForTokens)
+  const swapRes = messages[2].result;
+  assert.equal(swapRes.isError, false);
+  assert.equal(swapRes.structuredContent.selector, "0x38ed1739");
+  assert.equal(swapRes.structuredContent.category, "Uniswap V2");
+  assert.equal(swapRes.structuredContent.unlimitedApprovalRisk, false);
+  assert.equal(swapRes.structuredContent.args[3].formatted, OFFICIAL_CHANNELS.usdtBep20);
+
+  // 4. tokencost_estimate (multi-turn agent across Claude/GPT/Gemini/DeepSeek)
+  const tokRes = messages[3].result;
+  assert.equal(tokRes.isError, false);
+  assert.equal(tokRes.structuredContent.assumptions.turns, 4);
+  // 4 turns: 2000 + 2500 + 3000 + 3500 = 11000 input tokens; 4 * 500 = 2000 output tokens
+  assert.equal(tokRes.structuredContent.assumptions.totalInputTokensPerRun, 11000);
+  assert.equal(tokRes.structuredContent.assumptions.totalOutputTokensPerRun, 2000);
+  const providers = new Set(tokRes.structuredContent.estimates.map((e) => e.provider));
+  for (const p of ["OpenAI", "Anthropic", "Google", "DeepSeek"]) {
+    assert.ok(providers.has(p), `Missing provider ${p} in tokencost_estimate`);
+  }
+
+  // 5. cryptobill_quote (exact math + live #inv= roundtrip + Pro Bundle CTA)
+  const quoteRes = messages[4].result;
+  assert.equal(quoteRes.isError, false);
+  assert.equal(quoteRes.structuredContent.invoice.subtotal, 1500);
+  assert.equal(quoteRes.structuredContent.invoice.discountAmount, 150);
+  assert.equal(quoteRes.structuredContent.invoice.grandTotal, 1350);
+  assert.equal(quoteRes.structuredContent.links.cryptobillApp, "https://youthmy11-ai.github.io/cryptobill.html");
+  assert.equal(quoteRes.structuredContent.links.proBundlePriceUsd, 35);
+  assert.match(quoteRes.content[0].text, /https:\/\/youthmy11-ai\.github\.io\/cryptobill\.html#inv=/);
+  assert.match(quoteRes.content[0].text, /\$35/);
+
+  const shareUrl = quoteRes.structuredContent.links.shareableInvoiceUrl;
+  const hashPart = shareUrl.slice(shareUrl.indexOf("#inv="));
+  const decoded = decodeInvoicePayload(hashPart);
+  assert.equal(decoded.invoiceNumber, "INV-MCP-2026");
+  assert.equal(decoded.clientName, "Protocol DAO");
+  assert.equal(decoded.items.length, 2);
+});
+
+test("ForgeSuite MCP stdio server handles malformed JSON, unknown methods, unknown tools, and Content-Length framing", async () => {
+  const clBody = JSON.stringify({ jsonrpc: "2.0", id: 99, method: "ping" });
+  const clFramed = `Content-Length: ${Buffer.byteLength(clBody, "utf8")}\r\n\r\n${clBody}`;
+
+  const writes = [
+    "{broken-json\n",
+    JSON.stringify({ jsonrpc: "2.0", id: 10, method: "unknown/method" }) + "\n",
+    JSON.stringify({ jsonrpc: "2.0", id: 11, method: "tools/call", params: { name: "nonexistent_tool", arguments: {} } }) + "\n",
+    JSON.stringify({ jsonrpc: "2.0", id: 12, method: "tools/call", params: { name: "calldata_decode", arguments: { calldata: "not-hex" } } }) + "\n",
+    clFramed,
+  ];
+
+  const { code, messages } = await runMcpStdioSession(writes);
+  assert.equal(code, 0);
+  assert.equal(messages.length, 5);
+  assert.equal(messages[0].error.code, -32700);
+  assert.equal(messages[1].error.code, -32601);
+  assert.equal(messages[2].error.code, -32602);
+  assert.equal(messages[3].result.isError, true);
+  assert.equal(messages[4].id, 99);
+  assert.deepEqual(messages[4].result, {});
 });

@@ -26,6 +26,15 @@ All web tools execute **100% inside local browser memory** with zero server uplo
 6. **[EnvShield Secret Scanner](https://youthmy11-ai.github.io/envshield.html)** (`envshield.html`) — **Free**
    - Instant client-side `.env`, JSON, and transcript secret scanner & safe redactor covering OpenAI, Anthropic, GitHub, AWS, Google, Telegram, EVM private keys, JWTs, DB URIs, and high-entropy credentials.
 
+## ForgeSuite MCP Server (`mcp/forgesuite-mcp.mjs` · Zero-Dependency Node 22+ Stdio)
+
+Connect Claude Code, Cursor, Antigravity, or Windsurf to **4 offline developer & Web3 tools** (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`) — docs at **[mcp.html](https://youthmy11-ai.github.io/mcp.html)**:
+
+```bash
+mkdir -p ~/.forgesuite-mcp && curl -fsSL https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs -o ~/.forgesuite-mcp/forgesuite-mcp.mjs
+claude mcp add forgesuite -- node "$HOME/.forgesuite-mcp/forgesuite-mcp.mjs"
+```
+
 ## Packaged Pro Editions & Bundle (`3 Pro Tools · Save $14`)
 
 - **CryptoBill Forge Pro** — `$15` Lifetime (Unlimited line items, white-label PDF, custom branding, batch presets)

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ForgeSuite MCP Server — Zero-Dependency Offline Tools for Claude Code, Cursor &amp; AI Agents</title>
+  <meta name="description" content="Install ForgeSuite MCP Server in one command (Node 22+, 0 npm dependencies, 100% offline). Give Claude Code, Cursor, Antigravity, and Windsurf local .env leak scanning, EVM calldata decoding, LLM token cost modeling, and CryptoBill invoice quotes.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/mcp.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/mcp.html">
+  <meta property="og:title" content="ForgeSuite MCP Server — 4 Offline Developer &amp; Web3 Tools for AI Agents">
+  <meta property="og:description" content="Single-file Node 22+ stdio MCP server with zero dependencies: envshield_scan, calldata_decode, tokencost_estimate, and cryptobill_quote.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ForgeSuite MCP Server — Offline MCP Tools for Claude Code &amp; Cursor">
+  <meta name="twitter:description" content="Zero-dependency Node 22+ MCP stdio server: secret leak scanner, EVM calldata decoder, multi-turn token cost estimator, and crypto invoice generator.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='21' font-weight='800'%3EMCP%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ForgeSuite MCP Server",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Windows, macOS, Linux (Node.js 22+)",
+    "url": "https://youthmy11-ai.github.io/mcp.html",
+    "downloadUrl": "https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs",
+    "softwareVersion": "1.0.0",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free Open-Source MCP Server (MIT)", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "All-Access ForgeSuite Pro Bundle", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "Zero-dependency single-file Node 22+ JSON-RPC 2.0 MCP stdio server",
+      "envshield_scan: 100% offline .env, API key, JWT, DB URI, mnemonic, and EVM private key redactor",
+      "calldata_decode: Offline EVM selector decoder (ERC-20, Permit2, Uniswap, Safe) with MaxUint256 risk alerts",
+      "tokencost_estimate: Multi-turn AI agent cost estimator across Claude, GPT-5, Gemini 2.5, and DeepSeek V3",
+      "cryptobill_quote: Markdown/JSON crypto invoice generator with live serverless CryptoBill #inv= links"
+    ],
+    "description": "Free, zero-dependency Node 22+ Model Context Protocol (MCP) stdio server providing 4 offline developer and Web3 utilities for Claude Code, Cursor, Antigravity, and Windsurf."
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .mcp-code {
+      background: rgba(9, 13, 22, 0.85);
+      border: 1px solid var(--fs-border, rgba(148, 163, 184, 0.2));
+      border-radius: 10px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.86rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      margin: 10px 0 0;
+    }
+    [data-theme="light"] .mcp-code {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+    .mcp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .mcp-snippet-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body data-page="mcp">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">FS</span>
+        <span>ForgeSuite MCP</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="envshield.html" class="fs-btn fs-btn-sm fs-btn-secondary">EnvShield</a>
+        <a href="txdecode.html" class="fs-btn fs-btn-sm fs-btn-secondary">Calldata Lens</a>
+        <a href="tokencalc.html" class="fs-btn fs-btn-sm fs-btn-secondary">TokenCost</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill</a>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 64px;">
+    <!-- HERO -->
+    <section class="fs-section-head" style="margin-bottom:24px;">
+      <div>
+        <span class="fs-badge fs-badge-success">NODE 22+ · 0 NPM DEPENDENCIES · 100% OFFLINE STDIO MCP</span>
+        <h1 style="margin-top:10px;">ForgeSuite MCP Server for Claude Code, Cursor, Antigravity &amp; Windsurf</h1>
+        <p class="fs-lead" style="margin-top:8px;">
+          Give your AI coding agent <strong>4 deterministic, 100% local tools</strong> in a single auditable ESM file — scan <code>.env</code> secrets before they leak, decode EVM calldata &amp; flag unlimited <code>MaxUint256</code> approvals, estimate multi-turn LLM budgets, and generate payable crypto invoices with zero external servers.
+        </p>
+        <div class="fs-hero-ctas" style="margin-top:18px;">
+          <a href="#install" class="fs-btn fs-btn-primary">1-Command Install →</a>
+          <a href="mcp/forgesuite-mcp.mjs" download="forgesuite-mcp.mjs" class="fs-btn fs-btn-secondary">Download forgesuite-mcp.mjs</a>
+          <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="BUNDLE">All-Access Pro Bundle ($35 · Save $14)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1-COMMAND INSTALL -->
+    <section id="install" class="cb-panel" style="margin-bottom:24px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-accent">STEP 1 · DOWNLOAD SINGLE-FILE SERVER</span>
+          <h2 style="margin-top:6px;">Install in One Command (macOS, Linux &amp; Windows)</h2>
+        </div>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-copy-target="cmdDownload">Copy Command</button>
+      </div>
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Requires only <strong>Node.js 22+</strong>. No <code>npm install</code>, no native build tools, and zero outbound network calls at runtime.
+      </p>
+      <pre class="mcp-code"><code id="cmdDownload">mkdir -p ~/.forgesuite-mcp &amp;&amp; curl -fsSL https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs -o ~/.forgesuite-mcp/forgesuite-mcp.mjs</code></pre>
+
+      <div style="margin-top:14px;">
+        <div class="mcp-snippet-head">
+          <span class="fs-field-label">Windows PowerShell (1-line install)</span>
+          <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-copy-target="cmdDownloadWin">Copy PowerShell</button>
+        </div>
+        <pre class="mcp-code"><code id="cmdDownloadWin">New-Item -ItemType Directory -Force "$HOME\.forgesuite-mcp" | Out-Null; curl.exe -fsSL https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs -o "$HOME\.forgesuite-mcp\forgesuite-mcp.mjs"</code></pre>
+      </div>
+    </section>
+
+    <!-- CLIENT CONFIGS -->
+    <section class="cb-panel" style="margin-bottom:24px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-accent">STEP 2 · CONNECT YOUR AI CLIENT</span>
+          <h2 style="margin-top:6px;">Claude Code, Cursor, Antigravity &amp; Windsurf Snippets</h2>
+        </div>
+      </div>
+
+      <div class="mcp-grid">
+        <div class="fs-rail-box">
+          <div class="mcp-snippet-head">
+            <h3>Claude Code CLI (1-Command)</h3>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-copy-target="cfgClaudeCode">Copy</button>
+          </div>
+          <p class="inv-muted" style="margin:6px 0 0;">Register globally across all repositories:</p>
+          <pre class="mcp-code"><code id="cfgClaudeCode">claude mcp add forgesuite -- node "$HOME/.forgesuite-mcp/forgesuite-mcp.mjs"</code></pre>
+        </div>
+
+        <div class="fs-rail-box">
+          <div class="mcp-snippet-head">
+            <h3>Cursor / Antigravity / Windsurf JSON</h3>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-copy-target="cfgJson">Copy JSON</button>
+          </div>
+          <p class="inv-muted" style="margin:6px 0 0;">Add to <code>.cursor/mcp.json</code>, <code>mcp_config.json</code>, or <code>~/.codeium/windsurf/mcp_config.json</code>:</p>
+          <pre class="mcp-code"><code id="cfgJson">{
+  "mcpServers": {
+    "forgesuite": {
+      "command": "node",
+      "args": ["/ABS/PATH/TO/.forgesuite-mcp/forgesuite-mcp.mjs"]
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 OFFLINE TOOLS -->
+    <section id="tools" style="margin-bottom:28px;">
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-success">4 BUILT-IN MCP TOOLS · JSON-RPC 2.0 STDIO</span>
+          <h2>Offline Developer &amp; Web3 Tool Reference</h2>
+          <p>Every tool executes deterministically inside local Node.js memory with strict JSON Schema validation.</p>
+        </div>
+      </div>
+
+      <div class="mcp-grid">
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">DEVSECOPS</span>
+              <span class="fs-badge fs-badge-muted">13 RULES + ENTROPY</span>
+            </div>
+            <h3><code>envshield_scan</code></h3>
+            <p class="fs-card-desc">
+              Scans <code>.env</code> files, configs, JSON dumps, and logs for leaked OpenAI, Anthropic, GitHub, AWS, Google, Stripe, Telegram, Slack, JWT, DB URI password, seed mnemonic, and 64-hex EVM private keys — returning findings plus safely redacted text.
+            </p>
+            <pre class="mcp-code"><code>{
+  "name": "envshield_scan",
+  "arguments": {
+    "text": "OPENAI_API_KEY=sk-proj-...\nDATABASE_URL=postgres://u:p@host/db"
+  }
+}</code></pre>
+          </div>
+          <div class="fs-card-actions">
+            <a href="envshield.html" class="fs-btn fs-btn-sm fs-btn-secondary">Open Web App →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">EVM / WEB3</span>
+              <span class="fs-badge fs-badge-warn">MAX_UINT256 GUARD</span>
+            </div>
+            <h3><code>calldata_decode</code></h3>
+            <p class="fs-card-desc">
+              Decodes raw <code>0x</code> calldata selectors offline (ERC-20 <code>transfer</code>, <code>approve</code>, <code>transferFrom</code>, <code>increaseAllowance</code>, EIP-2612 <code>permit</code>, Permit2, Uniswap V2/V3/Universal Router, ERC-4626, Safe) and flags unlimited <code>MaxUint256</code> / <code>MaxUint160</code> approvals.
+            </p>
+            <pre class="mcp-code"><code>{
+  "name": "calldata_decode",
+  "arguments": {
+    "calldata": "0x095ea7b30000000000000000000000001111...ffff"
+  }
+}</code></pre>
+          </div>
+          <div class="fs-card-actions">
+            <a href="txdecode.html" class="fs-btn fs-btn-sm fs-btn-secondary">Open Web App →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">AI ECONOMICS</span>
+              <span class="fs-badge fs-badge-muted">MULTI-TURN AGENT</span>
+            </div>
+            <h3><code>tokencost_estimate</code></h3>
+            <p class="fs-card-desc">
+              Estimates per-run, daily, and monthly LLM API budgets and client retainer quotes across Claude 4.5 (Opus/Sonnet/Haiku), GPT-5/Mini, Gemini 2.5 Pro/Flash, and DeepSeek V3 with prompt-cache ratios and multi-turn context growth.
+            </p>
+            <pre class="mcp-code"><code>{
+  "name": "tokencost_estimate",
+  "arguments": {
+    "inputTokens": 4000,
+    "outputTokens": 800,
+    "turns": 6,
+    "cachedRatioPct": 50
+  }
+}</code></pre>
+          </div>
+          <div class="fs-card-actions">
+            <a href="tokencalc.html" class="fs-btn fs-btn-sm fs-btn-secondary">Open Web App →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">CRYPTO BILLING</span>
+              <span class="fs-badge fs-badge-muted">SHAREABLE #INV=</span>
+            </div>
+            <h3><code>cryptobill_quote</code></h3>
+            <p class="fs-card-desc">
+              Generates clean Markdown and JSON crypto invoices with exact subtotal/discount/tax math plus a live serverless <code>cryptobill.html#inv=...</code> URL ready for A4 PDF export and deterministic offline QR payment scanning.
+            </p>
+            <pre class="mcp-code"><code>{
+  "name": "cryptobill_quote",
+  "arguments": {
+    "clientName": "Acme Labs",
+    "currency": "USDT",
+    "items": [{"description": "Smart Contract Audit", "unitPrice": 1200}]
+  }
+}</code></pre>
+          </div>
+          <div class="fs-card-actions">
+            <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">Open CryptoBill →</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- PRO UPGRADE FUNNEL -->
+    <section class="cb-panel">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-warn">ONE-TIME LIFETIME LICENSES · ZERO SUBSCRIPTIONS</span>
+          <h2 style="margin-top:6px;">Upgrade Your Freelance &amp; Creator Workflow with ForgeSuite Pro ($15–$35)</h2>
+        </div>
+        <button type="button" class="fs-btn fs-btn-primary" data-checkout-sku="BUNDLE">Get All-Access Bundle ($35)</button>
+      </div>
+      <p class="inv-muted" style="margin:6px 0 16px;">
+        ForgeSuite MCP Server is 100% free and MIT licensed. Pair it with our one-time lifetime Pro editions — verified automatically on-chain via BSC USDT (BEP20) or Solana SPL USDC, plus TRC20, Binance Pay, and PayPal.
+      </p>
+      <div class="mcp-grid">
+        <div class="fs-rail-box">
+          <h3>CryptoBill Forge Pro — $15</h3>
+          <p class="inv-muted" style="margin:6px 0 12px;">Unlimited line items, white-label A4 PDF invoices, custom accent branding, and batch JSON presets for every <code>cryptobill_quote</code> link.</p>
+          <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="CB">Buy CryptoBill Pro ($15)</button>
+        </div>
+        <div class="fs-rail-box">
+          <h3>WebLead Extractor Pro — $15</h3>
+          <p class="inv-muted" style="margin:6px 0 12px;">Privacy-first Chrome MV3 extension extracting HTML tables, ARIA grids, JSON-LD, and emails to clean CSV/JSON/Markdown.</p>
+          <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="WL">Buy WebLead Pro ($15)</button>
+        </div>
+        <div class="fs-rail-box">
+          <h3>AutoShorts Studio Pro — $19</h3>
+          <p class="inv-muted" style="margin:6px 0 12px;">Local Python/FFmpeg batch 9:16/16:9/1:1 short-form video pipeline with SHA-256 deduplication and beat-synced subtitles.</p>
+          <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="AS">Buy AutoShorts Pro ($19)</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="mcp.html">MCP Server</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="json2sheet.html">JSON2Sheet Lab</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="txdecode.html">Calldata Lens</a>
+        <a href="envshield.html">EnvShield</a>
+        <a href="llms.txt">llms.txt</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { bindCheckoutTriggers } from "./assets/checkout.js";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      bindCheckoutTriggers();
+
+      const themeBtn = document.getElementById("themeToggleBtn");
+      if (themeBtn) {
+        const saved = window.localStorage.getItem("forgesuite_theme") || "dark";
+        document.documentElement.dataset.theme = saved;
+        themeBtn.textContent = saved === "light" ? "☀ Light" : "🌙 Dark";
+        themeBtn.addEventListener("click", () => {
+          const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+          document.documentElement.dataset.theme = next;
+          window.localStorage.setItem("forgesuite_theme", next);
+          themeBtn.textContent = next === "light" ? "☀ Light" : "🌙 Dark";
+        });
+      }
+
+      document.querySelectorAll("[data-copy-target]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-copy-target");
+          const target = id ? document.getElementById(id) : null;
+          if (!target) return;
+          const prev = btn.textContent;
+          try {
+            await navigator.clipboard.writeText(target.textContent || "");
+            btn.textContent = "Copied ✓";
+            setTimeout(() => {
+              btn.textContent = prev;
+            }, 1600);
+          } catch {}
+        });
+      });
+    });
+  </script>
+</body>
+</html>
