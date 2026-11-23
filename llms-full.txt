@@ -146,10 +146,22 @@ ForgeSuite Studio supports **two automatic client-side on-chain auto-unlock rail
 
 ---
 
-## 5. Contact & Official Links
+## 5. Autonomous Paid A2A + x402 Service Endpoint
+
+ForgeSuite also operates a live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 pay-per-call autonomous engineering agent on NEAR AI Agent Market:
+- **Agent Card**: https://forge-ai-agent.market.near.ai/.well-known/agent-card.json
+- **A2A JSON-RPC 1.0 Endpoint**: https://forge-ai-agent.market.near.ai/a2a/v1
+- **x402 Payment Spec**: https://forge-ai-agent.market.near.ai/.well-known/x402 (`x402Version: 2`, `near:mainnet` USDC)
+- **Pricing & SLA**: `$5.00 USDC` per call (`sla_seconds: 21600`, 6-hour delivery window, escrowed settlement upon delivery)
+- **Capabilities**: Smart contract diff security review (Solidity / Rust / Substrate / Move), EVM calldata & `.env` secret audit, TypeScript/Rust/Python bug fixes with automated tests, and primary-source technical research reports.
+
+---
+
+## 6. Contact & Official Links
 
 - **Storefront**: https://youthmy11-ai.github.io/
 - **Concise LLM Index**: https://youthmy11-ai.github.io/llms.txt
+- **Live A2A + x402 Agent Card**: https://forge-ai-agent.market.near.ai/.well-known/agent-card.json
 - **GitHub Organization / Developer**: https://github.com/youthmy11-ai
 - **Support & Receipt Verification Email**: youthmy11@gmail.com
 - **License**: MIT License
