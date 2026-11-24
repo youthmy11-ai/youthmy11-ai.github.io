@@ -88,6 +88,7 @@ import {
   normalizeBrandCandidate,
   scanBrandDomainAndHandles,
 } from "../mcp/forgesuite-mcp.mjs";
+import { createForgeSuiteMcpbBuffer } from "../mcp/pack-mcpb.mjs";
 import {
   BRANDGUARD_DEFAULT_TLDS,
   CORS_RDAP_BY_TLD,
@@ -2287,4 +2288,42 @@ test("BrandGuard supports Free 4-variation vs Pro 6-variation scans, 25-brand Ba
   assert.match(brandHtml, /Google Play/);
   assert.match(brandHtml, /data-checkout-sku="BUNDLE"/);
   assert.match(brandHtml, /data-checkout-sku="CB"/);
+});
+
+test("root server.json, deterministic .mcpb packer, and GitHub OIDC MCP Registry workflow stay synced", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const serverJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "server.json"), "utf8"));
+  const pkgJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
+  const { version, fileSha256, archiveBuffer } = createForgeSuiteMcpbBuffer(repoRoot);
+
+  assert.equal(
+    serverJson.$schema,
+    "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+  );
+  assert.equal(serverJson.name, "io.github.youthmy11-ai/forgesuite-mcp");
+  assert.equal(serverJson.version, pkgJson.version);
+  assert.ok(serverJson.description.length >= 1 && serverJson.description.length <= 100);
+  assert.equal(serverJson.repository.url, "https://github.com/youthmy11-ai/youthmy11-ai.github.io");
+  assert.equal(serverJson.repository.source, "github");
+
+  const mcpbPkg = serverJson.packages[0];
+  assert.equal(mcpbPkg.registryType, "mcpb");
+  assert.equal(
+    mcpbPkg.identifier,
+    `https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v${version}/forgesuite-mcp.mcpb`
+  );
+  assert.equal(mcpbPkg.version, version);
+  assert.equal(mcpbPkg.fileSha256, fileSha256);
+  assert.equal(mcpbPkg.transport.type, "stdio");
+  assert.equal(mcpbPkg.registryBaseUrl, undefined);
+  assert.equal(archiveBuffer.readUInt32LE(0), 0x04034b50, "MCPB bundle must start with PKZIP signature");
+
+  const wf = fs.readFileSync(
+    path.join(repoRoot, ".github", "workflows", "publish-mcp-registry.yml"),
+    "utf8"
+  );
+  assert.match(wf, /id-token:\s*write/);
+  assert.match(wf, /contents:\s*write/);
+  assert.match(wf, /mcp-publisher login github-oidc/);
+  assert.match(wf, /mcp-publisher publish/);
 });

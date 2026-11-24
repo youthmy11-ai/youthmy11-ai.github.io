@@ -1,0 +1,78 @@
+name: Publish ForgeSuite MCP to Official Registry
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "server.json"
+      - "package.json"
+      - "mcp/**"
+      - ".github/workflows/publish-mcp-registry.yml"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  publish-mcp-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build deterministic .mcpb bundle and sync server.json SHA-256
+        run: |
+          node mcp/pack-mcpb.mjs dist/forgesuite-mcp.mcpb --sync-server-json
+          unzip -t dist/forgesuite-mcp.mcpb
+          cat server.json
+
+      - name: Upload forgesuite-mcp.mcpb to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(node -p "JSON.parse(require('fs').readFileSync('server.json','utf8')).version")
+          TAG="v${VERSION}"
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" dist/forgesuite-mcp.mcpb --clobber
+          else
+            gh release create "${TAG}" dist/forgesuite-mcp.mcpb \
+              --target "${GITHUB_SHA}" \
+              --title "ForgeSuite MCP Server ${TAG}" \
+              --notes "Zero-dependency Node 20+ MCP Server (${TAG}, 7 tools) for Web3 EVM/Solana token risk scanning, calldata decoding, .env secret auditing, LLM FinOps, crypto invoicing, and brand availability."
+          fi
+
+      - name: Verify public GitHub Release asset accessibility
+        run: |
+          ASSET_URL=$(node -p "JSON.parse(require('fs').readFileSync('server.json','utf8')).packages[0].identifier")
+          for i in $(seq 1 15); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" -I "${ASSET_URL}")
+            echo "Release asset HEAD check #${i}: HTTP ${STATUS}"
+            if [ "${STATUS}" = "200" ] || [ "${STATUS}" = "302" ]; then
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Authenticate via GitHub OIDC and publish to Official MCP Registry
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+          chmod +x mcp-publisher
+          ./mcp-publisher validate
+
+          SERVER_ENC=$(node -p "encodeURIComponent(JSON.parse(require('fs').readFileSync('server.json','utf8')).name)")
+          VER_ENC=$(node -p "encodeURIComponent(JSON.parse(require('fs').readFileSync('server.json','utf8')).version)")
+          EXISTING=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.modelcontextprotocol.io/v0.1/servers/${SERVER_ENC}/versions/${VER_ENC}")
+          if [ "${EXISTING}" = "200" ]; then
+            echo "Version already published on registry.modelcontextprotocol.io (HTTP 200) — skipping duplicate publish."
+            exit 0
+          fi
+
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish

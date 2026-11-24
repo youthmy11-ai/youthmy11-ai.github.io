@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.youthmy11-ai/forgesuite-mcp",
+  "title": "ForgeSuite Web3, FinOps & Brand Security MCP",
+  "description": "Web3 token rug/proxy audit, calldata decode, .env secret scan, LLM cost, invoice & brand check.",
+  "version": "1.2.0",
+  "websiteUrl": "https://youthmy11-ai.github.io/mcp.html",
+  "repository": {
+    "url": "https://github.com/youthmy11-ai/youthmy11-ai.github.io",
+    "source": "github",
+    "id": "1459070715"
+  },
+  "icons": [
+    {
+      "src": "https://youthmy11-ai.github.io/assets/og-banner.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.2.0/forgesuite-mcp.mcpb",
+      "version": "1.2.0",
+      "fileSha256": "1c47db8ef607e255254eadb89f641c0da075dd9f13910d6a7bf9e554a3bf62f4",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
