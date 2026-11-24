@@ -13,6 +13,11 @@
       "url": "https://forge-token-guard.market.near.ai/a2a/v1",
       "protocolBinding": "JSONRPC",
       "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://forge-data-finops.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
     }
   ],
   "capabilities": {
@@ -43,6 +48,12 @@
       "name": "Forge TokenGuard Instant Scanner ($0.25 USDC/call A2A + x402)",
       "description": "Sub-15-second live RPC EVM proxy/bytecode risk scanner, Solana SPL/Token-2022 authority & holder concentration scanner, calldata decoder, and .env secret redactor ($0.25 USDC/call at https://forge-token-guard.market.near.ai/a2a/v1).",
       "tags": ["token-audit", "evm", "solana", "token-2022", "calldata", "x402", "fast-rpc"]
+    },
+    {
+      "id": "forge-data-finops",
+      "name": "Forge Data & FinOps Instant Utility ($0.15 USDC/call A2A + x402)",
+      "description": "Sub-500ms nested JSON-to-CSV/Markdown flattener with PII redaction, 8-model multi-turn LLM budget estimator, and milestone SOW + Solana Pay/BEP20/TRC20 invoice URI generator ($0.15 USDC/call at https://forge-data-finops.market.near.ai/a2a/v1).",
+      "tags": ["json-to-csv", "pii-redaction", "llm-cost", "finops", "crypto-invoicing", "solana-pay", "x402"]
     },
     {
       "id": "forgesuite-mcp",
