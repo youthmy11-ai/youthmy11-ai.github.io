@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.youthmy11-ai/forgesuite-mcp",
   "title": "ForgeSuite DevSecOps, Web3 Risk, Multi-Chain Wallet, Creator Media, Brand Launch & Crypto FinOps MCP Server",
-  "description": "Zero-dependency Node.js 20+ stdio MCP server (v1.4.0, 9 tools — run instantly via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`): .env secret leak scanner, EVM calldata/risk decoder, LLM token cost calculator, crypto invoice URI generator, live EVM token/proxy/opcode risk scanner, live Solana SPL/Token-2022 mint risk scanner, live RDAP+DoH domain & developer/social handle availability scanner, live 6-chain EVM/Solana wallet portfolio, EIP-7702 & Gnosis Safe multisig inspector, and offline .srt/.vtt 9:16 subtitle & caption quality auditor.",
-  "version": "1.4.0",
+  "description": "Zero-dependency Node.js 20+ stdio MCP server (v1.5.0, 10 tools — run instantly via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`): .env secret leak scanner, EVM calldata/risk decoder, LLM token cost calculator, crypto invoice URI generator, live EVM token/proxy/opcode risk scanner, live Solana SPL/Token-2022 mint risk scanner, live RDAP+DoH domain & developer/social handle availability scanner, live 6-chain EVM/Solana wallet portfolio, EIP-7702 & Gnosis Safe multisig inspector, offline .srt/.vtt 9:16 subtitle & caption quality auditor, and offline AI voiceover script duration calculator, rights/consent pre-flight scanner & multi-aspect spec builder.",
+  "version": "1.5.0",
   "websiteUrl": "https://youthmy11-ai.github.io/mcp.html",
   "repository": {
     "url": "https://github.com/youthmy11-ai/youthmy11-ai.github.io",
@@ -13,7 +13,7 @@
     {
       "registryType": "npm",
       "identifier": "github:youthmy11-ai/youthmy11-ai.github.io",
-      "version": "1.4.0",
+      "version": "1.5.0",
       "transport": {
         "type": "stdio"
       }
@@ -55,6 +55,10 @@
     {
       "name": "subtitle_caption_audit",
       "description": "Audit .srt and .vtt subtitle tracks offline for timestamp overlaps, CPS > 20 reading speed, 9:16 vertical safe-zone line width, mid-sentence cuts, and brand term fidelity — returning a 0–100 quality score plus normalized .srt/.vtt output."
+    },
+    {
+      "name": "media_brief_audit",
+      "description": "Audit AI media briefs and spoken voiceover scripts offline: counts Latin & CJK words/syllables, computes 135/150/165 WPM durations vs target seconds, flags FFmpeg atempo > 1.20x distortion or < 0.85x drag, checks likeness consent, copyright & trademark safety (0–100), and outputs 1:1, 9:16, 16:9, and 4:5 agent JSON specs."
     }
   ]
 }

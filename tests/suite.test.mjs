@@ -85,6 +85,7 @@ import {
 } from "../assets/tokenaudit.js";
 import {
   SERVER_INFO as MCP_SERVER_INFO,
+  auditMediaBrief as mcpAuditMediaBrief,
   auditSubtitleCaptions,
   classifyWalletEvmBytecode,
   deriveSolanaAssociatedTokenAddress,
@@ -159,6 +160,27 @@ import {
   serializeToVerticalAss,
   serializeToVtt,
 } from "../assets/srtlab.js";
+import {
+  ASPECT_RATIO_SPECS,
+  ATEMPO_MAX_SAFE,
+  ATEMPO_MIN_SAFE,
+  DEMO_CAMPAIGN_BATCH,
+  MAX_BATCH_MEDIA_BRIEFS,
+  MEDIASTUDIO_SAMPLES,
+  NEAR_MEDIA_GEN_URL,
+  auditMediaBrief,
+  buildAspectAndProviderSpecs,
+  buildFfmpegAtempoChain,
+  buildMediaBriefInvoicePayload,
+  buildMediaBriefSowState,
+  calculateScriptPacing,
+  countScriptWordsAndSyllables,
+  exportBatchMediaBriefCsv,
+  parseBatchMediaBriefs,
+  parseMediaStudioQueryParams,
+  runBatchMediaBriefAudit,
+  scanMediaRightsAndConsent,
+} from "../assets/mediastudio.js";
 
 test("verifySolanaUsdcTx and verifySolanaUsdcTxOnChain validate SPL USDC transfers and issue keys", async () => {
   const sampleTx = {
@@ -1118,12 +1140,17 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsFull, /BrandGuard/);
   assert.match(llmsFull, /WalletLens/);
   assert.match(llmsFull, /ClipCaption Lab/);
+  assert.match(llmsFull, /MediaBrief Studio/);
   assert.match(llmsFull, /ForgeSuite MCP Server/);
   assert.doesNotMatch(llmsTxt, /\b7 web (applications|utilities|tools)\b/i);
   assert.doesNotMatch(llmsFull, /\b7 web (applications|utilities|tools)\b/i);
-  assert.match(llmsTxt, /All 10 web applications/);
-  assert.match(llmsFull, /All 10 web applications/);
+  assert.doesNotMatch(llmsTxt, /\b10 web (applications|utilities|tools)\b/i);
+  assert.doesNotMatch(llmsFull, /\b10 web (applications|utilities|tools)\b/i);
+  assert.match(llmsTxt, /All 11 web applications/);
+  assert.match(llmsFull, /All 11 web applications/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/mcp\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/mediastudio\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/ai-voiceover-script-duration-calculator-compliance-checker\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/srtlab\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/tiktok-reels-9-16-subtitle-safe-zone-checker\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/youtube-most-replayed-clipper-ai-dubbing-guide\.html/);
@@ -1142,6 +1169,8 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/a\/forge-ai-agent/);
   assert.match(llmsFull, /pay-per-use-media-gen/);
   assert.match(llmsFull, /media-generator-sample\.md/);
+  assert.match(llmsFull, /mediastudio\.html/);
+  assert.match(llmsFull, /ai-voiceover-script-duration-calculator-compliance-checker\.html/);
   assert.match(llmsFull, /srtlab\.html/);
   assert.match(llmsFull, /tiktok-reels-9-16-subtitle-safe-zone-checker\.html/);
   assert.match(llmsFull, /youtube-most-replayed-clipper-ai-dubbing-guide\.html/);
@@ -1172,6 +1201,8 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
     { file: "sowbuilder.html", url: "https://youthmy11-ai.github.io/sowbuilder.html", category: "BusinessApplication" },
     { file: "txdecode.html", url: "https://youthmy11-ai.github.io/txdecode.html", category: "DeveloperApplication" },
     { file: "envshield.html", url: "https://youthmy11-ai.github.io/envshield.html", category: "SecurityApplication" },
+    { file: "mediastudio.html", url: "https://youthmy11-ai.github.io/mediastudio.html", category: "MultimediaApplication" },
+    { file: "ai-voiceover-script-duration-calculator-compliance-checker.html", url: "https://youthmy11-ai.github.io/ai-voiceover-script-duration-calculator-compliance-checker.html", category: "MultimediaApplication" },
     { file: "srtlab.html", url: "https://youthmy11-ai.github.io/srtlab.html", category: "MultimediaApplication" },
     { file: "tiktok-reels-9-16-subtitle-safe-zone-checker.html", url: "https://youthmy11-ai.github.io/tiktok-reels-9-16-subtitle-safe-zone-checker.html", category: "MultimediaApplication" },
     { file: "youtube-most-replayed-clipper-ai-dubbing-guide.html", url: "https://youthmy11-ai.github.io/youtube-most-replayed-clipper-ai-dubbing-guide.html", category: "MultimediaApplication" },
@@ -1276,15 +1307,15 @@ test("ForgeSuite MCP stdio server handles initialize, notifications/initialized,
   assert.equal(messages[0].id, 1);
   assert.equal(messages[0].result.protocolVersion, "2024-11-05");
   assert.equal(messages[0].result.serverInfo.name, "forgesuite-mcp");
-  assert.equal(messages[0].result.serverInfo.version, "1.4.0");
-  assert.equal(MCP_SERVER_INFO.version, "1.4.0");
+  assert.equal(messages[0].result.serverInfo.version, "1.5.0");
+  assert.equal(MCP_SERVER_INFO.version, "1.5.0");
   assert.ok(messages[0].result.capabilities.tools);
 
   assert.equal(messages[1].id, 2);
   assert.deepEqual(messages[1].result, {});
 
   assert.equal(messages[2].id, 3);
-  assert.equal(messages[2].result.tools.length, 9);
+  assert.equal(messages[2].result.tools.length, 10);
   const toolNames = messages[2].result.tools.map((t) => t.name).sort();
   assert.deepEqual(toolNames, [
     "brand_domain_handle_scan",
@@ -1292,6 +1323,7 @@ test("ForgeSuite MCP stdio server handles initialize, notifications/initialized,
     "cryptobill_quote",
     "envshield_scan",
     "evm_token_risk_scan",
+    "media_brief_audit",
     "multi_chain_wallet_scan",
     "solana_mint_risk_scan",
     "subtitle_caption_audit",
@@ -1495,7 +1527,7 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
 
   const mcpManifest = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "mcp", "server.json"), "utf8"));
   assert.equal(mcpManifest.name, "io.github.youthmy11-ai/forgesuite-mcp");
-  assert.equal(mcpManifest.version, "1.4.0");
+  assert.equal(mcpManifest.version, "1.5.0");
   assert.deepEqual(
     mcpManifest.tools.map((t) => t.name),
     [
@@ -1508,6 +1540,7 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
       "brand_domain_handle_scan",
       "multi_chain_wallet_scan",
       "subtitle_caption_audit",
+      "media_brief_audit",
     ]
   );
 });
@@ -1920,7 +1953,7 @@ test("ForgeSuite MCP v1.1.0 executes evm_token_risk_scan and solana_mint_risk_sc
  * 14. ForgeSuite MCP v1.2.0 Packaging, LF Line-Endings & Tool #7 Brand Scanner
  * ========================================================================== */
 
-test("root package.json, .gitattributes, shebang LF line-endings, and v1.4.0 npx discovery docs are valid", () => {
+test("root package.json, .gitattributes, shebang LF line-endings, and v1.5.0 npx discovery docs are valid", () => {
   const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const pkgPath = path.join(rootDir, "package.json");
   const gitAttrPath = path.join(rootDir, ".gitattributes");
@@ -1929,7 +1962,7 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.4.0 npx
   assert.ok(fs.existsSync(pkgPath), "root package.json must exist for npx github:... execution");
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
   assert.equal(pkg.name, "forgesuite-mcp");
-  assert.equal(pkg.version, "1.4.0");
+  assert.equal(pkg.version, "1.5.0");
   assert.equal(pkg.type, "module");
   assert.deepEqual(pkg.bin, { "forgesuite-mcp": "./mcp/forgesuite-mcp.mjs" });
   assert.equal(pkg.engines?.node, ">=20.0.0");
@@ -1969,7 +2002,8 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.4.0 npx
     assert.ok(content.includes("brand_domain_handle_scan"), `${rel} must list brand_domain_handle_scan`);
     assert.ok(content.includes("multi_chain_wallet_scan"), `${rel} must list multi_chain_wallet_scan`);
     assert.ok(content.includes("subtitle_caption_audit"), `${rel} must list subtitle_caption_audit`);
-    assert.ok(content.includes("1.4.0"), `${rel} must reference v1.4.0`);
+    assert.ok(content.includes("media_brief_audit"), `${rel} must list media_brief_audit`);
+    assert.ok(content.includes("1.5.0"), `${rel} must reference v1.5.0`);
   }
 });
 
@@ -2092,7 +2126,7 @@ test("brand_domain_handle_scan (Tool #7) audits RDAP+DoH domains, npm/PyPI/GitHu
   assert.match(direct.checkedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
   assert.deepEqual(direct.tldsChecked, ["com", "io", "ai", "dev", "app", "org"]);
   assert.equal(direct.upgradeLinks.proBundlePriceUsd, 35);
-  assert.equal(direct.upgradeLinks.nearAgentFleet.length, 7);
+  assert.equal(direct.upgradeLinks.nearAgentFleet.length, 8);
 
   const nova = direct.results[0];
   assert.equal(nova.normalizedSlug, "novaforgex");
@@ -2486,7 +2520,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   const vscodeInsidersLink =
     "vscode-insiders:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D";
   const mcpbAssetUrl =
-    "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.4.0/forgesuite-mcp.mcpb";
+    "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.5.0/forgesuite-mcp.mcpb";
 
   // Verify encoded VS Code deep-link payload decodes cleanly to valid JSON
   const decodedPayload = JSON.parse(decodeURIComponent(vscodeLink.split("?")[1]));
@@ -2517,7 +2551,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   ]) {
     assert.ok(doc.includes(registryUrl), `${label} missing Official MCP Registry URL`);
     assert.ok(doc.includes("io.github.youthmy11-ai/forgesuite-mcp"), `${label} missing registry name`);
-    assert.ok(doc.includes("v1.4.0 Active"), `${label} missing v1.4.0 Active badge`);
+    assert.ok(doc.includes("v1.5.0 Active"), `${label} missing v1.5.0 Active badge`);
     assert.ok(doc.includes(vscodeLink), `${label} missing 1-click VS Code MCP install link`);
     assert.ok(doc.includes(vscodeInsidersLink), `${label} missing 1-click VS Code Insiders MCP install link`);
     assert.ok(doc.includes(mcpbAssetUrl), `${label} missing .mcpb release bundle download link`);
@@ -2527,7 +2561,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   }
 
   assert.ok(indexHtml.includes(registryUrl), "index.html missing Official MCP Registry URL");
-  assert.ok(indexHtml.includes("v1.4.0 Active"), "index.html missing v1.4.0 Active badge");
+  assert.ok(indexHtml.includes("v1.5.0 Active"), "index.html missing v1.5.0 Active badge");
   for (const agentUrl of fleetAgents) {
     assert.ok(indexHtml.includes(agentUrl), `index.html missing A2A fleet agent ${agentUrl}`);
   }
@@ -2539,6 +2573,8 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
     assert.ok(profileMd.includes(vscodeLink), "profile README missing VS Code install link");
     assert.ok(profileMd.includes(vscodeInsidersLink), "profile README missing VS Code Insiders install link");
     assert.ok(profileMd.includes(mcpbAssetUrl), "profile README missing .mcpb bundle link");
+    assert.ok(profileMd.includes("mediastudio.html"), "profile README missing MediaBrief Studio link");
+    assert.ok(profileMd.includes("ai-voiceover-script-duration-calculator-compliance-checker.html"), "profile README missing WPM & Rights guide link");
     assert.ok(profileMd.includes("srtlab.html"), "profile README missing ClipCaption Lab link");
     for (const agentUrl of fleetAgents) {
       assert.ok(profileMd.includes(agentUrl), `profile README missing ${agentUrl}`);
@@ -3379,7 +3415,7 @@ test("srtlab.html and all 10 core client-side web apps carry valid links, Pro co
   }
   verifyInternalRelativeHtmlLinks(repoRoot, "srtlab.html", srtHtml);
 
-  const tenCoreWebApps = [
+  const elevenCoreWebApps = [
     "cryptobill.html",
     "tokencalc.html",
     "json2sheet.html",
@@ -3390,10 +3426,11 @@ test("srtlab.html and all 10 core client-side web apps carry valid links, Pro co
     "brandcheck.html",
     "walletcheck.html",
     "srtlab.html",
+    "mediastudio.html",
   ];
   const indexHtml = fs.readFileSync(path.join(repoRoot, "index.html"), "utf8");
   const sitemapXml = fs.readFileSync(path.join(repoRoot, "sitemap.xml"), "utf8");
-  for (const appFile of tenCoreWebApps) {
+  for (const appFile of elevenCoreWebApps) {
     assert.ok(fs.existsSync(path.join(repoRoot, appFile)), `Missing core web app ${appFile}`);
     assert.ok(indexHtml.includes(`href="${appFile}"`), `index.html missing link to ${appFile}`);
     assert.ok(
@@ -3437,7 +3474,7 @@ test("tiktok-reels-9-16-subtitle-safe-zone-checker.html ships valid SoftwareAppl
     "PlayResY: 1920",
     "srtlab.html",
     "subtitle_caption_audit",
-    "v1.4.0",
+    "v1.5.0",
     "npx --yes github:youthmy11-ai/youthmy11-ai.github.io",
     NEAR_VIDEO_CLIPPER_URL,
     NEAR_VIDEO_DUBBER_URL,
@@ -3497,7 +3534,7 @@ test("youtube-most-replayed-clipper-ai-dubbing-guide.html ships valid SoftwareAp
     "AutoShorts Studio Pro",
     "srtlab.html",
     "subtitle_caption_audit",
-    "v1.4.0",
+    "v1.5.0",
     "npx --yes github:youthmy11-ai/youthmy11-ai.github.io",
     NEAR_VIDEO_CLIPPER_URL,
     NEAR_VIDEO_DUBBER_URL,
@@ -3536,7 +3573,8 @@ test("index.html #technical-guides lists all 6 task-intent technical guides and 
   assert.ok(guidesSectionMatch, "index.html missing #technical-guides section");
   const guidesHtml = guidesSectionMatch[0];
 
-  const expectedSixGuides = [
+  const expectedSevenGuides = [
+    "ai-voiceover-script-duration-calculator-compliance-checker.html",
     "tiktok-reels-9-16-subtitle-safe-zone-checker.html",
     "youtube-most-replayed-clipper-ai-dubbing-guide.html",
     "eip-7702-delegation-gnosis-safe-checker.html",
@@ -3544,14 +3582,14 @@ test("index.html #technical-guides lists all 6 task-intent technical guides and 
     "solana-token-2022-scanner.html",
     "evm-proxy-honeypot-scanner.html",
   ];
-  for (const guideFile of expectedSixGuides) {
+  for (const guideFile of expectedSevenGuides) {
     assert.ok(
       guidesHtml.includes(`href="${guideFile}"`),
       `index.html #technical-guides missing "${guideFile}"`
     );
   }
   const railCards = [...guidesHtml.matchAll(/class="fs-rail-box"/g)];
-  assert.equal(railCards.length, 6, "index.html #technical-guides must display exactly 6 guide cards");
+  assert.equal(railCards.length, 7, "index.html #technical-guides must display exactly 7 guide cards");
 
   verifyInternalRelativeHtmlLinks(repoRoot, "index.html", indexHtml);
   verifyInternalRelativeHtmlLinks(repoRoot, "srtlab.html", srtHtml);
@@ -3618,4 +3656,343 @@ test("8th live cloud agent @pay-per-use-media-gen ($0.45 USDC, UUID 6565da7b-bf6
       `${docFile} still contains stale 7-agent fleet count`
     );
   }
+});
+
+/* ============================================================================
+ * 21. Web App #11 (`MediaBrief Studio` — mediastudio.html / assets/mediastudio.js),
+ *     ForgeSuite MCP v1.5.0 Tool #10 (`media_brief_audit`), &
+ *     SEO Guide #7 (`ai-voiceover-script-duration-calculator-compliance-checker.html`)
+ * ========================================================================== */
+
+test("MediaBrief Studio pacing engine counts Latin/CJK words & syllables, computes 135/150/165 WPM durations, chains FFmpeg atempo, and flags >1.20x distortion / <0.85x drag vs ±0.5s golden window", () => {
+  const emptyCounts = countScriptWordsAndSyllables("   ");
+  assert.equal(emptyCounts.totalWords, 0);
+  assert.equal(emptyCounts.syllableCount, 0);
+
+  // Bilingual Latin + CJK count check
+  const cjkMix = countScriptWordsAndSyllables("ForgeSuite delivers AI dubbing. 高品質な音声吹き替え。");
+  assert.equal(cjkMix.latinWords, 4);
+  assert.equal(cjkMix.cjkChars, 10);
+  assert.equal(cjkMix.totalWords, 14);
+  assert.equal(cjkMix.hasCjk, true);
+  assert.ok(cjkMix.syllableCount >= 14);
+
+  // Exact 75-word script at 150 WPM -> 30.00s GOLDEN_WINDOW
+  const seventyFiveWords = Array.from({ length: 75 }, () => "craft").join(" ");
+  const golden = calculateScriptPacing(seventyFiveWords, { targetSec: 30, wpm: 150 });
+  assert.equal(golden.durationsSec.wpm150, 30);
+  assert.equal(golden.durationsSec.wpm135, 33.33);
+  assert.equal(golden.durationsSec.wpm165, 27.27);
+  assert.equal(golden.inGoldenWindow, true);
+  assert.equal(golden.pacingStatus, "GOLDEN_WINDOW");
+  assert.equal(golden.wordDelta, 0);
+  assert.equal(golden.requiredAtempo, 1);
+  assert.equal(golden.atempoDistortionRisk, false);
+  assert.equal(golden.atempoUnderrunRisk, false);
+
+  // Overlong 8.0s script -> atempo > 1.20x distortion + exact trim guidance
+  const overlong = calculateScriptPacing(MEDIASTUDIO_SAMPLES.overlong_8s_hook.script, {
+    targetSec: 8,
+    wpm: 150,
+  });
+  assert.ok(overlong.requiredAtempo > ATEMPO_MAX_SAFE);
+  assert.equal(overlong.atempoDistortionRisk, true);
+  assert.equal(overlong.pacingStatus, "TOO_LONG_ATEMPO_DISTORTION");
+  assert.ok(overlong.wordsToTrim >= 12);
+  assert.ok(overlong.wordDelta < 0);
+
+  // Short 30.0s script -> atempo < 0.85x underrun + exact add guidance
+  const tooShort = calculateScriptPacing("Short eight word hook for thirty second video.", {
+    targetSec: 30,
+    wpm: 150,
+  });
+  assert.ok(tooShort.requiredAtempo < ATEMPO_MIN_SAFE);
+  assert.equal(tooShort.atempoUnderrunRisk, true);
+  assert.equal(tooShort.pacingStatus, "TOO_SHORT_UNDERRUN");
+  assert.ok(tooShort.wordsToAdd >= 60);
+  assert.ok(tooShort.wordDelta > 0);
+
+  // FFmpeg atempo chaining for extreme ratios (> 2.0x and < 0.5x)
+  assert.equal(buildFfmpegAtempoChain(1.15), "atempo=1.150");
+  assert.equal(buildFfmpegAtempoChain(2.4), "atempo=2.000,atempo=1.200");
+  assert.equal(buildFfmpegAtempoChain(0.4), "atempo=0.500,atempo=0.800");
+});
+
+test("MediaBrief Studio Rights & Consent Pre-Flight Scanner blocks unconsented celebrities, copyrighted Disney/Marvel/Nintendo/Anime IP & deceptive claims while respecting consent=1 and ownedBrands", () => {
+  const clean = scanMediaRightsAndConsent({
+    brief: MEDIASTUDIO_SAMPLES.golden_30s_spot.brief,
+    script: MEDIASTUDIO_SAMPLES.golden_30s_spot.script,
+    consentVerified: false,
+    ownedBrands: ["ForgeSuite", "Artisan Kiln"],
+  });
+  assert.equal(clean.safetyScore, 100);
+  assert.equal(clean.verdict, "CLEARED_FOR_GENERATION");
+  assert.equal(clean.counts.totalBlockingFlags, 0);
+
+  // Unconsented celebrity + Mickey Mouse/Spider-Man/Pikachu + Nike logo + guaranteed 100x
+  const dirty = scanMediaRightsAndConsent({
+    brief: MEDIASTUDIO_SAMPLES.rights_preflight_block.brief,
+    script: MEDIASTUDIO_SAMPLES.rights_preflight_block.script,
+    consentVerified: false,
+    ownedBrands: ["ForgeSuite"],
+  });
+  assert.equal(dirty.safetyScore, 0);
+  assert.equal(dirty.verdict, "BLOCKED_PREFLIGHT_RISK");
+  assert.ok(dirty.counts.realPersonHits >= 2, "Must detect well-known celebrity / Taylor Swift / Elon Musk");
+  assert.ok(dirty.counts.copyrightedCharacterHits >= 2, "Must detect Spider-Man / Pikachu / Mickey Mouse");
+  assert.ok(dirty.counts.thirdPartyBrandHits >= 1, "Must detect Nike swoosh logo");
+  assert.ok(dirty.counts.deceptiveOrSensitiveHits >= 1, "Must detect breaking news alert / guaranteed 100x");
+
+  // Consent = true clears real-person likeness block when no IP or deceptive claims exist
+  const consentedFounder = scanMediaRightsAndConsent({
+    brief: "Studio keynote clip featuring Taylor Swift with signed talent release on file",
+    script: "Welcome to our studio acoustic session.",
+    consentVerified: true,
+    ownedBrands: [],
+  });
+  assert.equal(consentedFounder.counts.realPersonHits, 0);
+  assert.equal(consentedFounder.counts.consentedPersonNotes, 1);
+  assert.equal(consentedFounder.safetyScore, 100);
+  assert.equal(consentedFounder.verdict, "CLEARED_FOR_GENERATION");
+
+  // Owned brand exemption clears third-party logo flag when licensed/owned
+  const licensedNike = scanMediaRightsAndConsent({
+    brief: "Product hero shot featuring official Nike swoosh on running shoe",
+    script: "Built for marathon speed.",
+    consentVerified: false,
+    ownedBrands: ["Nike"],
+  });
+  assert.equal(licensedNike.counts.thirdPartyBrandHits, 0);
+  assert.equal(licensedNike.safetyScore, 100);
+});
+
+test("MediaBrief Studio Multi-Aspect Spec Builder (1:1, 9:16, 16:9, 4:5), Pro 25-Asset Campaign Batch Matrix, CSV formula guard, URL query params (?script=...&targetSec=...&ratio=9:16&consent=0) & CryptoBill/ScopeGuard handoffs", () => {
+  const expectedResolutions = {
+    "1:1": "1024x1024",
+    "9:16": "1080x1920",
+    "16:9": "1920x1080",
+    "4:5": "1080x1350",
+  };
+  for (const [ratio, res] of Object.entries(expectedResolutions)) {
+    const built = buildAspectAndProviderSpecs({
+      title: `Spec_${ratio}`,
+      script: "Handcrafted stoneware ceramic mug built by ForgeSuite.",
+      ratio,
+      targetSec: 8,
+    });
+    assert.equal(built.ratio, ratio);
+    assert.equal(built.resolution, res);
+    assert.equal(built.agentPayloads["pay-per-use-media-gen"].priceUsdc, 0.45);
+    assert.equal(built.agentPayloads["short-video-clipper"].priceUsdc, 0.5);
+    assert.equal(built.agentPayloads["multi-lang-video-dubber"].priceUsdc, 0.65);
+    assert.equal(built.agentPayloads["pay-per-use-media-gen"].jobSpec.resolution, res);
+  }
+
+  // Batch Matrix (<= 25 assets) + CSV formula injection guard
+  const batchLines = [
+    "=EvilFormulaAd | 9:16 | 30 | Oak table ceramic mug | " + MEDIASTUDIO_SAMPLES.golden_30s_spot.script,
+    ...DEMO_CAMPAIGN_BATCH.slice(1).map(
+      (d) => `${d.title} | ${d.ratio} | ${d.targetSec} | ${d.brief} | ${d.script}`
+    ),
+  ].join("\n");
+  const parsedList = parseBatchMediaBriefs(batchLines);
+  assert.equal(parsedList.length, 4);
+
+  const batchPack = runBatchMediaBriefAudit(parsedList, { ownedBrands: "ForgeSuite, Artisan Kiln" });
+  assert.equal(batchPack.ok, true);
+  assert.equal(batchPack.totalAssets, 4);
+  assert.equal(batchPack.okAssets, 4);
+  assert.equal(batchPack.blockedAssetsCount, 1);
+  assert.equal(batchPack.estimatedMediaGenBudgetUsdc, 1.8);
+
+  const csv = exportBatchMediaBriefCsv(batchPack);
+  assert.match(csv, /asset_title,aspect_ratio,resolution,words,syllables/);
+  assert.match(csv, /'=EvilFormulaAd/, "CSV must neutralize leading = formula injection");
+
+  const overCap = Array.from({ length: MAX_BATCH_MEDIA_BRIEFS + 1 }, (_, i) => ({
+    title: `Asset_${i + 1}`,
+    ratio: "9:16",
+    targetSec: 8,
+    script: "Twenty words of clean ad copy.",
+  }));
+  assert.throws(() => runBatchMediaBriefAudit(overCap), /up to 25/i);
+
+  // URL query parameter parsing (?script=...&targetSec=...&ratio=9:16&consent=0)
+  const qp = parseMediaStudioQueryParams(
+    "?script=Hello+ForgeSuite+creators&targetSec=8&ratio=9:16&consent=0&brands=ForgeSuite"
+  );
+  assert.equal(qp.script, "Hello ForgeSuite creators");
+  assert.equal(qp.targetSec, 8);
+  assert.equal(qp.ratio, "9:16");
+  assert.equal(qp.consentVerified, false);
+  assert.equal(qp.ownedBrands, "ForgeSuite");
+
+  const qpConsented = parseMediaStudioQueryParams("?script=Keynote&targetSec=30&ratio=4:5&consent=1");
+  assert.equal(qpConsented.ratio, "4:5");
+  assert.equal(qpConsented.consentVerified, true);
+
+  // CryptoBill & ScopeGuard SOW roundtrips
+  const inv = buildMediaBriefInvoicePayload(batchPack);
+  assert.equal(decodeInvoicePayload(encodeInvoicePayload(inv)).items.length, 2);
+
+  const sow = buildMediaBriefSowState(batchPack);
+  const decodedSow = decodeSowHandoffPayload(`#sow=${encodeSowHandoffPayload(sow)}`);
+  assert.equal(computeSowTotals(decodedSow).isBalanced, true);
+});
+
+test("ForgeSuite MCP v1.5.0 Tool #10 (media_brief_audit) matches browser engine 100% and executes cleanly via direct call, JSON-RPC, and stdio", async () => {
+  for (const sample of Object.values(MEDIASTUDIO_SAMPLES)) {
+    const webRes = auditMediaBrief(sample);
+    const mcpRes = mcpAuditMediaBrief(sample);
+    assert.equal(mcpRes.ok, true);
+    assert.equal(mcpRes.readinessScore, webRes.readinessScore);
+    assert.equal(mcpRes.verdict, webRes.verdict);
+    assert.deepEqual(mcpRes.pacing.durationsSec, webRes.pacing.durationsSec);
+    assert.equal(mcpRes.pacing.requiredAtempo, webRes.pacing.requiredAtempo);
+    assert.equal(mcpRes.pacing.wordDelta, webRes.pacing.wordDelta);
+    assert.equal(mcpRes.rightsAndConsent.safetyScore, webRes.rightsAndConsent.safetyScore);
+    assert.equal(mcpRes.aspectSpec.resolution, webRes.aspectSpec.resolution);
+  }
+
+  const rpc = await handleJsonRpcMessage({
+    jsonrpc: "2.0",
+    id: "mb-1",
+    method: "tools/call",
+    params: {
+      name: "media_brief_audit",
+      arguments: {
+        brief: MEDIASTUDIO_SAMPLES.golden_30s_spot.brief,
+        script: MEDIASTUDIO_SAMPLES.golden_30s_spot.script,
+        targetSec: 30,
+        ratio: "9:16",
+        consentVerified: false,
+        ownedBrands: ["ForgeSuite", "Artisan Kiln"],
+      },
+    },
+  });
+  assert.equal(rpc.id, "mb-1");
+  assert.equal(rpc.result.isError, false);
+  assert.equal(rpc.result.structuredContent.readinessScore, 100);
+  assert.equal(rpc.result.structuredContent.verdict, "PRODUCTION_READY");
+  assert.match(rpc.result.content[0].text, /mediastudio\.html/);
+  assert.match(rpc.result.content[0].text, /pay-per-use-media-gen/);
+
+  const stdioRes = await runMcpStdioSession([
+    JSON.stringify({
+      jsonrpc: "2.0",
+      id: "mb-stdio-block",
+      method: "tools/call",
+      params: {
+        name: "media_brief_audit",
+        arguments: {
+          brief: MEDIASTUDIO_SAMPLES.rights_preflight_block.brief,
+          script: MEDIASTUDIO_SAMPLES.rights_preflight_block.script,
+          targetSec: 15,
+          ratio: "1:1",
+          consentVerified: false,
+        },
+      },
+    }) + "\n",
+    JSON.stringify({
+      jsonrpc: "2.0",
+      id: "mb-stdio-empty",
+      method: "tools/call",
+      params: { name: "media_brief_audit", arguments: { script: "   ", brief: "" } },
+    }) + "\n",
+  ]);
+  assert.equal(stdioRes.code, 0);
+  assert.equal(stdioRes.messages[0].result.isError, false);
+  assert.equal(stdioRes.messages[0].result.structuredContent.verdict, "BLOCKED_RIGHTS_OR_CONSENT");
+  assert.equal(stdioRes.messages[0].result.structuredContent.aspectSpec.resolution, "1024x1024");
+  assert.equal(stdioRes.messages[1].result.isError, true);
+});
+
+test("mediastudio.html and ai-voiceover-script-duration-calculator-compliance-checker.html ship valid SoftwareApplication + TechArticle + FAQPage JSON-LD, bidirectional links, 1-click presets, and Pro/cloud CTAs", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const appFile = "mediastudio.html";
+  const seoFile = "ai-voiceover-script-duration-calculator-compliance-checker.html";
+  const appHtml = fs.readFileSync(path.join(repoRoot, appFile), "utf8");
+  const seoHtml = fs.readFileSync(path.join(repoRoot, seoFile), "utf8");
+  const srtHtml = fs.readFileSync(path.join(repoRoot, "srtlab.html"), "utf8");
+
+  // Verify mediastudio.html JSON-LD & controls
+  const appLd = extractAllJsonLdObjects(appHtml);
+  assert.ok(appLd.types.has("SoftwareApplication"));
+  assert.ok(appLd.types.has("FAQPage"));
+  for (const term of [
+    NEAR_MEDIA_GEN_URL,
+    NEAR_VIDEO_CLIPPER_URL,
+    NEAR_VIDEO_DUBBER_URL,
+    "$0.45 USDC",
+    "$0.50 USDC",
+    "$0.65 USDC",
+    "1024×1024",
+    "1080×1920",
+    "1920×1080",
+    "1080×1350",
+    "media_brief_audit",
+    'href="cryptobill.html"',
+    'href="sowbuilder.html"',
+    `href="${seoFile}"`,
+    'data-checkout-sku="BUNDLE"',
+    'data-checkout-sku="AS"',
+    'data-checkout-sku="CB"',
+  ]) {
+    assert.ok(appHtml.includes(term), `${appFile} missing "${term}"`);
+  }
+
+  // Verify SEO Guide #7 JSON-LD, bidirectional links & 1-click presets
+  assert.match(seoHtml, /<title>[^<]*AI Voiceover Script Duration Calculator[^<]*Compliance Checker[^<]*<\/title>/);
+  assert.match(seoHtml, /<meta name="description" content="[^"]{90,}"/);
+  assert.ok(seoHtml.includes(`<link rel="canonical" href="https://youthmy11-ai.github.io/${seoFile}">`));
+  assert.ok(seoHtml.includes(`href="${appFile}"`), `${seoFile} must link to ${appFile}`);
+  assert.ok(srtHtml.includes(`href="${appFile}"`), "srtlab.html must link bidirectionally to mediastudio.html");
+  assert.ok(srtHtml.includes(`href="${seoFile}"`), "srtlab.html must link to WPM & Compliance guide");
+
+  const seoLd = extractAllJsonLdObjects(seoHtml);
+  assert.ok(seoLd.types.has("SoftwareApplication"), "Missing SoftwareApplication JSON-LD");
+  assert.ok(seoLd.types.has("TechArticle"), "Missing TechArticle JSON-LD");
+  assert.ok(seoLd.types.has("FAQPage"), "Missing FAQPage JSON-LD");
+
+  for (const term of [
+    "135 WPM",
+    "150 WPM",
+    "165 WPM",
+    "atempo",
+    "1.20x",
+    "0.85x",
+    "1024x1024",
+    "1080x1920",
+    "1920x1080",
+    "1080x1350",
+    "media_brief_audit",
+    "v1.5.0",
+    "npx --yes github:youthmy11-ai/youthmy11-ai.github.io",
+    NEAR_MEDIA_GEN_URL,
+    NEAR_VIDEO_CLIPPER_URL,
+    NEAR_VIDEO_DUBBER_URL,
+    "samples/media-generator-sample.md",
+    "samples/video-clipping-sample.md",
+    "samples/video-dubbing-sample.md",
+    'data-checkout-sku="CB"',
+    'data-checkout-sku="AS"',
+    'data-checkout-sku="BUNDLE"',
+  ]) {
+    assert.ok(seoHtml.includes(term), `${seoFile} missing "${term}"`);
+  }
+
+  const deepLinks = [...seoHtml.matchAll(/href="mediastudio\.html\?([^"]+)"/g)].map((m) =>
+    m[1].replace(/&amp;/g, "&")
+  );
+  assert.ok(deepLinks.length >= 4, "Expected at least 4 interactive mediastudio.html deep-links");
+  for (const qs of deepLinks) {
+    const parsed = parseMediaStudioQueryParams(qs);
+    assert.ok(
+      parsed.sample && Object.prototype.hasOwnProperty.call(MEDIASTUDIO_SAMPLES, parsed.sample),
+      `Invalid mediastudio.html sample query: ${qs}`
+    );
+  }
+
+  verifyInternalRelativeHtmlLinks(repoRoot, appFile, appHtml);
+  verifyInternalRelativeHtmlLinks(repoRoot, seoFile, seoHtml);
 });

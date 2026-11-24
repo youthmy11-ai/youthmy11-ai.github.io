@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediaBrief Studio — Free AI Voiceover Script Duration Calculator, Rights Pre-Flight &amp; Multi-Aspect Spec Builder</title>
+  <meta name="description" content="100% client-side AI voiceover script-to-duration pacing calculator (135/150/165 WPM + CJK, FFmpeg atempo 0.85x–1.20x distortion guard, ±0.5s golden window), celebrity/copyright/trademark pre-flight compliance scanner, 1:1/9:16/16:9/4:5 safe-zone spec builder, and Pro 25-Asset Campaign Batch Matrix.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/mediastudio.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/mediastudio.html">
+  <meta property="og:title" content="MediaBrief Studio — AI Voiceover Script Duration Calculator, Rights Scanner &amp; Multi-Aspect Spec Builder">
+  <meta property="og:description" content="Validate AI image, video &amp; voiceover briefs locally before paying render fees: exact Latin/CJK WPM pacing, FFmpeg atempo distortion check, likeness/IP compliance score (0–100), and 1-click JSON specs for @pay-per-use-media-gen, @short-video-clipper &amp; @multi-lang-video-dubber.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MediaBrief Studio — Script-to-Duration Pacing, Rights Pre-Flight &amp; 9:16/1:1/16:9 Spec Builder">
+  <meta name="twitter:description" content="Zero-upload AI script pacing calculator (135/150/165 WPM, FFmpeg atempo guard), celebrity/IP compliance scanner, multi-aspect safe-zone builder, and Pro 25-Asset Batch Matrix.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230ea5e9'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='21' font-weight='800'%3EMB%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "MediaBrief Studio",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web",
+    "url": "https://youthmy11-ai.github.io/mediastudio.html",
+    "softwareVersion": "1.5.0",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free Browser Script Pacing, Rights Pre-Flight & Multi-Aspect Spec Builder", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Single-Tool Pro Unlock (25-Asset Campaign Batch Matrix)", "price": "15", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "AutoShorts Studio Pro Unlock (Desktop CLI + MediaBrief & ClipCaption Pro)", "price": "19", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "All-Access Creator & Freelancer Bundle", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "100% client-side Latin & CJK word/syllable counter computing exact voiceover durations at 135, 150, and 165 WPM against target duration (e.g. 8.0s, 15.0s, 30.0s)",
+      "FFmpeg atempo ratio calculator warning against chipmunk distortion (> 1.20x) and robotic underrun (< 0.85x) with exact word trim/add guidance for the ±0.5s golden window",
+      "Rights & Consent Pre-Flight Scanner scoring 0–100 across unconsented celebrity/politician likenesses, copyrighted characters (Disney, Marvel, Nintendo, Pixar, Anime), third-party logos, and deceptive claims",
+      "Multi-aspect 1:1 (1024x1024), 9:16 (1080x1920), 16:9 (1920x1080), and 4:5 (1080x1350) safe-zone builder exporting ready-to-paste JSON specs for @pay-per-use-media-gen ($0.45 USDC), @short-video-clipper ($0.50 USDC), and @multi-lang-video-dubber ($0.65 USDC)",
+      "Pro 25-Asset Campaign Batch Matrix exporting formula-safe CSV and JSON Campaign Manifests with 1-click CryptoBill & ScopeGuard SOW handoffs"
+    ],
+    "description": "Zero-backend browser AI media production brief validator, voiceover script-to-duration calculator, likeness/IP compliance checker, and multi-aspect creative spec generator."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Does MediaBrief Studio upload my unreleased ad scripts or creative briefs to any server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. MediaBrief Studio executes 100% locally inside your browser using zero-dependency ES Module JavaScript (assets/mediastudio.js). Your scripts, campaign briefs, and brand lists never leave your device."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why does MediaBrief Studio warn when FFmpeg atempo exceeds 1.20x or drops below 0.85x?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Time-stretching neural TTS or human voiceovers faster than 1.20x compresses breath pauses and introduces metallic WSOLA artifacts, while stretching slower than 0.85x creates unnatural vocal drag. Trimming or adding the exact word delta to land inside the ±0.5s golden window keeps natural 1.00x prosody."
+        }
+      }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .ms-stage-grid {
+      display: grid;
+      grid-template-columns: minmax(210px, auto) minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+    }
+    .ms-canvas-frame {
+      position: relative;
+      width: 212px;
+      aspect-ratio: 9 / 16;
+      border-radius: 20px;
+      border: 3px solid rgba(56, 189, 248, 0.45);
+      background:
+        radial-gradient(circle at 28% 24%, rgba(14, 165, 233, 0.34), transparent 54%),
+        radial-gradient(circle at 76% 68%, rgba(16, 185, 129, 0.25), transparent 52%),
+        linear-gradient(180deg, #0b1324 0%, #131d35 55%, #090d16 100%);
+      box-shadow: 0 18px 40px rgba(2, 6, 23, 0.62);
+      overflow: hidden;
+      color: #ffffff;
+      transition: aspect-ratio 0.2s ease, width 0.2s ease;
+      justify-self: center;
+    }
+    .ms-zone-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 13%;
+      background: rgba(239, 68, 68, 0.16);
+      border-bottom: 1px dashed rgba(248, 113, 113, 0.58);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fca5a5;
+      text-transform: uppercase;
+    }
+    .ms-zone-right {
+      position: absolute;
+      top: 24%;
+      right: 5px;
+      bottom: 24%;
+      width: 32px;
+      border-radius: 8px;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px dashed rgba(251, 191, 36, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      font-size: 0.62rem;
+      color: #fde68a;
+      padding: 4px 0;
+    }
+    .ms-zone-bottom {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 22%;
+      background: rgba(239, 68, 68, 0.16);
+      border-top: 1px dashed rgba(248, 113, 113, 0.55);
+      padding: 6px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+      font-size: 0.62rem;
+      color: rgba(241, 245, 249, 0.82);
+    }
+    .ms-safe-box {
+      position: absolute;
+      left: 10px;
+      right: 42px;
+      bottom: 24%;
+      min-height: 48px;
+      border: 1px dashed rgba(16, 185, 129, 0.68);
+      border-radius: 9px;
+      background: rgba(15, 23, 42, 0.52);
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .ms-caption-text {
+      font-family: "Arial Black", Impact, system-ui, sans-serif;
+      font-weight: 800;
+      font-size: 0.78rem;
+      line-height: 1.24;
+      color: #ffffff;
+      text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+      word-break: break-word;
+    }
+    @media (max-width: 700px) {
+      .ms-stage-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-page="mediastudio">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark" style="background:linear-gradient(135deg,#0ea5e9,#10b981);">MB</span>
+        <span>MediaBrief Studio</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="ai-voiceover-script-duration-calculator-compliance-checker.html" class="fs-btn fs-btn-sm fs-btn-secondary">WPM &amp; Rights Guide</a>
+        <a href="srtlab.html" class="fs-btn fs-btn-sm fs-btn-secondary">ClipCaption Lab</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP v1.5.0 (10 Tools)</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill</a>
+        <a href="sowbuilder.html" class="fs-btn fs-btn-sm fs-btn-secondary">ScopeGuard SOW</a>
+        <button type="button" id="msBundleBtn" class="fs-btn fs-btn-sm fs-btn-primary">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 60px;">
+    <div class="fs-section-head" style="margin-bottom:20px;">
+      <div>
+        <span class="fs-badge fs-badge-accent">WEB APP #11 · 100% CLIENT-SIDE · 135/150/165 WPM PACING · RIGHTS &amp; CONSENT SCANNER · 1:1 / 9:16 / 16:9 / 4:5 SPECS</span>
+        <h1 style="margin-top:10px;">MediaBrief Studio — Script-to-Duration Calculator, Rights Pre-Flight &amp; Spec Builder</h1>
+        <p class="fs-lead" style="margin-top:6px;">
+          Standardize creative briefs &amp; voiceover scripts locally before spending AI render credits: lock exact <strong>Latin &amp; CJK duration pacing</strong> (<code>135 / 150 / 165 WPM</code> vs target seconds + <code>FFmpeg atempo</code> distortion guard), screen for <strong>unconsented celebrity likenesses, Disney/Marvel/Nintendo IP &amp; third-party trademarks</strong> (<code>0–100</code> Safety Score), and export normalized <code>1:1</code>, <code>9:16</code>, <code>16:9</code> &amp; <code>4:5</code> JSON specs.
+        </p>
+      </div>
+    </div>
+
+    <div class="cb-workspace">
+      <!-- LEFT COLUMN: BRIEF & SCRIPT EDITOR, CLOUD MEDIA AGENTS & PRO 25-ASSET BATCH -->
+      <section class="cb-editor-pane" aria-label="Media Brief Editor, Rights Controls & Pro Batch Campaign Matrix">
+        <!-- 1. FREE PACING, RIGHTS & SPEC AUDITOR -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Creative Brief &amp; Voiceover Script Input (Free · Zero Upload)</h2>
+            <span class="fs-badge fs-badge-success">FREE · 0 SERVER CALLS</span>
+          </div>
+
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-ms-sample="golden_30s_spot">Sample: 30s Golden Spot (75w)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-ms-sample="overlong_8s_hook">Sample: Overlong 8s Hook (atempo &gt; 1.20x)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-ms-sample="rights_preflight_block">Sample: Celebrity + IP Block</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-ms-sample="multilang_cjk_15s">Sample: Bilingual CJK 15s Dub</button>
+          </div>
+
+          <label class="fs-field">
+            <span class="fs-field-label">Asset / Ad Variant Title</span>
+            <input id="msAssetTitle" type="text" class="fs-input" placeholder="e.g. Q4 Stoneware Mug 9:16 Launch Spot">
+          </label>
+
+          <label class="fs-field">
+            <span class="fs-field-label">Visual Scene / Product Brief (Scanned for likeness, logos &amp; IP)</span>
+            <textarea id="msVisualBrief" class="fs-textarea" rows="3" placeholder="Describe camera framing, lighting, product subject, and motion..."></textarea>
+          </label>
+
+          <label class="fs-field">
+            <span class="fs-field-label">Spoken Voiceover Script (Verbatim word &amp; syllable pacing — Latin + CJK supported)</span>
+            <textarea id="msScriptInput" class="fs-textarea" rows="6" placeholder="Paste spoken voiceover script here to compute exact 135/150/165 WPM timing and FFmpeg atempo..."></textarea>
+          </label>
+
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">Target Duration (<code>seconds</code>, e.g. <code>8.0</code> or <code>30.0</code>)</span>
+              <input id="msTargetSec" type="number" class="fs-input" step="0.5" min="1" max="3600" value="30">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Reference Speaking Rate (<code>WPM</code>)</span>
+              <select id="msWpmSelect" class="fs-select">
+                <option value="135">135 WPM — Calm / Luxury Storytelling</option>
+                <option value="150" selected>150 WPM — Broadcast &amp; Neural TTS Standard</option>
+                <option value="165">165 WPM — High-Energy Short-Form Hook</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">Aspect Ratio &amp; Output Resolution</span>
+              <select id="msRatioSelect" class="fs-select">
+                <option value="9:16" selected>9:16 Vertical (1080×1920 · Shorts/Reels/TikTok)</option>
+                <option value="1:1">1:1 Square (1024×1024 · Product Photo/Feed)</option>
+                <option value="16:9">16:9 Widescreen (1920×1080 · YouTube/Hero)</option>
+                <option value="4:5">4:5 Portrait Feed (1080×1350 · Meta/IG Paid Ads)</option>
+              </select>
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Owned / Licensed Brand Terms (Exempt from 3rd-party flag)</span>
+              <input id="msOwnedBrands" type="text" class="fs-input" placeholder="ForgeSuite, Artisan Kiln" value="ForgeSuite, Artisan Kiln">
+            </label>
+          </div>
+
+          <label style="display:inline-flex;align-items:center;gap:8px;font-size:0.86rem;cursor:pointer;">
+            <input id="msConsentCheck" type="checkbox">
+            <span><strong>Documented Talent / Likeness Consent Verified</strong> (signed release on file for any named real person)</span>
+          </label>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="msAuditBtn" class="fs-btn fs-btn-primary">Audit Pacing, Rights &amp; Build Spec</button>
+            <button type="button" id="msShareBtn" class="fs-btn fs-btn-secondary">🔗 Copy ?script=... Share URL</button>
+            <button type="button" id="msOpenSrtLabBtn" class="fs-btn fs-btn-ghost">🎬 Send Script to ClipCaption Lab →</button>
+          </div>
+
+          <div id="msStatusMsg" class="fs-status-msg" aria-live="polite"></div>
+        </div>
+
+        <!-- 2. 1-CLICK CLOUD AI CREATIVE FLEET HANDOFFS -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h3>Ready to Render? Dispatch Your Verified Spec to Our 24/7 Cloud Agents</h3>
+            <span class="fs-badge fs-badge-accent">PAY-PER-USE NEAR AI AGENTS</span>
+          </div>
+          <p class="inv-muted" style="margin:2px 0 10px;">
+            Once your script hits the <code>±0.5s</code> golden window and clears <code>Rights &amp; Consent Pre-Flight</code>, paste the generated JSON spec directly into our autonomous 24/7 creative media agents — or automate pre-flight checks locally via Tool #10 <code>media_brief_audit</code> in <strong>ForgeSuite MCP v1.5.0</strong>:
+          </p>
+          <div style="display:grid;gap:10px;">
+            <div class="fs-rail-box" style="padding:12px;">
+              <div class="fs-card-top">
+                <strong><code>@pay-per-use-media-gen</code> — $0.45 USDC / job</strong>
+                <a href="samples/media-generator-sample.md" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem;color:var(--accent);text-decoration:underline;">Sample 1:1 / 9:16 / 30s TTS ↗</a>
+              </div>
+              <small class="inv-muted"><strong>AI Image, Video &amp; Voiceover Generator</strong>: generates <code>1024x1024</code> studio product photos, <code>9:16</code> <code>8.00s</code> vertical MP4 videos &amp; 100% verbatim neural voiceovers across 26+ languages.</small>
+              <div>
+                <a href="https://market.near.ai/agents/pay-per-use-media-gen" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Hire @pay-per-use-media-gen ($0.45 USDC) ↗</a>
+              </div>
+            </div>
+
+            <div class="fs-rail-box" style="padding:12px;">
+              <div class="fs-card-top">
+                <strong><code>@short-video-clipper</code> — $0.50 USDC / job</strong>
+                <a href="samples/video-clipping-sample.md" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem;color:var(--accent);text-decoration:underline;">Sample MP4 Output ↗</a>
+              </div>
+              <small class="inv-muted">Extracts 1–8 sentence-clean <code>9:16</code>, <code>1:1</code>, <code>16:9</code> &amp; <code>4:5</code> highlight clips anchored to YouTube <code>Most Replayed</code> peaks with burned-in mobile captions.</small>
+              <div>
+                <a href="https://market.near.ai/agents/short-video-clipper" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Hire @short-video-clipper ($0.50 USDC) ↗</a>
+              </div>
+            </div>
+
+            <div class="fs-rail-box" style="padding:12px;">
+              <div class="fs-card-top">
+                <strong><code>@multi-lang-video-dubber</code> — $0.65 USDC / job</strong>
+                <a href="samples/video-dubbing-sample.md" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem;color:var(--accent);text-decoration:underline;">Sample ES/DE/JA Dub ↗</a>
+              </div>
+              <small class="inv-muted">Localizes videos into 25+ languages with multi-speaker stock voices, stereo <code>Mid/Side</code> music preservation, verbatim brand locks &amp; synced <code>.srt</code>.</small>
+              <div>
+                <a href="https://market.near.ai/agents/multi-lang-video-dubber" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Hire @multi-lang-video-dubber ($0.65 USDC) ↗</a>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+            <button type="button" id="msSendInvoiceBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Invoice Media Production (CryptoBill) →</button>
+            <button type="button" id="msSendSowBtn" class="fs-btn fs-btn-sm fs-btn-ghost">1-Click Production SOW (ScopeGuard) →</button>
+            <a href="ai-voiceover-script-duration-calculator-compliance-checker.html" class="fs-btn fs-btn-sm fs-btn-ghost">WPM &amp; Pre-Flight Guide →</a>
+          </div>
+        </div>
+
+        <!-- 3. PRO TIER: 25-ASSET CAMPAIGN BATCH MATRIX -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Pro 25-Asset Campaign Batch Matrix</h2>
+            <span id="msProBadge" class="fs-badge fs-badge-warn">PRO FEATURE · $15 PRO / $19 AUTOSHORTS / $35 BUNDLE</span>
+          </div>
+
+          <div id="msProLockBanner" class="cb-pro-lock">
+            <strong>Creative Agency &amp; Growth Marketing Pro Mode:</strong> Batch-audit up to <strong>25 ad scripts &amp; creative briefs</strong> simultaneously across <code>1:1</code>, <code>9:16</code>, <code>16:9</code> &amp; <code>4:5</code> formats, catch unconsented celebrity/IP blockers before render spend, and export formula-safe <strong>CSV + JSON Campaign Manifests</strong> with <strong>Single Pro ($15)</strong>, <strong>AutoShorts Pro ($19)</strong>, or the <strong>All-Access Bundle ($35)</strong> (instant on-chain BSC USDT &amp; Solana USDC verification).
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">All-Access Bundle ($35)</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="AS">AutoShorts Pro ($19)</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="CB">CryptoBill Pro ($15)</button>
+              <button type="button" id="msActivateKeyBtn" class="fs-btn fs-btn-sm fs-btn-ghost">Activate Pro Key</button>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <button type="button" id="msBatchDemoBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Load 4-Asset Multi-Format Demo Campaign</button>
+            <label class="fs-btn fs-btn-sm fs-btn-ghost cb-file-btn">
+              📁 Load .TXT / .JSON Campaign
+              <input id="msBatchFileInput" type="file" accept=".txt,.json,.csv,text/plain,application/json">
+            </label>
+          </div>
+
+          <label class="fs-field">
+            <span class="fs-field-label">Batch Campaign Entries (<code>Title | Ratio | TargetSec | VisualBrief | SpokenScript</code> — 1 per line or JSON array, max 25)</span>
+            <textarea id="msBatchInputArea" class="fs-textarea" rows="5" spellcheck="false" style="font-family:var(--font-mono);font-size:0.8rem;" placeholder="Ad_01 | 9:16 | 30 | Warm wooden table mug pour | Every great morning begins..."></textarea>
+          </label>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="msBatchRunBtn" class="fs-btn fs-btn-primary">Unlock 25-Asset Batch Matrix — Pro ($15 / $19 / $35)</button>
+            <button type="button" id="msBatchCsvBtn" class="fs-btn fs-btn-secondary" disabled>Export Campaign CSV</button>
+            <button type="button" id="msBatchJsonBtn" class="fs-btn fs-btn-secondary" disabled>Export JSON Manifest</button>
+          </div>
+
+          <div id="msBatchStatusMsg" class="fs-status-msg" aria-live="polite"></div>
+
+          <div style="overflow-x:auto;">
+            <table class="fs-table">
+              <thead>
+                <tr>
+                  <th>Asset &amp; Spec</th>
+                  <th>Words / Timing</th>
+                  <th>atempo</th>
+                  <th>Safety</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody id="msBatchBody">
+                <tr>
+                  <td colspan="5" class="inv-muted">Load up to 25 campaign scripts/briefs to batch-verify WPM duration targets, FFmpeg atempo, and likeness/IP compliance.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: PACING TELEMETRY, MULTI-ASPECT SAFE-ZONE SIMULATOR & PROVIDER JSON SPECS -->
+      <section class="cb-preview-pane" aria-label="Pacing Telemetry, Safe-Zone Simulator and Provider JSON Spec">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <div>
+              <h2>Live Pacing, Rights Pre-Flight &amp; Provider Spec Output</h2>
+              <div class="inv-muted" style="margin-top:2px;font-size:0.85rem;">Real-time word/syllable math, 0–100 compliance score &amp; copy-ready agent JSON specs.</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span id="msVerdictBadge" class="fs-badge fs-badge-muted">READY</span>
+              <button type="button" id="msCopyMdBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Copy Audit MD</button>
+            </div>
+          </div>
+
+          <div id="msMetricsGrid" class="cb-grid-2"></div>
+
+          <!-- WPM MATRIX TABLE -->
+          <div>
+            <h3 style="margin:6px 0 8px;font-size:0.94rem;">Exact Script-to-Duration Pacing Matrix (<code>135 / 150 / 165 WPM</code>)</h3>
+            <div style="overflow-x:auto;">
+              <table class="fs-table">
+                <thead>
+                  <tr>
+                    <th>Cadence Profile</th>
+                    <th>Est. Duration</th>
+                    <th>FFmpeg <code>atempo</code></th>
+                    <th>Window Check</th>
+                  </tr>
+                </thead>
+                <tbody id="msWpmBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- LIVE ASPECT-RATIO & SAFE-ZONE VISUALIZER -->
+          <div class="fs-rail-box" style="padding:16px;">
+            <div class="ms-stage-grid">
+              <div id="msCanvasFrame" class="ms-canvas-frame" aria-label="Aspect-Ratio and Caption Safe-Zone Simulator">
+                <div id="msCanvasTopZone" class="ms-zone-top">Top UI (13%)</div>
+                <div style="position:absolute;top:24%;left:12px;right:48px;text-align:center;opacity:0.32;font-size:0.72rem;">
+                  Protected Subject &amp; Product Frame
+                </div>
+                <div id="msCanvasRightZone" class="ms-zone-right" title="Platform Right Action Icons">
+                  <span>♥</span>
+                  <span>💬</span>
+                  <span>↗</span>
+                </div>
+                <div id="msCanvasSafeBox" class="ms-safe-box">
+                  <div id="msCanvasCaption" class="ms-caption-text">Safe-zone caption preview…</div>
+                </div>
+                <div id="msCanvasBottomZone" class="ms-zone-bottom">
+                  <strong>9:16 · 1080x1920</strong>
+                  <span>Bottom UI Danger (22%)</span>
+                </div>
+              </div>
+
+              <div style="display:grid;gap:10px;">
+                <h3 style="margin:0;font-size:0.95rem;">Normalized Aspect-Ratio &amp; Safe-Zone Geometry</h3>
+                <div id="msCanvasMeta" style="display:grid;gap:6px;font-size:0.85rem;"></div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+                  <a id="msHireSelectedAgentLink" href="https://market.near.ai/agents/pay-per-use-media-gen" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">
+                    Hire @pay-per-use-media-gen ($0.45 USDC) ↗
+                  </a>
+                  <a href="srtlab.html" class="fs-btn fs-btn-sm fs-btn-secondary">9:16 .ASS Burn-In Lab →</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- READY-TO-PASTE PROVIDER / AGENT JSON SPEC -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-ms-agent-tab="pay-per-use-media-gen">@pay-per-use-media-gen ($0.45)</button>
+                <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-ms-agent-tab="short-video-clipper">@short-video-clipper ($0.50)</button>
+                <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-ms-agent-tab="multi-lang-video-dubber">@multi-lang-video-dubber ($0.65)</button>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button type="button" id="msCopyJsonBtn" class="fs-btn fs-btn-sm fs-btn-ghost">📋 Copy JSON Spec</button>
+                <button type="button" id="msDownloadJsonBtn" class="fs-btn fs-btn-sm fs-btn-ghost">⬇ .JSON</button>
+              </div>
+            </div>
+            <textarea id="msAgentJsonOutput" class="fs-textarea" rows="9" readonly style="font-family:var(--font-mono);font-size:0.8rem;"></textarea>
+          </div>
+
+          <!-- RIGHTS, CONSENT & PACING DIAGNOSTICS TABLE -->
+          <div>
+            <h3 style="margin:6px 0 10px;font-size:0.95rem;">Pre-Flight Pacing, Likeness Consent, Copyright &amp; Trademark Diagnostics</h3>
+            <div style="overflow-x:auto;">
+              <table class="fs-table">
+                <thead>
+                  <tr>
+                    <th>Severity</th>
+                    <th>Rule Code</th>
+                    <th>Diagnostic Detail &amp; Actionable Fix</th>
+                  </tr>
+                </thead>
+                <tbody id="msIssuesBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="mcp.html">MCP Server (v1.5.0)</a>
+        <a href="mediastudio.html">MediaBrief Studio</a>
+        <a href="ai-voiceover-script-duration-calculator-compliance-checker.html">WPM &amp; Compliance Guide</a>
+        <a href="srtlab.html">ClipCaption Lab</a>
+        <a href="tiktok-reels-9-16-subtitle-safe-zone-checker.html">9:16 Safe-Zone Checker</a>
+        <a href="youtube-most-replayed-clipper-ai-dubbing-guide.html">Most Replayed Clipper &amp; Dub Guide</a>
+        <a href="walletcheck.html">WalletLens</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="brandcheck.html">BrandGuard</a>
+        <a href="txdecode.html">Calldata Lens</a>
+        <a href="envshield.html">EnvShield</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="json2sheet.html">JSON2Sheet Lab</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="https://market.near.ai/agents/pay-per-use-media-gen" target="_blank" rel="noopener noreferrer">@pay-per-use-media-gen ($0.45)</a>
+        <a href="https://market.near.ai/agents/short-video-clipper" target="_blank" rel="noopener noreferrer">@short-video-clipper ($0.50)</a>
+        <a href="https://market.near.ai/agents/multi-lang-video-dubber" target="_blank" rel="noopener noreferrer">@multi-lang-video-dubber ($0.65)</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/mediastudio.js"></script>
+</body>
+</html>

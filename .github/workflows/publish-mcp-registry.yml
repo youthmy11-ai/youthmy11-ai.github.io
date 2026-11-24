@@ -45,7 +45,7 @@ jobs:
             gh release create "${TAG}" dist/forgesuite-mcp.mcpb \
               --target "${GITHUB_SHA}" \
               --title "ForgeSuite MCP Server ${TAG}" \
-              --notes "Zero-dependency Node 20+ MCP Server (${TAG}, 9 tools) for multi-chain EVM/Solana wallet & EIP-7702/Gnosis Safe inspection, token risk scanning, calldata decoding, .env secret auditing, SRT/VTT 9:16 subtitle caption auditing, LLM FinOps, crypto invoicing, and brand availability."
+              --notes "Zero-dependency Node 20+ MCP Server (${TAG}, 10 tools) for multi-chain EVM/Solana wallet & EIP-7702/Gnosis Safe inspection, token risk scanning, calldata decoding, .env secret auditing, SRT/VTT 9:16 subtitle caption auditing, AI voiceover script pacing & media brief compliance, LLM FinOps, crypto invoicing, and brand availability."
           fi
 
       - name: Verify public GitHub Release asset accessibility

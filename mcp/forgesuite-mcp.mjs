@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * ForgeSuite MCP Server (v1.4.0)
+ * ForgeSuite MCP Server (v1.5.0)
  * Zero-dependency Node 20+ Model Context Protocol (MCP) stdio JSON-RPC 2.0 server.
  *
  * 1-Command Global Run:
  *   npx --yes github:youthmy11-ai/youthmy11-ai.github.io
  *
- * 9 Developer, FinOps, Creator Media, Brand Launch & Web3 Security Tools:
+ * 10 Developer, FinOps, Creator Media, Brand Launch & Web3 Security Tools:
  *   1. envshield_scan           — Scan .env/configs/logs offline for leaked secrets & return redacted output
  *   2. calldata_decode          — Decode EVM calldata selectors offline & flag unlimited MaxUint256 approvals
  *   3. tokencost_estimate       — Estimate LLM API & multi-turn AI agent run costs (Claude/GPT/Gemini/DeepSeek)
@@ -16,6 +16,7 @@
  *   7. brand_domain_handle_scan — Live RDAP + DoH domain (.com/.io/.ai/.dev/.app/.org), npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability audit
  *   8. multi_chain_wallet_scan  — Live 6-chain EVM & Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector
  *   9. subtitle_caption_audit   — Audit .srt/.vtt captions offline for overlaps, CPS reading speed, 9:16 mobile safe zones, mid-sentence cuts & brand terms + return normalized .srt/.vtt & 0-100 quality score
+ *  10. media_brief_audit        — Audit AI voiceover scripts & creative briefs offline: Latin/CJK WPM pacing (135/150/165 WPM vs targetSec), FFmpeg atempo distortion check, likeness/copyright/trademark pre-flight score (0-100) & 1:1/9:16/16:9/4:5 agent JSON specs
  *
  * Docs & Pro Bundle ($35 Lifetime): https://youthmy11-ai.github.io/mcp.html
  * License: MIT (youthmy11-ai)
@@ -29,7 +30,7 @@ import { fileURLToPath } from "node:url";
 
 export const SERVER_INFO = Object.freeze({
   name: "forgesuite-mcp",
-  version: "1.4.0",
+  version: "1.5.0",
 });
 
 export const SUPPORTED_PROTOCOL_VERSIONS = Object.freeze([
@@ -46,6 +47,7 @@ export const FORGESUITE_LINKS = Object.freeze({
   brandcheck: "https://youthmy11-ai.github.io/brandcheck.html",
   walletcheck: "https://youthmy11-ai.github.io/walletcheck.html",
   srtlab: "https://youthmy11-ai.github.io/srtlab.html",
+  mediastudio: "https://youthmy11-ai.github.io/mediastudio.html",
   tokencalc: "https://youthmy11-ai.github.io/tokencalc.html",
   cryptobill: "https://youthmy11-ai.github.io/cryptobill.html",
   pricing: "https://youthmy11-ai.github.io/#pricing",
@@ -54,6 +56,7 @@ export const FORGESUITE_LINKS = Object.freeze({
   forgeBrandChecker: "https://market.near.ai/agents/forge-brand-checker",
   forgeDataFinops: "https://market.near.ai/a/forge-data-finops",
   walletActivityScanner: "https://market.near.ai/agents/wallet-activity-scanner",
+  payPerUseMediaGen: "https://market.near.ai/agents/pay-per-use-media-gen",
   shortVideoClipper: "https://market.near.ai/agents/short-video-clipper",
   multiLangVideoDubber: "https://market.near.ai/agents/multi-lang-video-dubber",
 });
@@ -2262,6 +2265,12 @@ export const NEAR_AGENT_FLEET = Object.freeze([
     a2aEndpoint: "https://short-video-clipper.market.near.ai/a2a/v1",
   },
   {
+    id: "pay-per-use-media-gen",
+    name: "AI Image, Video & Voiceover Generator — 1024x1024 Studio Photos, 9:16 8s MP4s & Verbatim 26-Lang Voiceovers ($0.45 USDC/call)",
+    marketUrl: FORGESUITE_LINKS.payPerUseMediaGen,
+    a2aEndpoint: "https://pay-per-use-media-gen.market.near.ai/a2a/v1",
+  },
+  {
     id: "forge-brand-checker",
     name: "Brand Name Availability Checker — USPTO Trademark, WHOIS/RDAP & 10-Platform Handle Scanner ($0.35 USDC/call)",
     marketUrl: FORGESUITE_LINKS.forgeBrandChecker,
@@ -2337,7 +2346,7 @@ async function safeJsonFetch(url, options = {}) {
   const fetchImpl = options.fetchImpl ?? globalThis.fetch;
   const timeoutMs = options.timeoutMs ?? 6500;
   const headers = {
-    "User-Agent": "ForgeSuite-MCP/1.3.0 (+https://youthmy11-ai.github.io)",
+    "User-Agent": "ForgeSuite-MCP/1.5.0 (+https://youthmy11-ai.github.io)",
     Accept: options.accept || "application/json",
     ...(options.headers || {}),
   };
@@ -4731,7 +4740,640 @@ export function auditSubtitleCaptions(params = {}) {
 }
 
 /* ============================================================================
- * 10. MCP Tool Definitions & Dispatch (9 Tools)
+ * 10. MediaBrief Studio — Script Pacing, Rights Pre-Flight & Spec Builder (Offline)
+ * ========================================================================== */
+
+const MCP_CJK_RX =
+  /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uAC00-\uD7AF]/g;
+
+const MCP_ASPECT_SPECS = Object.freeze({
+  "1:1": {
+    ratio: "1:1",
+    width: 1024,
+    height: 1024,
+    resolution: "1024x1024",
+    safeZone: {
+      xMin: 80,
+      xMax: 944,
+      yMin: 690,
+      yMax: 854,
+      widthPx: 864,
+      heightPx: 164,
+      topDangerPct: 9,
+      rightDangerPct: 8,
+      bottomDangerPct: 17,
+      maxCharsPerLine: 34,
+      maxLines: 2,
+      assPlayResX: 1024,
+      assPlayResY: 1024,
+      assMarginL: 80,
+      assMarginR: 80,
+      assMarginV: 170,
+    },
+  },
+  "9:16": {
+    ratio: "9:16",
+    width: 1080,
+    height: 1920,
+    resolution: "1080x1920",
+    safeZone: {
+      xMin: 90,
+      xMax: 905,
+      yMin: 1180,
+      yMax: 1490,
+      widthPx: 815,
+      heightPx: 310,
+      topDangerPct: 13,
+      rightDangerPct: 16,
+      bottomDangerPct: 22,
+      maxCharsPerLine: 32,
+      maxLines: 2,
+      assPlayResX: 1080,
+      assPlayResY: 1920,
+      assMarginL: 90,
+      assMarginR: 175,
+      assMarginV: 420,
+    },
+  },
+  "16:9": {
+    ratio: "16:9",
+    width: 1920,
+    height: 1080,
+    resolution: "1920x1080",
+    safeZone: {
+      xMin: 160,
+      xMax: 1760,
+      yMin: 780,
+      yMax: 940,
+      widthPx: 1600,
+      heightPx: 160,
+      topDangerPct: 9,
+      rightDangerPct: 6,
+      bottomDangerPct: 13,
+      maxCharsPerLine: 42,
+      maxLines: 2,
+      assPlayResX: 1920,
+      assPlayResY: 1080,
+      assMarginL: 160,
+      assMarginR: 160,
+      assMarginV: 140,
+    },
+  },
+  "4:5": {
+    ratio: "4:5",
+    width: 1080,
+    height: 1350,
+    resolution: "1080x1350",
+    safeZone: {
+      xMin: 90,
+      xMax: 990,
+      yMin: 890,
+      yMax: 1110,
+      widthPx: 900,
+      heightPx: 220,
+      topDangerPct: 9,
+      rightDangerPct: 8,
+      bottomDangerPct: 18,
+      maxCharsPerLine: 36,
+      maxLines: 2,
+      assPlayResX: 1080,
+      assPlayResY: 1350,
+      assMarginL: 90,
+      assMarginR: 90,
+      assMarginV: 240,
+    },
+  },
+});
+
+const MCP_REAL_PERSON_RULES = Object.freeze([
+  { label: "well-known celebrity", rx: /\bwell[- ]known\s+celebrit(?:y|ies)\b/i },
+  { label: "famous celebrity", rx: /\bfamous\s+celebrit(?:y|ies)\b/i },
+  { label: "celebrity endorsement/likeness", rx: /\bcelebrit(?:y|ies)\s+(?:holding|endors\w+|wearing|using|spokesperson)\b/i },
+  { label: "unconsented voice clone", rx: /\b(?:voice\s+clone\s+of|in\s+the\s+voice\s+of|sound\s+just\s+like|deepfake\s+of)\b/i },
+  { label: "world leader / politician", rx: /\b(?:world\s+leader|sitting\s+president|famous\s+politician)\b/i },
+  { label: "Elon Musk", rx: /\belon\s+musk\b/i },
+  { label: "Taylor Swift", rx: /\btaylor\s+swift\b/i },
+  { label: "Donald Trump", rx: /\bdonald\s+trump\b/i },
+  { label: "Joe Biden", rx: /\bjoe\s+biden\b/i },
+  { label: "Barack Obama", rx: /\bbarack\s+obama\b/i },
+  { label: "Kamala Harris", rx: /\bkamala\s+harris\b/i },
+  { label: "Vladimir Putin", rx: /\bvladimir\s+putin\b/i },
+  { label: "Xi Jinping", rx: /\bxi\s+jinping\b/i },
+  { label: "Sam Altman", rx: /\bsam\s+altman\b/i },
+  { label: "Jensen Huang", rx: /\bjensen\s+huang\b/i },
+  { label: "Vitalik Buterin", rx: /\bvitalik\s+buterin\b/i },
+  { label: "Mark Zuckerberg", rx: /\bmark\s+zuckerberg\b/i },
+  { label: "Jeff Bezos", rx: /\bjeff\s+bezos\b/i },
+  { label: "Bill Gates", rx: /\bbill\s+gates\b/i },
+  { label: "Tim Cook", rx: /\btim\s+cook\b/i },
+  { label: "Cristiano Ronaldo", rx: /\bcristiano\s+ronaldo\b/i },
+  { label: "Lionel Messi", rx: /\blionel\s+messi\b/i },
+  { label: "LeBron James", rx: /\blebron\s+james\b/i },
+  { label: "MrBeast", rx: /\bmr\s*beast\b/i },
+  { label: "Kim Kardashian", rx: /\bkim\s+kardashian\b/i },
+  { label: "Beyonce", rx: /\bbeyonc[eé]\b/i },
+  { label: "Rihanna", rx: /\brihanna\b/i },
+  { label: "Ariana Grande", rx: /\bariana\s+grande\b/i },
+  { label: "Scarlett Johansson", rx: /\bscarlett\s+johansson\b/i },
+  { label: "Morgan Freeman", rx: /\bmorgan\s+freeman\b/i },
+  { label: "Tom Cruise", rx: /\btom\s+cruise\b/i },
+  { label: "Keanu Reeves", rx: /\bkeanu\s+reeves\b/i },
+  { label: "Dwayne Johnson", rx: /\bdwayne\s+johnson\b/i },
+  { label: "Robert Downey Jr", rx: /\brobert\s+downey\b/i },
+]);
+
+const MCP_COPYRIGHT_CHARACTER_RULES = Object.freeze([
+  { label: "Mickey Mouse (Disney)", rx: /\bmickey\s+mouse\b/i },
+  { label: "Minnie Mouse (Disney)", rx: /\bminnie\s+mouse\b/i },
+  { label: "Donald Duck (Disney)", rx: /\bdonald\s+duck\b/i },
+  { label: "Disney / Pixar IP", rx: /\b(?:disney\s+princess|disney\s+character|pixar\s+character|buzz\s+lightyear|elsa\s+from\s+frozen)\b/i },
+  { label: "Star Wars / Darth Vader / Baby Yoda", rx: /\b(?:darth\s+vader|luke\s+skywalker|baby\s+yoda|grogu|lightsaber\s+duel|star\s+wars)\b/i },
+  { label: "Spider-Man (Marvel/Sony)", rx: /\bspider[- ]?man\b/i },
+  { label: "Iron Man (Marvel)", rx: /\biron\s+man\b/i },
+  { label: "Captain America / Avengers (Marvel)", rx: /\b(?:captain\s+america|the\s+avengers|deadpool|wolverine)\b/i },
+  { label: "Batman / Superman / Joker (DC)", rx: /\b(?:batman|superman|wonder\s+woman|harley\s+quinn)\b/i },
+  { label: "Super Mario (Nintendo)", rx: /\b(?:super\s+mario|mario\s+bros|princess\s+peach|bowser)\b/i },
+  { label: "Pokemon / Pikachu (Nintendo)", rx: /\b(?:pikachu|pok[eé]mon|charizard|mewtwo)\b/i },
+  { label: "Legend of Zelda (Nintendo)", rx: /\b(?:legend\s+of\s+zelda|hyrule)\b/i },
+  { label: "Sonic the Hedgehog (Sega)", rx: /\bsonic\s+the\s+hedgehog\b/i },
+  { label: "Naruto / Dragon Ball / One Piece (Anime IP)", rx: /\b(?:naruto|uzumaki|son\s+goku|dragon\s+ball|monkey\s+d\.?\s+luffy|one\s+piece|gojo\s+satoru|demon\s+slayer|totoro|studio\s+ghibli)\b/i },
+  { label: "Hello Kitty / SpongeBob / Harry Potter / Minions", rx: /\b(?:hello\s+kitty|spongebob|harry\s+potter|hogwarts|minions|shrek|james\s+bond)\b/i },
+]);
+
+const MCP_THIRD_PARTY_BRAND_RULES = Object.freeze([
+  { label: "Apple Logo / iPhone Trademark", brandKey: "apple", rx: /\b(?:apple\s+logo|official\s+iphone)\b/i },
+  { label: "Nike / Swoosh Logo", brandKey: "nike", rx: /\b(?:nike\s+swoosh|nike\s+logo|air\s+jordan\s+logo)\b/i },
+  { label: "Adidas Three Stripes", brandKey: "adidas", rx: /\b(?:adidas\s+logo|adidas\s+stripes)\b/i },
+  { label: "Coca-Cola / Pepsi Trademark", brandKey: "coca-cola", rx: /\b(?:coca[- ]?cola|pepsi\s+logo)\b/i },
+  { label: "Starbucks / McDonald's Logo", brandKey: "starbucks", rx: /\b(?:starbucks\s+logo|mcdonald'?s\s+arches|mcdonald'?s\s+logo)\b/i },
+  { label: "Luxury Fashion Trademark (Louis Vuitton / Gucci / Rolex)", brandKey: "luxury", rx: /\b(?:louis\s+vuitton|gucci\s+monogram|chanel\s+logo|rolex\s+crown|rolex\s+watch)\b/i },
+  { label: "Automotive Emblem (Ferrari / Lamborghini / Tesla Logo)", brandKey: "automotive", rx: /\b(?:ferrari\s+logo|lamborghini\s+crest|porsche\s+crest|tesla\s+logo)\b/i },
+  { label: "Olympic Rings / FIFA World Cup", brandKey: "sports-federation", rx: /\b(?:olympic\s+rings|fifa\s+world\s+cup)\b/i },
+]);
+
+const MCP_DECEPTIVE_SENSITIVE_RULES = Object.freeze([
+  { label: "Fake Breaking News / Emergency Broadcast", rx: /\b(?:breaking\s+news\s+alert|emergency\s+broadcast\s+alert|leaked\s+secret\s+footage)\b/i },
+  { label: "Guaranteed Financial Return / Crypto Scam Claim", rx: /\b(?:guaranteed\s+100x|guaranteed\s+(?:profit|return)|double\s+your\s+(?:crypto|bitcoin|money)|risk[- ]free\s+profit)\b/i },
+  { label: "Unverified Miracle Medical Claim", rx: /\b(?:miracle\s+cure|cures\s+cancer|instant\s+medical\s+cure|fda\s+approved\s+miracle)\b/i },
+  { label: "NSFW / Explicit / Graphic Violence", rx: /\b(?:nsfw|explicit\s+nudity|nude\s+portrait|graphic\s+violence|gore\s+scene|self[- ]harm|bomb\s+making)\b/i },
+]);
+
+function mcpNormalizeRatio(rawRatio) {
+  const c = String(rawRatio ?? "").trim().toLowerCase();
+  if (c === "1:1" || c === "1x1" || c === "1024x1024" || c === "square") return "1:1";
+  if (c === "16:9" || c === "16x9" || c === "1920x1080" || c === "landscape" || c === "widescreen") return "16:9";
+  if (c === "4:5" || c === "4x5" || c === "1080x1350" || c === "portrait") return "4:5";
+  return "9:16";
+}
+
+function mcpEstimateWordSyllables(rawToken) {
+  const token = String(rawToken || "").trim();
+  if (!token) return 0;
+  const digitMatches = token.match(/\d/g);
+  if (digitMatches && digitMatches.length > 0) {
+    let n = digitMatches.length;
+    if (/[$€£¥]/.test(token)) n += 1;
+    if (/%/.test(token)) n += 2;
+    if (/[x×]/i.test(token) && /\d+[x×]\d+/i.test(token)) n += 1;
+    return Math.min(10, Math.max(1, n));
+  }
+  const alpha = token
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/[^a-z]/g, "");
+  if (!alpha) return 0;
+  if (alpha.length <= 3) return 1;
+  const trimmed = alpha.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, "").replace(/^y/, "");
+  const groups = trimmed.match(/[aeiouy]{1,2}/g);
+  return Math.max(1, groups ? groups.length : 1);
+}
+
+function mcpBuildAtempoChain(rawTempo) {
+  const tempo = Number(rawTempo);
+  if (!Number.isFinite(tempo) || tempo <= 0) return "atempo=1.000";
+  const factors = [];
+  let rem = tempo;
+  let guard = 0;
+  while (rem > 2.0001 && guard < 6) {
+    factors.push(2.0);
+    rem /= 2.0;
+    guard += 1;
+  }
+  while (rem < 0.4999 && guard < 6) {
+    factors.push(0.5);
+    rem /= 0.5;
+    guard += 1;
+  }
+  factors.push(rem);
+  return factors.map((f) => `atempo=${f.toFixed(3)}`).join(",");
+}
+
+export function auditMediaBrief(params = {}) {
+  const title = String(params.title || "Media Production Brief").trim();
+  const script = String(params.script ?? "");
+  const brief = String(params.brief ?? params.visualBrief ?? "");
+  if (!script.trim() && !brief.trim()) {
+    return {
+      ok: false,
+      error: "Provide a spoken voiceover 'script' and/or a visual 'brief' to audit.",
+    };
+  }
+
+  const ratio = mcpNormalizeRatio(params.ratio ?? params.aspectRatio ?? "9:16");
+  const spec = MCP_ASPECT_SPECS[ratio];
+  const targetSec = Math.max(
+    1,
+    Math.min(
+      3600,
+      Number(params.targetSec ?? params.targetDurationSec) > 0
+        ? Number(params.targetSec ?? params.targetDurationSec)
+        : 30
+    )
+  );
+  const selectedWpm = Math.max(80, Math.min(260, Number(params.wpm) > 0 ? Number(params.wpm) : 150));
+  const consentVerified = Boolean(
+    params.consentVerified === true ||
+      params.consent === true ||
+      params.consent === 1 ||
+      params.consent === "1" ||
+      String(params.consent || "").toLowerCase() === "true"
+  );
+  const ownedBrands = Array.isArray(params.ownedBrands)
+    ? [...new Set(params.ownedBrands.map((b) => String(b || "").trim()).filter(Boolean))]
+    : typeof (params.ownedBrands ?? params.brandTerms) === "string" &&
+        String(params.ownedBrands ?? params.brandTerms).trim()
+      ? [
+          ...new Set(
+            String(params.ownedBrands ?? params.brandTerms)
+              .split(/[,;\n|]+/)
+              .map((b) => b.trim())
+              .filter(Boolean)
+          ),
+        ]
+      : [];
+
+  // 1. Pacing calculation (Latin + CJK)
+  const cleanedScript = script.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").trim();
+  const cjkMatches = cleanedScript.match(MCP_CJK_RX);
+  const cjkChars = cjkMatches ? cjkMatches.length : 0;
+  const nonCjk = cleanedScript.replace(MCP_CJK_RX, " ");
+  const latinTokens = cleanedScript
+    ? nonCjk
+        .split(/\s+/)
+        .map((t) => t.replace(/^[^\p{L}\p{N}$€£¥]+|[^\p{L}\p{N}%]+$/gu, ""))
+        .filter((t) => /[\p{L}\p{N}]/u.test(t))
+    : [];
+  const latinWords = latinTokens.length;
+  let latinSyllables = 0;
+  for (const tok of latinTokens) latinSyllables += mcpEstimateWordSyllables(tok);
+
+  const totalWords = latinWords + cjkChars;
+  const effectiveWords = Number((latinWords + cjkChars / 1.65).toFixed(2));
+  const syllableCount = latinSyllables + cjkChars;
+
+  const dur135 = Number(((effectiveWords / 135) * 60).toFixed(2));
+  const dur150 = Number(((effectiveWords / 150) * 60).toFixed(2));
+  const dur165 = Number(((effectiveWords / 165) * 60).toFixed(2));
+  const estimatedSec = Number(((effectiveWords / selectedWpm) * 60).toFixed(2));
+  const goldenMinSec = Number(Math.max(0.5, targetSec - 0.5).toFixed(2));
+  const goldenMaxSec = Number((targetSec + 0.5).toFixed(2));
+  const idealWordsExact = (targetSec / 60) * selectedWpm;
+  const goldenMinWords = Math.max(1, Math.ceil((goldenMinSec / 60) * selectedWpm));
+  const goldenMaxWords = Math.max(goldenMinWords, Math.floor((goldenMaxSec / 60) * selectedWpm));
+  const idealWords = Math.max(1, Math.round(idealWordsExact));
+
+  let pacing;
+  if (totalWords === 0) {
+    pacing = {
+      counts: {
+        charCount: 0,
+        latinWords: 0,
+        cjkChars: 0,
+        totalWords: 0,
+        effectiveWords: 0,
+        syllableCount: 0,
+        hasCjk: false,
+      },
+      selectedWpm,
+      targetSec,
+      durationsSec: { wpm135: 0, wpm150: 0, wpm165: 0, atSelectedWpm: 0 },
+      deltaSec: Number((-targetSec).toFixed(2)),
+      inGoldenWindow: false,
+      goldenWindowSec: { min: goldenMinSec, max: goldenMaxSec },
+      goldenWordRange: { minWords: goldenMinWords, idealWords, maxWords: goldenMaxWords },
+      wordDelta: idealWords,
+      wordsToTrim: 0,
+      wordsToAdd: idealWords,
+      requiredAtempo: 0,
+      ffmpegAtempoFilter: "atempo=1.000",
+      atempoDistortionRisk: false,
+      atempoUnderrunRisk: false,
+      pacingStatus: "EMPTY_SCRIPT",
+      pacingScore: 40,
+      recommendation: `Visual-only brief (0 spoken words). Add ~${idealWords} words at ${selectedWpm} WPM for a ${targetSec.toFixed(1)}s voiceover.`,
+    };
+  } else {
+    const deltaSec = Number((estimatedSec - targetSec).toFixed(2));
+    const inGoldenWindow = Math.abs(deltaSec) <= 0.5;
+    const requiredAtempo = Number((estimatedSec / targetSec).toFixed(3));
+    const ffmpegAtempoFilter = mcpBuildAtempoChain(requiredAtempo);
+    const atempoDistortionRisk = requiredAtempo > 1.2;
+    const atempoUnderrunRisk = requiredAtempo < 0.85;
+    let wordsToTrim = 0;
+    let wordsToAdd = 0;
+    let wordDelta = 0;
+    if (!inGoldenWindow) {
+      if (estimatedSec > goldenMaxSec) {
+        wordsToTrim = Math.max(1, Math.round(effectiveWords - idealWordsExact));
+        wordDelta = -wordsToTrim;
+      } else if (estimatedSec < goldenMinSec) {
+        wordsToAdd = Math.max(1, Math.round(idealWordsExact - effectiveWords));
+        wordDelta = wordsToAdd;
+      }
+    }
+    let pacingStatus = "GOLDEN_WINDOW";
+    let pacingScore = 100;
+    let recommendation = `Script hits the ${targetSec.toFixed(1)}s ±0.5s golden window (${estimatedSec.toFixed(2)}s at ${selectedWpm} WPM; atempo ${requiredAtempo.toFixed(2)}x).`;
+    if (atempoDistortionRisk) {
+      pacingStatus = "TOO_LONG_ATEMPO_DISTORTION";
+      pacingScore = Math.max(15, 100 - (Math.min(60, Math.round((requiredAtempo - 1.2) * 90) + 22)));
+      recommendation = `Script runs ${estimatedSec.toFixed(2)}s vs ${targetSec.toFixed(1)}s target (requires FFmpeg ${ffmpegAtempoFilter} = ${requiredAtempo.toFixed(2)}x > 1.20x distortion ceiling). Trim ~${wordsToTrim} word(s) to land inside ${goldenMinWords}–${goldenMaxWords} words.`;
+    } else if (atempoUnderrunRisk) {
+      pacingStatus = "TOO_SHORT_UNDERRUN";
+      pacingScore = Math.max(25, 100 - (Math.min(55, Math.round((0.85 - requiredAtempo) * 90) + 18)));
+      recommendation = `Script runs only ${estimatedSec.toFixed(2)}s vs ${targetSec.toFixed(1)}s target (atempo ${requiredAtempo.toFixed(2)}x < 0.85x causes robotic drag). Add ~${wordsToAdd} word(s) to reach ${goldenMinWords}–${goldenMaxWords} words.`;
+    } else if (!inGoldenWindow && deltaSec > 0) {
+      pacingStatus = "SLIGHTLY_OVER_TARGET";
+      pacingScore = 86;
+      recommendation = `Script is ${deltaSec.toFixed(2)}s over ${targetSec.toFixed(1)}s (atempo ${requiredAtempo.toFixed(2)}x <= 1.20x, or trim ~${wordsToTrim} word(s)).`;
+    } else if (!inGoldenWindow && deltaSec < 0) {
+      pacingStatus = "SLIGHTLY_UNDER_TARGET";
+      pacingScore = 88;
+      recommendation = `Script is ${Math.abs(deltaSec).toFixed(2)}s under ${targetSec.toFixed(1)}s (atempo ${requiredAtempo.toFixed(2)}x >= 0.85x, or add ~${wordsToAdd} word(s)).`;
+    }
+    pacing = {
+      counts: {
+        charCount: cleanedScript.length,
+        latinWords,
+        cjkChars,
+        totalWords,
+        effectiveWords,
+        syllableCount,
+        hasCjk: cjkChars > 0,
+      },
+      selectedWpm,
+      targetSec,
+      durationsSec: { wpm135: dur135, wpm150: dur150, wpm165: dur165, atSelectedWpm: estimatedSec },
+      deltaSec,
+      inGoldenWindow,
+      goldenWindowSec: { min: goldenMinSec, max: goldenMaxSec },
+      goldenWordRange: { minWords: goldenMinWords, idealWords, maxWords: goldenMaxWords },
+      wordDelta,
+      wordsToTrim,
+      wordsToAdd,
+      requiredAtempo,
+      ffmpegAtempoFilter,
+      atempoDistortionRisk,
+      atempoUnderrunRisk,
+      pacingStatus,
+      pacingScore,
+      recommendation,
+    };
+  }
+
+  // 2. Rights & Consent Pre-Flight Scan
+  const combined = `${brief}\n${script}`.trim();
+  const ownedLower = ownedBrands.map((b) => b.toLowerCase());
+  const flags = [];
+  let realPersonHits = 0;
+  let consentedPersonNotes = 0;
+  let copyrightedCharacterHits = 0;
+  let thirdPartyBrandHits = 0;
+  let deceptiveOrSensitiveHits = 0;
+
+  for (const item of MCP_REAL_PERSON_RULES) {
+    const m = combined.match(item.rx);
+    if (m) {
+      if (consentVerified) {
+        consentedPersonNotes += 1;
+        flags.push({
+          severity: "LOW",
+          category: "consent",
+          ruleId: "CONSENT_ATTESTED_KEEP_RELEASE",
+          trigger: m[0],
+          message: `Real-person reference "${m[0]}" (${item.label}) with Consent = VERIFIED. Retain signed talent release.`,
+        });
+      } else {
+        realPersonHits += 1;
+        flags.push({
+          severity: "CRITICAL",
+          category: "real_person_no_consent",
+          ruleId: "REAL_PERSON_NO_CONSENT",
+          trigger: m[0],
+          message: `Real-person/celebrity likeness "${m[0]}" (${item.label}) requires documented consent verification.`,
+        });
+      }
+    }
+  }
+  for (const item of MCP_COPYRIGHT_CHARACTER_RULES) {
+    const m = combined.match(item.rx);
+    if (m) {
+      copyrightedCharacterHits += 1;
+      flags.push({
+        severity: "HIGH",
+        category: "copyrighted_character",
+        ruleId: "COPYRIGHTED_CHARACTER_IP",
+        trigger: m[0],
+        message: `Protected character/franchise "${m[0]}" (${item.label}) triggers copyright/IP rejection.`,
+      });
+    }
+  }
+  for (const item of MCP_THIRD_PARTY_BRAND_RULES) {
+    const m = combined.match(item.rx);
+    if (m) {
+      const mLower = m[0].toLowerCase();
+      const isOwned = ownedLower.some(
+        (owned) => owned.length >= 2 && (mLower.includes(owned) || owned.includes(item.brandKey))
+      );
+      if (!isOwned) {
+        thirdPartyBrandHits += 1;
+        flags.push({
+          severity: "MEDIUM",
+          category: "third_party_trademark",
+          ruleId: "THIRD_PARTY_TRADEMARK_LOGO",
+          trigger: m[0],
+          message: `Third-party trademark/logo "${m[0]}" (${item.label}) detected outside owned brands.`,
+        });
+      }
+    }
+  }
+  for (const item of MCP_DECEPTIVE_SENSITIVE_RULES) {
+    const m = combined.match(item.rx);
+    if (m) {
+      deceptiveOrSensitiveHits += 1;
+      flags.push({
+        severity: "CRITICAL",
+        category: "deceptive_or_sensitive",
+        ruleId: "DECEPTIVE_OR_SENSITIVE_CONTENT",
+        trigger: m[0],
+        message: `Deceptive or sensitive content "${m[0]}" (${item.label}) violates ad & creative safety policies.`,
+      });
+    }
+  }
+
+  const safetyPenalty =
+    realPersonHits * 45 +
+    deceptiveOrSensitiveHits * 50 +
+    copyrightedCharacterHits * 35 +
+    thirdPartyBrandHits * 20;
+  const safetyScore = Math.max(0, Math.min(100, 100 - safetyPenalty));
+  const hasCritHigh =
+    realPersonHits > 0 || deceptiveOrSensitiveHits > 0 || copyrightedCharacterHits > 0;
+  const rightsVerdict =
+    safetyScore >= 90 && !hasCritHigh
+      ? "CLEARED_FOR_GENERATION"
+      : safetyScore >= 65 && realPersonHits === 0 && deceptiveOrSensitiveHits === 0
+        ? "REVIEW_TRADEMARKS_OR_CLAIMS"
+        : "BLOCKED_PREFLIGHT_RISK";
+
+  const rightsAndConsent = {
+    safetyScore,
+    verdict: rightsVerdict,
+    consentVerified,
+    ownedBrands,
+    counts: {
+      realPersonHits,
+      consentedPersonNotes,
+      copyrightedCharacterHits,
+      thirdPartyBrandHits,
+      deceptiveOrSensitiveHits,
+      totalBlockingFlags:
+        realPersonHits + copyrightedCharacterHits + thirdPartyBrandHits + deceptiveOrSensitiveHits,
+    },
+    flags,
+  };
+
+  let readinessScore = Math.round(safetyScore * 0.65 + pacing.pacingScore * 0.35);
+  if (rightsVerdict === "BLOCKED_PREFLIGHT_RISK") {
+    readinessScore = Math.min(readinessScore, safetyScore);
+  }
+  readinessScore = Math.max(0, Math.min(100, readinessScore));
+
+  const verdict =
+    rightsVerdict === "BLOCKED_PREFLIGHT_RISK"
+      ? "BLOCKED_RIGHTS_OR_CONSENT"
+      : pacing.atempoDistortionRisk || pacing.atempoUnderrunRisk
+        ? "PACING_REVISION_NEEDED"
+        : readinessScore >= 88
+          ? "PRODUCTION_READY"
+          : "REVIEW_RECOMMENDED";
+
+  const agentPayloads = {
+    "pay-per-use-media-gen": {
+      agent: "@pay-per-use-media-gen",
+      priceUsdc: 0.45,
+      marketUrl: FORGESUITE_LINKS.payPerUseMediaGen,
+      a2aEndpoint: "https://pay-per-use-media-gen.market.near.ai/a2a/v1",
+      jobSpec: {
+        asset_title: title,
+        aspect_ratio: spec.ratio,
+        resolution: spec.resolution,
+        width: spec.width,
+        height: spec.height,
+        target_duration_sec: targetSec,
+        visual_prompt: brief.trim() || `Studio ${spec.resolution} (${spec.ratio}) visual matching spoken script.`,
+        verbatim_script: cleanedScript || null,
+        speaking_rate_wpm: selectedWpm,
+        estimated_natural_duration_sec: pacing.durationsSec.atSelectedWpm,
+        ffmpeg_atempo_chain: pacing.ffmpegAtempoFilter,
+        caption_safe_zone: spec.safeZone,
+        compliance_preflight: {
+          likeness_consent_verified: consentVerified,
+          safety_score: safetyScore,
+          verdict: rightsVerdict,
+          protected_brand_terms: ownedBrands,
+        },
+      },
+    },
+    "short-video-clipper": {
+      agent: "@short-video-clipper",
+      priceUsdc: 0.5,
+      marketUrl: FORGESUITE_LINKS.shortVideoClipper,
+      a2aEndpoint: "https://short-video-clipper.market.near.ai/a2a/v1",
+      jobSpec: {
+        asset_title: title,
+        output_aspect_ratio: spec.ratio,
+        output_resolution: spec.resolution,
+        target_clip_duration_sec: targetSec,
+        burn_in_captions: true,
+        caption_constraints: {
+          max_cps: 20,
+          max_chars_per_line: spec.safeZone.maxCharsPerLine,
+          max_lines_per_cue: spec.safeZone.maxLines,
+          ass_play_res: `${spec.safeZone.assPlayResX}x${spec.safeZone.assPlayResY}`,
+          ass_margin_v: spec.safeZone.assMarginV,
+        },
+        protected_brand_terms: ownedBrands,
+      },
+    },
+    "multi-lang-video-dubber": {
+      agent: "@multi-lang-video-dubber",
+      priceUsdc: 0.65,
+      marketUrl: FORGESUITE_LINKS.multiLangVideoDubber,
+      a2aEndpoint: "https://multi-lang-video-dubber.market.near.ai/a2a/v1",
+      jobSpec: {
+        asset_title: title,
+        aspect_ratio: spec.ratio,
+        resolution: spec.resolution,
+        target_languages: Array.isArray(params.targetLanguages)
+          ? params.targetLanguages
+          : ["es", "de", "ja"],
+        preserve_music_sfx_mid_side: true,
+        max_allowed_atempo: 1.2,
+        min_allowed_atempo: 0.85,
+        source_script_verbatim: cleanedScript || null,
+        source_target_duration_sec: targetSec,
+        do_not_translate_brand_terms: ownedBrands,
+        deliverables: ["dubbed_mp4", "synced_srt"],
+      },
+    },
+  };
+
+  const targetAgent = [
+    "pay-per-use-media-gen",
+    "short-video-clipper",
+    "multi-lang-video-dubber",
+  ].includes(String(params.targetAgent || "").trim())
+    ? String(params.targetAgent).trim()
+    : "pay-per-use-media-gen";
+
+  return {
+    ok: true,
+    title,
+    readinessScore,
+    verdict,
+    pacing,
+    rightsAndConsent,
+    aspectSpec: spec,
+    targetAgent,
+    selectedAgentSpec: agentPayloads[targetAgent],
+    agentPayloads,
+    links: {
+      mediaBriefStudioUrl: FORGESUITE_LINKS.mediastudio,
+      clipCaptionLabUrl: FORGESUITE_LINKS.srtlab,
+      payPerUseMediaGenUrl: FORGESUITE_LINKS.payPerUseMediaGen,
+      shortVideoClipperUrl: FORGESUITE_LINKS.shortVideoClipper,
+      multiLangVideoDubberUrl: FORGESUITE_LINKS.multiLangVideoDubber,
+      proBundleUrl: FORGESUITE_LINKS.pricing,
+      proBundlePriceUsd: 35,
+    },
+  };
+}
+
+/* ============================================================================
+ * 11. MCP Tool Definitions & Dispatch (10 Tools)
  * ========================================================================== */
 
 export const TOOLS = Object.freeze([
@@ -5040,6 +5682,56 @@ export const TOOLS = Object.freeze([
       required: ["content"],
     },
   },
+  {
+    name: "media_brief_audit",
+    description:
+      "Audit AI media production briefs & spoken voiceover scripts 100% offline: counts Latin & CJK words/syllables, computes exact speaking durations at 135/150/165 WPM vs target seconds, calculates FFmpeg atempo (warning > 1.20x distortion or < 0.85x drag) and exact word trim/add delta for the ±0.5s golden window, scans for unconsented celebrity/politician likenesses, copyrighted characters (Disney/Marvel/Nintendo/Pixar/Anime), third-party logos & deceptive claims (0-100 safety score), and outputs normalized 1:1 (1024x1024), 9:16 (1080x1920), 16:9 (1920x1080), and 4:5 (1080x1350) safe-zone JSON specs.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        script: {
+          type: "string",
+          description: "Spoken voiceover script (Latin, European, Vietnamese, or CJK text) to calculate word/syllable pacing and FFmpeg atempo.",
+        },
+        brief: {
+          type: "string",
+          description: "Optional visual scene / product prompt to screen for likeness, copyright, trademark, and safety compliance.",
+        },
+        targetSec: {
+          type: "number",
+          description: "Target audio/video duration in seconds (e.g. 8, 15, 30, 60; default: 30).",
+          default: 30,
+        },
+        wpm: {
+          type: "number",
+          description: "Reference speaking rate in words per minute (e.g. 135, 150, 165; default: 150).",
+          default: 150,
+        },
+        ratio: {
+          type: "string",
+          enum: ["1:1", "9:16", "16:9", "4:5"],
+          description: "Target output aspect ratio (1:1=1024x1024, 9:16=1080x1920, 16:9=1920x1080, 4:5=1080x1350; default: 9:16).",
+          default: "9:16",
+        },
+        consentVerified: {
+          type: "boolean",
+          description: "Set true only if documented identity & signed likeness consent is on file for any named real person (default: false).",
+          default: false,
+        },
+        ownedBrands: {
+          type: "array",
+          items: { type: "string" },
+          description: "Optional list of owned/licensed brand terms exempt from third-party trademark alerts.",
+        },
+        targetAgent: {
+          type: "string",
+          enum: ["pay-per-use-media-gen", "short-video-clipper", "multi-lang-video-dubber"],
+          description: "Preferred target cloud agent spec to highlight (default: pay-per-use-media-gen).",
+          default: "pay-per-use-media-gen",
+        },
+      },
+    },
+  },
 ]);
 
 function executeTool(name, args = {}, options = {}) {
@@ -5319,6 +6011,7 @@ function executeTool(name, args = {}, options = {}) {
             `- Forge AI Agent ($5.00 USDC/call): ${FORGESUITE_LINKS.forgeAgent}`,
             `- Multi-Language Video Dubber ($0.65 USDC/call): ${FORGESUITE_LINKS.multiLangVideoDubber}`,
             `- Short-Form Video Clipper ($0.50 USDC/call): ${FORGESUITE_LINKS.shortVideoClipper}`,
+            `- Pay-Per-Use Media Generator ($0.45 USDC/call): ${FORGESUITE_LINKS.payPerUseMediaGen}`,
             `- Brand Availability Checker ($0.35 USDC/call): ${FORGESUITE_LINKS.forgeBrandChecker}`,
             `- Forge TokenGuard ($0.25 USDC/call): ${FORGESUITE_LINKS.forgeTokenGuard}`,
             `- Forge Data & FinOps ($0.15 USDC/call): ${FORGESUITE_LINKS.forgeDataFinops}`,
@@ -5509,7 +6202,70 @@ function executeTool(name, args = {}, options = {}) {
       lines.push(
         "",
         `Live 9:16 Safe-Zone Simulator & Pro 1080x1920 Animated .ASS Studio: ${FORGESUITE_LINKS.srtlab}`,
-        `Autonomous Cloud Video Agents: @short-video-clipper ($0.50 USDC): ${FORGESUITE_LINKS.shortVideoClipper} | @multi-lang-video-dubber ($0.65 USDC): ${FORGESUITE_LINKS.multiLangVideoDubber}`
+        `Autonomous Cloud Video Agents: @pay-per-use-media-gen ($0.45 USDC): ${FORGESUITE_LINKS.payPerUseMediaGen} | @short-video-clipper ($0.50 USDC): ${FORGESUITE_LINKS.shortVideoClipper} | @multi-lang-video-dubber ($0.65 USDC): ${FORGESUITE_LINKS.multiLangVideoDubber}`
+      );
+
+      return {
+        isError: false,
+        content: [{ type: "text", text: lines.join("\n") }],
+        structuredContent: res,
+      };
+    }
+
+    case "media_brief_audit": {
+      const rawScript = typeof safeArgs.script === "string" ? safeArgs.script : "";
+      const rawBrief =
+        typeof (safeArgs.brief ?? safeArgs.visualBrief ?? safeArgs.prompt) === "string"
+          ? String(safeArgs.brief ?? safeArgs.visualBrief ?? safeArgs.prompt)
+          : "";
+      if (!rawScript.trim() && !rawBrief.trim()) {
+        return {
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: "Invalid argument: provide a non-empty 'script' (spoken voiceover) and/or 'brief' (visual prompt).",
+            },
+          ],
+        };
+      }
+      const res = auditMediaBrief({ ...safeArgs, script: rawScript, brief: rawBrief });
+      if (!res.ok) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: `MediaBrief Audit Error: ${res.error}` }],
+          structuredContent: res,
+        };
+      }
+
+      const p = res.pacing;
+      const r = res.rightsAndConsent;
+      const lines = [
+        `MediaBrief Studio — Script Pacing, Rights Pre-Flight & Multi-Aspect Spec (${res.aspectSpec.ratio} · ${res.aspectSpec.resolution})`,
+        `Overall Readiness: ${res.readinessScore}/100 (${res.verdict}) | Safety Score: ${r.safetyScore}/100 (${r.verdict}, Consent=${r.consentVerified})`,
+        `Pacing (${p.selectedWpm} WPM): ${p.counts.totalWords} words (${p.counts.syllableCount} syllables${p.counts.hasCjk ? `, ${p.counts.cjkChars} CJK chars` : ""}) -> ${p.durationsSec.atSelectedWpm.toFixed(2)}s vs ${p.targetSec.toFixed(1)}s target`,
+        `WPM Matrix: 135 WPM=${p.durationsSec.wpm135.toFixed(2)}s | 150 WPM=${p.durationsSec.wpm150.toFixed(2)}s | 165 WPM=${p.durationsSec.wpm165.toFixed(2)}s`,
+        `FFmpeg Tempo: ${p.ffmpegAtempoFilter} (${p.requiredAtempo.toFixed(3)}x) — ${p.recommendation}`,
+      ];
+
+      if (r.flags.length > 0) {
+        lines.push("", "Rights, Consent & Policy Flags:");
+        for (const f of r.flags) {
+          lines.push(`- [${f.severity}] ${f.ruleId} ("${f.trigger}"): ${f.message}`);
+        }
+      } else {
+        lines.push("", "Rights, Consent & Policy Flags: CLEAN (0 likeness, copyright, or trademark blockers).");
+      }
+
+      lines.push(
+        "",
+        `Normalized Spec for ${res.selectedAgentSpec.agent} ($${res.selectedAgentSpec.priceUsdc.toFixed(2)} USDC):`,
+        "```json",
+        JSON.stringify(res.selectedAgentSpec, null, 2),
+        "```",
+        "",
+        `Interactive MediaBrief Studio & Pro 25-Asset Campaign Batch Matrix: ${FORGESUITE_LINKS.mediastudio}`,
+        `24/7 Cloud Media Fleet: @pay-per-use-media-gen ($0.45): ${FORGESUITE_LINKS.payPerUseMediaGen} | @short-video-clipper ($0.50): ${FORGESUITE_LINKS.shortVideoClipper} | @multi-lang-video-dubber ($0.65): ${FORGESUITE_LINKS.multiLangVideoDubber}`
       );
 
       return {
@@ -5575,7 +6331,7 @@ export function handleJsonRpcMessage(msg, options = {}) {
         },
         serverInfo: SERVER_INFO,
         instructions:
-          "ForgeSuite MCP Server (v1.4.0) provides 9 zero-dependency developer, FinOps, creator media, brand launch & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner), brand_domain_handle_scan (authoritative RDAP + Google DoH .com/.io/.ai/.dev/.app/.org domains, npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability scanner), multi_chain_wallet_scan (live 6-chain Ethereum/Base/Arbitrum/BSC/Polygon/Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector), and subtitle_caption_audit (offline .srt/.vtt timing overlap, CPS reading speed, 9:16 vertical safe-zone, mid-sentence cut & brand keyword auditor + normalizer). Global run: npx --yes github:youthmy11-ai/youthmy11-ai.github.io | Docs: https://youthmy11-ai.github.io/mcp.html",
+          "ForgeSuite MCP Server (v1.5.0) provides 10 zero-dependency developer, FinOps, creator media, brand launch & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner), brand_domain_handle_scan (authoritative RDAP + Google DoH .com/.io/.ai/.dev/.app/.org domains, npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability scanner), multi_chain_wallet_scan (live 6-chain Ethereum/Base/Arbitrum/BSC/Polygon/Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector), subtitle_caption_audit (offline .srt/.vtt timing overlap, CPS reading speed, 9:16 vertical safe-zone, mid-sentence cut & brand keyword auditor + normalizer), and media_brief_audit (offline Latin/CJK voiceover WPM duration calculator, FFmpeg atempo distortion checker, likeness/copyright/trademark pre-flight scanner & 1:1/9:16/16:9/4:5 agent JSON spec builder). Global run: npx --yes github:youthmy11-ai/youthmy11-ai.github.io | Docs: https://youthmy11-ai.github.io/mcp.html",
       });
     }
 

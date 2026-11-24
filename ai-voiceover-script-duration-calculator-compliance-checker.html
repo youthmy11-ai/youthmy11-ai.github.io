@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Voiceover Script Duration Calculator &amp; Media Compliance Checker (135/150/165 WPM, FFmpeg atempo &amp; Rights Pre-Flight)</title>
+  <meta name="description" content="Free 100% client-side AI voiceover script-to-duration calculator (Latin &amp; CJK words/syllables at 135, 150 &amp; 165 WPM, FFmpeg atempo 0.85x–1.20x distortion guard, ±0.5s golden window), celebrity likeness &amp; copyright pre-flight compliance checker, and 1:1/9:16/16:9/4:5 creative spec builder.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/ai-voiceover-script-duration-calculator-compliance-checker.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/ai-voiceover-script-duration-calculator-compliance-checker.html">
+  <meta property="og:title" content="AI Voiceover Script Duration Calculator, FFmpeg atempo Guard &amp; Rights Pre-Flight Checker">
+  <meta property="og:description" content="Calculate exact voiceover seconds at 135/150/165 WPM (Latin + CJK), prevent >1.20x FFmpeg atempo distortion, screen scripts for unconsented celebrity likenesses &amp; Disney/Marvel/Nintendo IP, and build 9:16/1:1/16:9/4:5 creative specs.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Voiceover Script Duration Calculator &amp; Pre-Flight Rights Checker (Free Browser + MCP v1.5.0)">
+  <meta name="twitter:description" content="Zero-upload script-to-duration pacing engine (135/150/165 WPM + CJK), FFmpeg atempo distortion calculator, 0–100 likeness/IP compliance scanner, and multi-aspect JSON spec builder.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230ea5e9'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-size='17' font-weight='800'%3EWPM%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "MediaBrief Studio — AI Voiceover Script Duration Calculator & Compliance Checker",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web, Windows, macOS, Linux (Node.js 20+ MCP)",
+    "url": "https://youthmy11-ai.github.io/ai-voiceover-script-duration-calculator-compliance-checker.html",
+    "softwareVersion": "1.5.0",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free Browser & MCP v1.5.0 Script Pacing & Rights Compliance Auditor", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Cloud 1:1 Photo, 9:16 8s Video & Verbatim TTS (@pay-per-use-media-gen)", "price": "0.45", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Cloud 9:16 Retention-Peak MP4 Clipping (@short-video-clipper)", "price": "0.50", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Cloud 26-Language Neural Video Dubbing (@multi-lang-video-dubber)", "price": "0.65", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Single-Tool Pro Unlock (25-Asset Campaign Batch Matrix)", "price": "15", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "AutoShorts Studio Pro Unlock (Desktop CLI + MediaBrief & ClipCaption Pro)", "price": "19", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "All-Access Creator & Freelancer Bundle", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "Calculates exact spoken durations at 135, 150, and 165 WPM across Latin, European, Vietnamese, and CJK scripts with numeric/currency syllable expansion",
+      "Computes required FFmpeg atempo filter chains against target duration (8s, 15s, 30s, 60s), warning when atempo > 1.20x causes distortion or < 0.85x causes robotic drag",
+      "Pre-flight screens prompts and scripts (0–100 Safety Score) for unconsented celebrity/politician likenesses, protected Disney/Marvel/Nintendo/Pixar/Anime characters, third-party trademarks, and deceptive claims",
+      "Generates normalized 1:1 (1024x1024), 9:16 (1080x1920), 16:9 (1920x1080), and 4:5 (1080x1350) safe-zone JSON specs and runs locally via ForgeSuite MCP v1.5.0 Tool #10 (media_brief_audit)"
+    ],
+    "description": "Zero-backend browser and Node.js MCP v1.5.0 AI voiceover script duration calculator, FFmpeg atempo distortion checker, likeness/copyright compliance scanner, and multi-aspect creative spec builder."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "headline": "AI Voiceover Script-to-Duration Pacing Mathematics, FFmpeg atempo [0.85x–1.20x] Guardrails & Pre-Flight Likeness/IP Compliance Engineering",
+        "description": "Technical playbook for creators, performance marketers, and AI media pipelines: matching word & CJK syllable counts to 8s/15s/30s/60s ad slots at 135/150/165 WPM, avoiding WSOLA time-stretch distortion, screening briefs for likeness consent and IP risks, and standardizing 1:1, 9:16, 16:9, and 4:5 specs.",
+        "url": "https://youthmy11-ai.github.io/ai-voiceover-script-duration-calculator-compliance-checker.html",
+        "datePublished": "2026-11-24",
+        "dateModified": "2026-11-24",
+        "proficiencyLevel": "Expert",
+        "author": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How many words fit cleanly into an 8-second, 15-second, or 30-second AI voiceover spot?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "At the broadcast and neural TTS standard of 150 WPM (2.5 words per second), an 8.0s vertical hook holds 20 words (golden ±0.5s window: 19–21 words), a 15.0s social ad holds 37–38 words (37–38 words), and a 30.0s commercial holds 75 words (74–76 words). Calm luxury narration (135 WPM) fits 68 words in 30s, while energetic short-form hooks (165 WPM) fit 82–83 words in 30s. For CJK scripts (Japanese, Chinese, Korean), 1.65 characters equal roughly 1 spoken English word."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why do voiceover pipelines cap FFmpeg atempo between 0.85x and 1.20x?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "FFmpeg's atempo filter uses WSOLA (Waveform Similarity Overlap-Add) time-domain stretching. Pushing speech above 1.20x swallows consonant plosives, crushes natural inter-clause breaths, and produces metallic chipmunk artifacts; slowing speech below 0.85x introduces phase warble and robotic vocal drag. Trimming or adding words before synthesis preserves crisp 1.00x neural prosody."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why do AI image, video, and voiceover APIs reject celebrity names and copyrighted characters?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Commercial generative providers and autonomous agents (such as @pay-per-use-media-gen) enforce strict likeness right-of-publicity and IP policies: prompts naming real celebrities or politicians without documented identity & signed consent, or requesting protected Disney, Marvel, Nintendo, Pixar, or Anime characters and third-party logos, are declined at pre-flight. MediaBrief Studio catches these triggers locally before you spend render credits."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can AI coding agents run script pacing and compliance checks locally via MCP v1.5.0?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Run npx --yes github:youthmy11-ai/youthmy11-ai.github.io to invoke Tool #10 media_brief_audit 100% offline in VS Code, Claude Code, Cursor, Antigravity, or Windsurf (ForgeSuite MCP v1.5.0, Official MCP Registry verified), then pass the validated JSON spec to @pay-per-use-media-gen ($0.45 USDC), @short-video-clipper ($0.50 USDC), or @multi-lang-video-dubber ($0.65 USDC)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .seo-code {
+      background: rgba(9, 13, 22, 0.88);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      margin: 10px 0 0;
+    }
+    [data-theme="light"] .seo-code {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+    .seo-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .seo-launch-box {
+      padding: 22px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.14), rgba(16, 185, 129, 0.11));
+      border: 1px solid var(--border-strong);
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body data-page="ai-voiceover-script-duration-calculator-compliance-checker">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark" style="background:linear-gradient(135deg,#0ea5e9,#10b981);">MB</span>
+        <span>MediaBrief · WPM &amp; Rights</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="mediastudio.html" class="fs-btn fs-btn-sm fs-btn-secondary">Live MediaBrief Studio</a>
+        <a href="srtlab.html" class="fs-btn fs-btn-sm fs-btn-secondary">ClipCaption Lab</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP Server (v1.5.0)</a>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="AS">AutoShorts Pro ($19)</button>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 64px;">
+    <!-- HERO + INTERACTIVE 1-CLICK MEDIABRIEF LAUNCHER -->
+    <section style="margin-bottom:28px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span class="fs-badge fs-badge-accent">135 / 150 / 165 WPM + CJK · FFMPEG ATEMPO GUARD · RIGHTS &amp; CONSENT PRE-FLIGHT</span>
+        <a href="https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite" target="_blank" rel="noopener noreferrer" class="fs-badge fs-badge-success">
+          ✓ Official MCP Registry: io.github.youthmy11-ai/forgesuite-mcp · v1.5.0 Active ↗
+        </a>
+      </div>
+
+      <h1 style="margin:12px 0 10px;font-size:clamp(1.85rem, 3.5vw, 2.65rem);line-height:1.15;letter-spacing:-0.025em;">
+        AI Voiceover Script Duration Calculator, <code>FFmpeg atempo</code> Guard &amp; Rights Compliance Checker
+      </h1>
+      <p class="fs-lead" style="margin:0;max-width:85ch;color:var(--text-muted);">
+        Two mistakes burn AI video &amp; ad production budgets: stuffing 40 words into an <code>8.0s</code> vertical video (forcing <strong><code>FFmpeg atempo &gt; 1.20x</code></strong> chipmunk distortion) and submitting unvetted prompts naming <strong>unconsented celebrities, protected Disney/Marvel/Nintendo IP, or third-party logos</strong>. Calculate exact Latin &amp; CJK voiceover duration, lock the <code>±0.5s</code> golden window, score pre-flight safety (<code>0–100</code>), and export normalized <code>1:1</code>, <code>9:16</code>, <code>16:9</code> &amp; <code>4:5</code> creative specs 100% client-side.
+      </p>
+
+      <!-- INTERACTIVE QUICK SCRIPT PACING & COMPLIANCE LAUNCHER -->
+      <div class="seo-launch-box" aria-label="Interactive AI Voiceover Script Duration and Compliance Launcher">
+        <form id="msQuickLaunchForm" style="display:grid;gap:12px;">
+          <label class="fs-field">
+            <span class="fs-field-label" style="color:var(--text);">Test Voiceover Script or Prompt (100% Local Browser Memory)</span>
+            <textarea id="msQuickScript" class="fs-textarea" rows="3">Every great morning begins with one quiet moment before the daily rush starts. Handcrafted from natural stoneware clay, our ceramic mug keeps pour-over coffee warm from first sip to last drop.</textarea>
+          </label>
+          <div class="cb-grid-2">
+            <div class="cb-grid-2">
+              <label class="fs-field">
+                <span class="fs-field-label" style="color:var(--text);">Target Duration (<code>sec</code>)</span>
+                <input id="msQuickTargetSec" type="number" class="fs-input" step="0.5" min="1" max="600" value="15">
+              </label>
+              <label class="fs-field">
+                <span class="fs-field-label" style="color:var(--text);">Aspect Ratio</span>
+                <select id="msQuickRatio" class="fs-select">
+                  <option value="9:16" selected>9:16 (1080×1920)</option>
+                  <option value="1:1">1:1 (1024×1024)</option>
+                  <option value="16:9">16:9 (1920×1080)</option>
+                  <option value="4:5">4:5 (1080×1350)</option>
+                </select>
+              </label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;">
+              <label style="display:inline-flex;align-items:center;gap:8px;font-size:0.86rem;cursor:pointer;padding-bottom:8px;">
+                <input id="msQuickConsent" type="checkbox">
+                <span>Signed Likeness Consent Verified (<code>consent=1</code>)</span>
+              </label>
+              <button type="submit" class="fs-btn fs-btn-primary">Calculate Duration &amp; Audit in MediaBrief Studio →</button>
+            </div>
+          </div>
+        </form>
+
+        <div style="margin-top:14px;">
+          <div class="fs-field-label" style="margin-bottom:8px;">1-Click Interactive Deep-Link Presets into <code>mediastudio.html</code> (Zero Upload):</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="mediastudio.html?sample=golden_30s_spot&amp;targetSec=30&amp;ratio=9:16&amp;consent=0" class="fs-btn fs-btn-sm fs-btn-primary">
+              ✓ 30.0s Golden Window Spot (74w · 9:16 · 100/100)
+            </a>
+            <a href="mediastudio.html?sample=overlong_8s_hook&amp;targetSec=8&amp;ratio=9:16&amp;consent=0" class="fs-btn fs-btn-sm fs-btn-secondary">
+              ⚠ Overlong 8.0s Vertical Hook (atempo 1.70x &gt; 1.20x)
+            </a>
+            <a href="mediastudio.html?sample=rights_preflight_block&amp;targetSec=15&amp;ratio=1:1&amp;consent=0" class="fs-btn fs-btn-sm fs-btn-secondary">
+              🛑 Unconsented Celebrity + IP Pre-Flight Block
+            </a>
+            <a href="mediastudio.html?sample=multilang_cjk_15s&amp;targetSec=15&amp;ratio=16:9&amp;consent=1" class="fs-btn fs-btn-sm fs-btn-ghost">
+              🌐 Bilingual CJK + English 15.0s Dub Spec (16:9)
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WPM WORD-BUDGET & FFMPEG ATEMPO REFERENCE MATRIX -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-warn">VOICEOVER WORD BUDGETS &amp; MULTI-ASPECT PIXEL GEOMETRY</span>
+          <h2 style="margin-top:6px;">Exact Word Counts for 8s, 15s, 30s &amp; 60s Slots + Aspect-Ratio Safe Zones</h2>
+        </div>
+        <a href="mediastudio.html?sample=golden_30s_spot&amp;targetSec=30&amp;ratio=9:16&amp;consent=0" class="fs-btn fs-btn-sm fs-btn-secondary">Open Live Pacing Calculator →</a>
+      </div>
+      <p class="inv-muted" style="margin:6px 0 12px;">
+        Neural TTS engines (such as <code>en-US-AvaMultilingualNeural</code> used in our <a href="samples/media-generator-sample.md" style="text-decoration:underline;">verified 30.04s voiceover deliverable</a>) average <strong><code>145–155 WPM</code></strong> in natural conversational cadence. Use this reference table to keep <code>FFmpeg atempo</code> safely inside <strong><code>[0.85x, 1.20x]</code></strong>:
+      </p>
+      <div style="overflow-x:auto;">
+        <table class="fs-table">
+          <thead>
+            <tr>
+              <th>Target Ad Slot</th>
+              <th>135 WPM (Calm / Luxury)</th>
+              <th>150 WPM (Broadcast / TTS)</th>
+              <th>165 WPM (Fast Shorts Hook)</th>
+              <th>CJK Characters (~1.65×)</th>
+              <th>Recommended Aspect Ratio &amp; Safe Zone</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><code>8.0s</code> Micro-Hook</strong></td>
+              <td><code>18 words</code> (17–19w)</td>
+              <td><strong><code>20 words</code> (19–21w)</strong></td>
+              <td><code>22 words</code> (21–23w)</td>
+              <td><code>31–35 CJK chars</code></td>
+              <td><code>9:16</code> (<code>1080x1920</code> · <code>&lt;= 32</code> ch/line, <code>MarginV: 420</code>)</td>
+            </tr>
+            <tr>
+              <td><strong><code>15.0s</code> Paid Social</strong></td>
+              <td><code>34 words</code> (33–35w)</td>
+              <td><strong><code>37–38 words</code> (37–38w)</strong></td>
+              <td><code>41 words</code> (40–42w)</td>
+              <td><code>60–64 CJK chars</code></td>
+              <td><code>4:5</code> (<code>1080x1350</code> · <code>&lt;= 36</code> ch/line) or <code>9:16</code></td>
+            </tr>
+            <tr>
+              <td><strong><code>30.0s</code> Commercial</strong></td>
+              <td><code>68 words</code> (67–69w)</td>
+              <td><strong><code>75 words</code> (74–76w)</strong></td>
+              <td><code>82–83 words</code> (82–83w)</td>
+              <td><code>122–126 CJK chars</code></td>
+              <td><code>1:1</code> (<code>1024x1024</code>), <code>9:16</code> (<code>1080x1920</code>), or <code>16:9</code></td>
+            </tr>
+            <tr>
+              <td><strong><code>60.0s</code> Product Explainer</strong></td>
+              <td><code>135 words</code> (134–136w)</td>
+              <td><strong><code>150 words</code> (149–151w)</strong></td>
+              <td><code>165 words</code> (164–166w)</td>
+              <td><code>245–250 CJK chars</code></td>
+              <td><code>16:9</code> (<code>1920x1080</code> · <code>&lt;= 42</code> ch/line, <code>MarginV: 140</code>)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6 TECHNICAL PRE-FLIGHT PILLARS -->
+    <section style="margin-bottom:28px;">
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-accent">SYLLABLE PHYSICS · WSOLA ATEMPO · LIKENESS CONSENT · MULTI-AGENT SPECS</span>
+          <h2>6 Engineering Checks Before You Call an AI Video, Image, or Voiceover API</h2>
+          <p>How MediaBrief Studio prevents wasted render spend, distorted voiceovers, and policy rejections in zero server roundtrips.</p>
+        </div>
+      </div>
+
+      <div class="seo-grid-2">
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">MULTILINGUAL PACING</span>
+              <span class="fs-badge fs-badge-muted">LATIN + CJK + NUMERALS</span>
+            </div>
+            <h3>1. Syllable-Aware Latin &amp; CJK Tokenization</h3>
+            <p class="fs-card-desc">
+              Naive <code>split(" ")</code> counters miscount Chinese, Japanese, and Korean scripts as 1 giant word and treat <code>"$0.45"</code> or <code>"1080x1920"</code> as single-syllable tokens. MediaBrief Studio expands numeric/currency tokens into spoken syllables and weights CJK characters at <code>1.65 chars/word</code> for accurate multilingual timing.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="mediastudio.html?sample=multilang_cjk_15s&amp;targetSec=15&amp;ratio=16:9&amp;consent=1" class="fs-btn fs-btn-sm fs-btn-secondary">Test Bilingual CJK Pacing →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">AUDIO DSP GUARD</span>
+              <span class="fs-badge fs-badge-muted">0.85X &lt;= ATEMPO &lt;= 1.20X</span>
+            </div>
+            <h3>2. <code>FFmpeg atempo</code> Distortion &amp; Chaining Math</h3>
+            <p class="fs-card-desc">
+              When spoken duration exceeds target length by more than <code>20%</code> (<code>atempo &gt; 1.20x</code>), WSOLA time-compression destroys vocal warmth; below <code>0.85x</code>, vowels smear. MediaBrief Studio flags unsafe ratios, builds valid chained filters (e.g. <code>atempo=2.000,atempo=1.100</code> when <code>&gt; 2.0x</code>), and computes the exact word delta to hit <code>±0.5s</code>.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="mediastudio.html?sample=overlong_8s_hook&amp;targetSec=8&amp;ratio=9:16&amp;consent=0" class="fs-btn fs-btn-sm fs-btn-secondary">Inspect atempo &gt; 1.20x Alert →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">LIKENESS &amp; PUBLICITY</span>
+              <span class="fs-badge fs-badge-muted">CONSENT ATTESTATION</span>
+            </div>
+            <h3>3. Real-Person &amp; Celebrity Consent Pre-Flight</h3>
+            <p class="fs-card-desc">
+              Prompts requesting a <em>"well-known celebrity holding the product"</em>, politicians, or unconsented voice clones trigger immediate policy rejection (see Scenario 4 in <a href="samples/media-generator-sample.md" style="text-decoration:underline;"><code>media-generator-sample.md</code></a>). Toggle <code>consent=1</code> only when signed talent releases are on file.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="mediastudio.html?sample=rights_preflight_block&amp;targetSec=15&amp;ratio=1:1&amp;consent=0" class="fs-btn fs-btn-sm fs-btn-secondary">Run Rights Pre-Flight Demo →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">IP &amp; BRAND HYGIENE</span>
+              <span class="fs-badge fs-badge-muted">DISNEY · NINTENDO · LOGOS</span>
+            </div>
+            <h3>4. Copyrighted Character &amp; Third-Party Logo Screening</h3>
+            <p class="fs-card-desc">
+              Screens visual prompts and ad copy against protected entertainment franchises (Disney, Marvel, DC, Nintendo, Pixar, Studio Ghibli, Anime), third-party luxury/tech logos, and deceptive <code>guaranteed 100x</code> / fake-news claims — while exempting your declared <code>Owned Brands</code>.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="uspto-trademark-domain-brand-checker.html" class="fs-btn fs-btn-sm fs-btn-secondary">USPTO &amp; Brand Checker →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">4 ASPECT STANDARDS</span>
+              <span class="fs-badge fs-badge-muted">1:1 · 9:16 · 16:9 · 4:5</span>
+            </div>
+            <h3>5. Multi-Aspect Safe-Zone &amp; Cloud Agent Spec Builder</h3>
+            <p class="fs-card-desc">
+              Locks exact pixel dimensions (<code>1024x1024</code>, <code>1080x1920</code>, <code>1920x1080</code>, <code>1080x1350</code>) and subtitle safe boxes, outputting copy-ready JSON payloads for <code>@pay-per-use-media-gen</code> (<code>$0.45</code>), <code>@short-video-clipper</code> (<code>$0.50</code>), and <code>@multi-lang-video-dubber</code> (<code>$0.65</code>) — plus 1-click handoff into <a href="srtlab.html" style="text-decoration:underline;">ClipCaption Lab</a>.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="tiktok-reels-9-16-subtitle-safe-zone-checker.html" class="fs-btn fs-btn-sm fs-btn-secondary">9:16 Safe-Zone Guide →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">AGENCY BATCH OPS</span>
+              <span class="fs-badge fs-badge-warn">PRO · $15 / $19 / $35</span>
+            </div>
+            <h3>6. Pro 25-Asset Campaign Matrix &amp; Client Billing</h3>
+            <p class="fs-card-desc">
+              Launching a 20-variant paid social test across TikTok, Reels, and Meta Feeds? Audit up to <strong>25 campaign scripts &amp; briefs</strong> in one pass, neutralize spreadsheet formula injection (<code>=,+,-,@</code>) in CSV exports, download JSON Campaign Manifests, and send quotes to <a href="cryptobill.html" style="text-decoration:underline;">CryptoBill</a> or <a href="sowbuilder.html" style="text-decoration:underline;">ScopeGuard SOW</a>.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">All-Access Bundle ($35)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="CB">Single Pro ($15)</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- MCP V1.5.0 (TOOL #10 media_brief_audit) + 24/7 CLOUD MEDIA FLEET -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-success">LOCAL STDIO MCP V1.5.0 (FREE · TOOL #10) + 24/7 NEAR AI MEDIA AGENTS ($0.45 / $0.50 / $0.65 USDC)</span>
+          <h2 style="margin-top:6px;">Automate Pre-Flight Media Audits in VS Code, Claude Code &amp; Cursor — Then Render on Cloud</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="vscode:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D" class="fs-btn fs-btn-sm fs-btn-primary">⚡ Install in VS Code</a>
+          <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-copy-target="msMcpCmd">Copy npx Command</button>
+        </div>
+      </div>
+
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Run Tool #10 <code>media_brief_audit</code> locally with zero npm dependencies via our Official MCP Registry server (<code>io.github.youthmy11-ai/forgesuite-mcp</code> · <strong>v1.5.0</strong>, 10 tools):
+      </p>
+      <pre class="seo-code"><code id="msMcpCmd">npx --yes github:youthmy11-ai/youthmy11-ai.github.io</code></pre>
+
+      <div class="seo-grid-2">
+        <div class="fs-rail-box">
+          <h3>MCP v1.5.0 Call: <code>media_brief_audit</code> (Free Offline Stdio)</h3>
+          <pre class="seo-code"><code>{
+  "name": "media_brief_audit",
+  "arguments": {
+    "brief": "9:16 vertical slow coffee pour into stoneware mug on sunlit wood table",
+    "script": "Every great morning starts with rich pour-over coffee in our handcrafted ForgeSuite stoneware mug, built for daily focus.",
+    "targetSec": 8,
+    "wpm": 150,
+    "ratio": "9:16",
+    "consentVerified": false,
+    "ownedBrands": ["ForgeSuite"],
+    "targetAgent": "pay-per-use-media-gen"
+  }
+}</code></pre>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">Full MCP v1.5.0 Docs (10 Tools) →</a>
+            <a href="https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.5.0/forgesuite-mcp.mcpb" class="fs-btn fs-btn-sm fs-btn-ghost">Download .mcpb (v1.5.0)</a>
+          </div>
+        </div>
+
+        <div class="fs-rail-box" style="display:grid;gap:12px;align-content:space-between;">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">24/7 NEAR AI CREATIVE MEDIA FLEET</span>
+              <span class="fs-badge fs-badge-muted">VERIFIED PNG + MP4 + MP3 + SRT</span>
+            </div>
+            <h3 style="margin-top:10px;">Dispatch Pre-Flight Cleared Specs to Our 3 Autonomous Media Agents</h3>
+            <ul class="fs-feature-list" style="margin:8px 0 0;">
+              <li>
+                <strong><code>@pay-per-use-media-gen</code> ($0.45 USDC/job):</strong> Generates <code>1024x1024</code> studio product photos, <code>9:16</code> <code>8.00s</code> vertical MP4 videos &amp; 100% verbatim neural voiceovers across 26+ languages (<a href="samples/media-generator-sample.md" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">Verified Sample Suite ↗</a>).
+              </li>
+              <li>
+                <strong><code>@short-video-clipper</code> ($0.50 USDC/job):</strong> Extracts 1–8 sentence-clean <code>9:16</code>, <code>1:1</code>, <code>16:9</code> &amp; <code>4:5</code> MP4 clips from YouTube <code>Most Replayed</code> peaks (<a href="samples/video-clipping-sample.md" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">Verified MP4 Sample ↗</a>).
+              </li>
+              <li>
+                <strong><code>@multi-lang-video-dubber</code> ($0.65 USDC/job):</strong> Dubs videos into 26 languages with stereo <code>Mid/Side</code> music preservation &amp; synced <code>.srt</code> (<a href="samples/video-dubbing-sample.md" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">Verified ES/DE/JA Sample ↗</a>).
+              </li>
+            </ul>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="https://market.near.ai/agents/pay-per-use-media-gen" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Hire @pay-per-use-media-gen ($0.45) ↗</a>
+            <a href="https://market.near.ai/agents/short-video-clipper" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-secondary">Hire @short-video-clipper ($0.50) ↗</a>
+            <a href="https://market.near.ai/agents/multi-lang-video-dubber" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-secondary">Hire @multi-lang-video-dubber ($0.65) ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRO CONVERSION FUNNEL -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-warn">LIFETIME CREATOR PRO UNLOCK · $15 PRO · $19 AUTOSHORTS · $35 BUNDLE</span>
+          <h2 style="margin-top:6px;">Unlock 25-Asset Campaign Batch Matrix, Animated <code>.ASS</code> &amp; AutoShorts Studio Pro</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="CB">Single Pro ($15)</button>
+          <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="AS">AutoShorts Studio Pro ($19)</button>
+          <button type="button" class="fs-btn fs-btn-primary" data-checkout-sku="BUNDLE">All-Access Bundle ($35 · Save $14)</button>
+        </div>
+      </div>
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Pay once with instant client-side on-chain verification via <strong>BSC BEP20 USDT</strong> or <strong>Solana SPL USDC</strong>. Unlock the <strong>MediaBrief 25-Asset Campaign Batch Matrix</strong>, <strong>ClipCaption Lab 1080x1920 Animated <code>.ASS</code> Studio</strong>, and every Pro micro-SaaS utility in ForgeSuite Studio with zero recurring subscriptions.
+      </p>
+    </section>
+
+    <!-- FAQ -->
+    <section>
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-muted">TECHNICAL FAQ</span>
+          <h2>Voiceover WPM Pacing, FFmpeg atempo &amp; AI Media Rights Questions</h2>
+        </div>
+      </div>
+      <div class="fs-faq-grid">
+        <div class="fs-faq-item">
+          <h3>How many words fit in an 8s vertical video vs a 30s commercial?</h3>
+          <p>At <code>150 WPM</code>, target <strong><code>19–21</code> words</strong> for an <code>8.0s</code> vertical clip and <strong><code>74–76</code> words</strong> for a <code>30.0s</code> spot to land cleanly inside the <code>±0.5s</code> golden window at <code>1.00x</code> natural speed.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>What happens if my script requires FFmpeg atempo &gt; 1.20x?</h3>
+          <p>Above <code>1.20x</code>, WSOLA time-stretching crushes natural breath pauses and creates metallic pitch/formant artifacts. Trim the recommended word count in <a href="mediastudio.html" style="text-decoration:underline;">MediaBrief Studio</a> before synthesis.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>How does the Likeness Consent flag (consent=0 vs consent=1) work?</h3>
+          <p>By default (<code>consent=0</code>), real celebrity or politician names trigger a <code>CRITICAL</code> pre-flight block. Enable <code>consent=1</code> only when you hold verifiable identity and signed likeness permission for that speaker/talent.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Are my ad scripts or client campaign briefs uploaded anywhere?</h3>
+          <p>Never. Both <code>mediastudio.html</code> and <code>forgesuite-mcp</code> (<code>media_brief_audit</code>) run 100% locally in browser memory or Node.js 20+ stdio with zero ForgeSuite backend servers.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="mediastudio.html">MediaBrief Studio</a>
+        <a href="ai-voiceover-script-duration-calculator-compliance-checker.html">WPM &amp; Compliance Guide</a>
+        <a href="srtlab.html">ClipCaption Lab</a>
+        <a href="tiktok-reels-9-16-subtitle-safe-zone-checker.html">9:16 Safe-Zone Checker</a>
+        <a href="youtube-most-replayed-clipper-ai-dubbing-guide.html">Most Replayed Clipper &amp; Dub Guide</a>
+        <a href="walletcheck.html">WalletLens</a>
+        <a href="eip-7702-delegation-gnosis-safe-checker.html">EIP-7702 &amp; Safe Checker</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="solana-token-2022-scanner.html">Solana Token-2022 Scanner</a>
+        <a href="evm-proxy-honeypot-scanner.html">EVM Proxy &amp; Honeypot Scanner</a>
+        <a href="brandcheck.html">BrandGuard</a>
+        <a href="uspto-trademark-domain-brand-checker.html">USPTO &amp; Brand Checker</a>
+        <a href="mcp.html">MCP Server (v1.5.0)</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="llms.txt">llms.txt</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { bindCheckoutTriggers } from "./assets/checkout.js";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      bindCheckoutTriggers();
+
+      const form = document.getElementById("msQuickLaunchForm");
+      const scriptEl = document.getElementById("msQuickScript");
+      const targetEl = document.getElementById("msQuickTargetSec");
+      const ratioEl = document.getElementById("msQuickRatio");
+      const consentEl = document.getElementById("msQuickConsent");
+
+      if (form && scriptEl && targetEl && ratioEl) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const params = new URLSearchParams();
+          params.set("script", (scriptEl.value || "").trim());
+          params.set("targetSec", String(Number(targetEl.value) || 15));
+          params.set("ratio", ratioEl.value || "9:16");
+          params.set("consent", consentEl?.checked ? "1" : "0");
+          window.location.href = `mediastudio.html?${params.toString()}`;
+        });
+      }
+
+      const themeBtn = document.getElementById("themeToggleBtn");
+      if (themeBtn) {
+        const saved = window.localStorage.getItem("forgesuite_theme") || "dark";
+        document.documentElement.dataset.theme = saved;
+        themeBtn.textContent = saved === "light" ? "☀ Light" : "🌙 Dark";
+        themeBtn.addEventListener("click", () => {
+          const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+          document.documentElement.dataset.theme = next;
+          window.localStorage.setItem("forgesuite_theme", next);
+          themeBtn.textContent = next === "light" ? "☀ Light" : "🌙 Dark";
+        });
+      }
+
+      document.querySelectorAll("[data-copy-target]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-copy-target");
+          const target = id ? document.getElementById(id) : null;
+          if (!target) return;
+          const prev = btn.textContent;
+          try {
+            await navigator.clipboard.writeText(target.textContent || "");
+            btn.textContent = "Copied ✓";
+            setTimeout(() => {
+              btn.textContent = prev;
+            }, 1600);
+          } catch {}
+        });
+      });
+    });
+  </script>
+</body>
+</html>

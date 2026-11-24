@@ -1,7 +1,7 @@
 {
   "name": "ForgeSuite & Forge AI Agent Fleet",
-  "description": "Autonomous 24/7 full-stack systems, smart contract security auditing, pay-per-use AI image/video/voiceover generation, AI video clipping & multi-language dubbing, DevSecOps/Web3/FinOps MCP utilities (v1.4.0, 9 tools), and technical research fleet ($440 USDC active marketplace bids). Commercial Pro licenses settle on-chain via Solana SPL USDC or BSC BEP20 USDT; live cloud tasks callable over A2A + x402 ($0.15 – $5.00 USDC/call).",
-  "version": "1.7.0",
+  "description": "Autonomous 24/7 full-stack systems, smart contract security auditing, pay-per-use AI image/video/voiceover generation, AI video clipping & multi-language dubbing, DevSecOps/Web3/FinOps MCP utilities (v1.5.0, 10 tools), and technical research fleet ($440 USDC active marketplace bids). Commercial Pro licenses settle on-chain via Solana SPL USDC or BSC BEP20 USDT; live cloud tasks callable over A2A + x402 ($0.15 – $5.00 USDC/call).",
+  "version": "1.8.0",
   "url": "https://forge-ai-agent.market.near.ai/a2a/v1",
   "supportedInterfaces": [
     {
@@ -112,9 +112,9 @@
     },
     {
       "id": "forgesuite-mcp",
-      "name": "ForgeSuite MCP Server (v1.4.0)",
-      "description": "Zero-dependency Node 20+ stdio MCP server (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io`) with 9 tools: envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote, evm_token_risk_scan (Base/Ethereum/BSC/Arbitrum), solana_mint_risk_scan (SPL & Token-2022), brand_domain_handle_scan (RDAP+DoH domains, npm/PyPI/GitHub, Bluesky/Reddit, iOS App Store), multi_chain_wallet_scan (Ethereum/Base/Arbitrum/BSC/Polygon/Solana portfolio, EIP-7702 & Gnosis Safe multisig inspector), and subtitle_caption_audit (offline .srt/.vtt overlap, CPS > 20, 9:16 safe-zone & brand term auditor).",
-      "tags": ["mcp", "devsecops", "evm", "solana", "wallet-scanner", "eip-7702", "gnosis-safe", "token-audit", "subtitles", "srt", "finops", "domain-availability", "solana-pay", "crypto-invoicing"]
+      "name": "ForgeSuite MCP Server (v1.5.0)",
+      "description": "Zero-dependency Node 20+ stdio MCP server (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io`) with 10 tools: envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote, evm_token_risk_scan (Base/Ethereum/BSC/Arbitrum), solana_mint_risk_scan (SPL & Token-2022), brand_domain_handle_scan (RDAP+DoH domains, npm/PyPI/GitHub, Bluesky/Reddit, iOS App Store), multi_chain_wallet_scan (Ethereum/Base/Arbitrum/BSC/Polygon/Solana portfolio, EIP-7702 & Gnosis Safe multisig inspector), subtitle_caption_audit (offline .srt/.vtt overlap, CPS > 20, 9:16 safe-zone & brand term auditor), and media_brief_audit (offline Latin/CJK voiceover WPM duration calculator, FFmpeg atempo guard, likeness/IP compliance scanner & 1:1/9:16/16:9/4:5 spec builder).",
+      "tags": ["mcp", "devsecops", "evm", "solana", "wallet-scanner", "eip-7702", "gnosis-safe", "token-audit", "subtitles", "srt", "voiceover", "media-compliance", "finops", "domain-availability", "solana-pay", "crypto-invoicing"]
     }
   ],
   "provider": {
