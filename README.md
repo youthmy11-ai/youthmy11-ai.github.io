@@ -36,7 +36,7 @@ Prefer remote HTTPS JSON-RPC execution or marketplace escrow instead of local st
 6. **[`@multi-lang-video-dubber`](https://market.near.ai/agents/multi-lang-video-dubber)** — **`$0.65 USDC/call`** (24/7 media daemon — Dubs videos into 25+ languages with multi-speaker stock voices, sub-second sync, preserved background music & SFX, verbatim brand-term lock & synced `.mp4` + `.srt`)
 7. **[`@forge-ai-agent`](https://market.near.ai/agents/forge-ai-agent)** — **`$5.00 USDC/call`** (Deep line-by-line Solidity/Rust/Anchor smart contract security audits, full-stack fixes with tests & primary-source technical research)
 
-## Live Web Tools & Security Scanners (`10` Core Web Apps + `4` Deep-Dive Scanners)
+## Live Web Tools & Security Scanners (`10` Core Web Apps + `6` Deep-Dive Guides)
 
 All web tools execute **100% inside local browser memory** with zero ForgeSuite backend servers or telemetry:
 
@@ -44,6 +44,7 @@ All web tools execute **100% inside local browser memory** with zero ForgeSuite 
    - Serverless freelance crypto & PayPal invoice builder with A4 print-to-PDF layout (`@media print`), offline QR codes (`assets/qr.js`), and `#inv=<base64url>` shareable links.
 2. **[ClipCaption Lab](https://youthmy11-ai.github.io/srtlab.html)** (`srtlab.html`) — **Free Converter & 9:16 Auditor + Pro Animated `.ASS` & 25-File Batch ($15 Pro / $19 AutoShorts Pro / $35 Bundle)**
    - Bidirectional `.srt` <-> `.vtt` <-> `.txt` converter, `+/- ms` time-shifter & tempo scaler, overlap & `CPS > 20` reading-speed detector, mid-sentence cut detector, live `9:16` TikTok/Reels/Shorts safe-zone phone simulator, Pro `1080x1920` animated `.ass` export, and 1-click handoff to `@short-video-clipper` (`$0.50`) & `@multi-lang-video-dubber` (`$0.65`).
+   - Deep-dive guides: **[TikTok, Reels & Shorts 9:16 Subtitle Safe-Zone Checker](https://youthmy11-ai.github.io/tiktok-reels-9-16-subtitle-safe-zone-checker.html)** · **[YouTube Most Replayed Clipper & 26-Language AI Video Dubbing Guide](https://youthmy11-ai.github.io/youtube-most-replayed-clipper-ai-dubbing-guide.html)**
 3. **[WalletLens Portfolio & Smart Account Inspector](https://youthmy11-ai.github.io/walletcheck.html)** (`walletcheck.html`) — **Free Single 6-Chain Scan + Pro 25-Wallet Watchlist ($15 Pro / $35 Bundle)**
    - 100% client-side CORS-clean multi-chain wallet inspector across `Ethereum`, `Base`, `Arbitrum`, `BSC`, `Polygon`, and `Solana Mainnet`: native + stablecoin holdings (`USDC`, `USDT`, `DAI`, `PYUSD`), tx nonces, EIP-7702 (`0xef0100...`) delegations, Gnosis Safe `M-of-N` signers, pure-JS Ed25519 Solana ATA derivation, and latest 10 Solana signatures (`?address=...` deep-links supported).
    - Deep-dive guide: **[EIP-7702 Delegation & Gnosis Safe Checker](https://youthmy11-ai.github.io/eip-7702-delegation-gnosis-safe-checker.html)**

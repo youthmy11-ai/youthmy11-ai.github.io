@@ -1125,6 +1125,8 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsFull, /All 10 web applications/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/mcp\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/srtlab\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/tiktok-reels-9-16-subtitle-safe-zone-checker\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/youtube-most-replayed-clipper-ai-dubbing-guide\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/tokenaudit\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/solana-token-2022-scanner\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/evm-proxy-honeypot-scanner\.html/);
@@ -1138,6 +1140,8 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/forge-brand-checker/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/a\/forge-ai-agent/);
   assert.match(llmsFull, /srtlab\.html/);
+  assert.match(llmsFull, /tiktok-reels-9-16-subtitle-safe-zone-checker\.html/);
+  assert.match(llmsFull, /youtube-most-replayed-clipper-ai-dubbing-guide\.html/);
   assert.match(llmsFull, /solana-token-2022-scanner\.html/);
   assert.match(llmsFull, /evm-proxy-honeypot-scanner\.html/);
   assert.match(llmsFull, /eip-7702-delegation-gnosis-safe-checker\.html/);
@@ -1166,6 +1170,8 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
     { file: "txdecode.html", url: "https://youthmy11-ai.github.io/txdecode.html", category: "DeveloperApplication" },
     { file: "envshield.html", url: "https://youthmy11-ai.github.io/envshield.html", category: "SecurityApplication" },
     { file: "srtlab.html", url: "https://youthmy11-ai.github.io/srtlab.html", category: "MultimediaApplication" },
+    { file: "tiktok-reels-9-16-subtitle-safe-zone-checker.html", url: "https://youthmy11-ai.github.io/tiktok-reels-9-16-subtitle-safe-zone-checker.html", category: "MultimediaApplication" },
+    { file: "youtube-most-replayed-clipper-ai-dubbing-guide.html", url: "https://youthmy11-ai.github.io/youtube-most-replayed-clipper-ai-dubbing-guide.html", category: "MultimediaApplication" },
     { file: "mcp.html", url: "https://youthmy11-ai.github.io/mcp.html", category: "DeveloperApplication" },
   ];
 
@@ -3386,4 +3392,158 @@ test("srtlab.html and all 10 core client-side web apps carry valid links, Pro co
       `sitemap.xml missing ${appFile}`
     );
   }
+});
+
+/* ============================================================================
+ * 20. Creator Video & AI Media Task-Intent SEO Pages (Iteration 9)
+ * ========================================================================== */
+
+test("tiktok-reels-9-16-subtitle-safe-zone-checker.html ships valid SoftwareApplication + TechArticle + FAQPage JSON-LD, 1-click srtlab.html presets, MCP v1.4.0 subtitle_caption_audit, cloud video agents & Pro CTAs", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const file = "tiktok-reels-9-16-subtitle-safe-zone-checker.html";
+  const canonicalUrl = `https://youthmy11-ai.github.io/${file}`;
+  const html = fs.readFileSync(path.join(repoRoot, file), "utf8");
+  const srtHtml = fs.readFileSync(path.join(repoRoot, "srtlab.html"), "utf8");
+
+  assert.match(html, /<title>[^<]*9:16 Subtitle Safe-Zone Checker[^<]*<\/title>/);
+  assert.match(html, /<meta name="description" content="[^"]{90,}"/);
+  assert.ok(html.includes(`<link rel="canonical" href="${canonicalUrl}">`));
+  assert.ok(srtHtml.includes(`href="${file}"`), "srtlab.html must link bidirectionally to 9:16 safe-zone checker");
+
+  const { types } = extractAllJsonLdObjects(html);
+  assert.ok(types.has("SoftwareApplication"), "Missing SoftwareApplication JSON-LD");
+  assert.ok(types.has("TechArticle"), "Missing TechArticle JSON-LD");
+  assert.ok(types.has("FAQPage"), "Missing FAQPage JSON-LD");
+
+  for (const term of [
+    "9:16",
+    "1080x1920",
+    "TikTok",
+    "Instagram Reels",
+    "YouTube Shorts",
+    "CPS",
+    "20",
+    ".ass",
+    "PlayResX: 1080",
+    "PlayResY: 1920",
+    "srtlab.html",
+    "subtitle_caption_audit",
+    "v1.4.0",
+    "npx --yes github:youthmy11-ai/youthmy11-ai.github.io",
+    NEAR_VIDEO_CLIPPER_URL,
+    NEAR_VIDEO_DUBBER_URL,
+    "$0.50 USDC",
+    "$0.65 USDC",
+    "samples/video-clipping-sample.md",
+    "samples/video-dubbing-sample.md",
+    'data-checkout-sku="CB"',
+    'data-checkout-sku="AS"',
+    'data-checkout-sku="BUNDLE"',
+  ]) {
+    assert.ok(html.includes(term), `${file} missing "${term}"`);
+  }
+
+  const deepLinks = [...html.matchAll(/href="srtlab\.html\?([^"]+)"/g)].map((m) =>
+    m[1].replace(/&amp;/g, "&")
+  );
+  assert.ok(deepLinks.length >= 4, "Expected at least 4 interactive srtlab.html deep-links");
+  for (const qs of deepLinks) {
+    const parsed = parseSrtLabQueryParams(qs);
+    assert.ok(
+      parsed.sample && Object.prototype.hasOwnProperty.call(SRTLAB_SAMPLES, parsed.sample),
+      `Invalid srtlab.html sample query: ${qs}`
+    );
+  }
+  const autoFixLink = deepLinks.find((q) => q.includes("autoFix=1"));
+  assert.ok(autoFixLink, "Expected at least one autoFix=1 preset link");
+  const parsedAutoFix = parseSrtLabQueryParams(autoFixLink);
+  assert.equal(parsedAutoFix.autoFix, true);
+  assert.equal(parsedAutoFix.outputTab, "ass");
+
+  verifyInternalRelativeHtmlLinks(repoRoot, file, html);
+});
+
+test("youtube-most-replayed-clipper-ai-dubbing-guide.html ships valid SoftwareApplication + TechArticle + FAQPage JSON-LD, 1-click srtlab.html presets, MCP v1.4.0, stereo Mid/Side 26-lang dubbing & sample links", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const file = "youtube-most-replayed-clipper-ai-dubbing-guide.html";
+  const canonicalUrl = `https://youthmy11-ai.github.io/${file}`;
+  const html = fs.readFileSync(path.join(repoRoot, file), "utf8");
+  const srtHtml = fs.readFileSync(path.join(repoRoot, "srtlab.html"), "utf8");
+
+  assert.match(html, /<title>[^<]*YouTube Most Replayed Clipper[^<]*26-Language AI Video Dubbing[^<]*<\/title>/);
+  assert.match(html, /<meta name="description" content="[^"]{90,}"/);
+  assert.ok(html.includes(`<link rel="canonical" href="${canonicalUrl}">`));
+  assert.ok(srtHtml.includes(`href="${file}"`), "srtlab.html must link bidirectionally to Most Replayed & AI Dubbing guide");
+
+  const { types } = extractAllJsonLdObjects(html);
+  assert.ok(types.has("SoftwareApplication"), "Missing SoftwareApplication JSON-LD");
+  assert.ok(types.has("TechArticle"), "Missing TechArticle JSON-LD");
+  assert.ok(types.has("FAQPage"), "Missing FAQPage JSON-LD");
+
+  for (const term of [
+    "Most Replayed",
+    "26 languages",
+    "Mid/Side",
+    "-27.1 dBFS",
+    "AutoShorts Studio Pro",
+    "srtlab.html",
+    "subtitle_caption_audit",
+    "v1.4.0",
+    "npx --yes github:youthmy11-ai/youthmy11-ai.github.io",
+    NEAR_VIDEO_CLIPPER_URL,
+    NEAR_VIDEO_DUBBER_URL,
+    "$0.50 USDC",
+    "$0.65 USDC",
+    "samples/video-clipping-sample.md",
+    "samples/video-dubbing-sample.md",
+    'data-checkout-sku="CB"',
+    'data-checkout-sku="AS"',
+    'data-checkout-sku="BUNDLE"',
+  ]) {
+    assert.ok(html.includes(term), `${file} missing "${term}"`);
+  }
+
+  const deepLinks = [...html.matchAll(/href="srtlab\.html\?([^"]+)"/g)].map((m) =>
+    m[1].replace(/&amp;/g, "&")
+  );
+  assert.ok(deepLinks.length >= 4, "Expected at least 4 interactive srtlab.html deep-links");
+  for (const qs of deepLinks) {
+    const parsed = parseSrtLabQueryParams(qs);
+    assert.ok(
+      parsed.sample && Object.prototype.hasOwnProperty.call(SRTLAB_SAMPLES, parsed.sample),
+      `Invalid srtlab.html sample query: ${qs}`
+    );
+  }
+
+  verifyInternalRelativeHtmlLinks(repoRoot, file, html);
+});
+
+test("index.html #technical-guides lists all 6 task-intent technical guides and preserves clean internal links across srtlab.html and index.html", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const indexHtml = fs.readFileSync(path.join(repoRoot, "index.html"), "utf8");
+  const srtHtml = fs.readFileSync(path.join(repoRoot, "srtlab.html"), "utf8");
+
+  const guidesSectionMatch = indexHtml.match(/<div class="cb-panel" id="technical-guides"[\s\S]*?<\/section>/);
+  assert.ok(guidesSectionMatch, "index.html missing #technical-guides section");
+  const guidesHtml = guidesSectionMatch[0];
+
+  const expectedSixGuides = [
+    "tiktok-reels-9-16-subtitle-safe-zone-checker.html",
+    "youtube-most-replayed-clipper-ai-dubbing-guide.html",
+    "eip-7702-delegation-gnosis-safe-checker.html",
+    "uspto-trademark-domain-brand-checker.html",
+    "solana-token-2022-scanner.html",
+    "evm-proxy-honeypot-scanner.html",
+  ];
+  for (const guideFile of expectedSixGuides) {
+    assert.ok(
+      guidesHtml.includes(`href="${guideFile}"`),
+      `index.html #technical-guides missing "${guideFile}"`
+    );
+  }
+  const railCards = [...guidesHtml.matchAll(/class="fs-rail-box"/g)];
+  assert.equal(railCards.length, 6, "index.html #technical-guides must display exactly 6 guide cards");
+
+  verifyInternalRelativeHtmlLinks(repoRoot, "index.html", indexHtml);
+  verifyInternalRelativeHtmlLinks(repoRoot, "srtlab.html", srtHtml);
 });

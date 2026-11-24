@@ -139,7 +139,10 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 
 ### 3.14 ClipCaption Lab — 9:16 Subtitle Auditor, Time-Shifter & Converter (`https://youthmy11-ai.github.io/srtlab.html`)
 - **Category**: MultimediaApplication (Web — Free `.SRT`/`.VTT`/`.TXT` Converter & 9:16 Auditor + Pro Animated `.ASS` & 25-File Batch in `$15` Pro / `$19` AutoShorts Pro / `$35` Bundle)
-- **URL Deep-Link Parameters**: Supports `?sample=<preset>&shift=<ms>&tempo=<scale>&maxCps=<cps>&maxLine=<chars>&brands=<csv>` and `#srt=<base64url>`.
+- **Specialized Deep-Dive Guides & Launchers**:
+  - **TikTok, Reels & YouTube Shorts 9:16 Subtitle Safe-Zone Checker**: `https://youthmy11-ai.github.io/tiktok-reels-9-16-subtitle-safe-zone-checker.html`
+  - **YouTube Most Replayed Clipper & 26-Language AI Video Dubbing Guide**: `https://youthmy11-ai.github.io/youtube-most-replayed-clipper-ai-dubbing-guide.html`
+- **URL Deep-Link Parameters**: Supports `?sample=<preset>&shift=<ms>&tempo=<scale>&maxCps=<cps>&maxLine=<chars>&brands=<csv>&autoFix=1&out=<srt|vtt|txt|ass>` and `#srt=<base64url>`.
 - **Reusable Engine**: `https://youthmy11-ai.github.io/assets/srtlab.js` (Pure ES Module compatible with Browser & Node.js 20+)
 - **Capabilities**:
   - **Bidirectional `.SRT` <-> `.VTT` <-> `.TXT` Conversion**: Strips inline VTT karaoke timestamps and HTML/voice tags cleanly, or converts timestamped/plain transcripts directly into normalized subtitle tracks.
@@ -186,6 +189,8 @@ ForgeSuite operates 7 live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 
 
 - **Storefront**: https://youthmy11-ai.github.io/
 - **ClipCaption Lab**: https://youthmy11-ai.github.io/srtlab.html
+- **9:16 Subtitle Safe-Zone Checker**: https://youthmy11-ai.github.io/tiktok-reels-9-16-subtitle-safe-zone-checker.html
+- **YouTube Most Replayed Clipper & 26-Lang AI Dubbing Guide**: https://youthmy11-ai.github.io/youtube-most-replayed-clipper-ai-dubbing-guide.html
 - **WalletLens Inspector**: https://youthmy11-ai.github.io/walletcheck.html
 - **EIP-7702 & Gnosis Safe Guide**: https://youthmy11-ai.github.io/eip-7702-delegation-gnosis-safe-checker.html
 - **TokenGuard Scanner**: https://youthmy11-ai.github.io/tokenaudit.html

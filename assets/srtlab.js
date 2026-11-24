@@ -1191,6 +1191,10 @@ export function parseSrtLabQueryParams(searchStr = "", hashStr = "") {
     ? Number(sp.get("maxLine")) || DEFAULT_MAX_LINE_CHARS
     : DEFAULT_MAX_LINE_CHARS;
   const brandTerms = sp.get("brands")?.trim() || "";
+  const autoFixRaw = (sp.get("autoFix") || "").trim().toLowerCase();
+  const autoFix = autoFixRaw === "1" || autoFixRaw === "true" || autoFixRaw === "yes";
+  const outRaw = (sp.get("out") || "").trim().toLowerCase();
+  const outputTab = ["srt", "vtt", "txt", "ass"].includes(outRaw) ? outRaw : "srt";
 
   let decodedSubtitle = null;
   const cleanHash = String(hashStr || "").replace(/^#/, "");
@@ -1209,6 +1213,8 @@ export function parseSrtLabQueryParams(searchStr = "", hashStr = "") {
     maxCps,
     maxLineLength,
     brandTerms,
+    autoFix,
+    outputTab,
     decodedSubtitle,
   };
 }
@@ -1930,6 +1936,16 @@ export function initClipCaptionLab() {
   if (maxCpsInputEl) maxCpsInputEl.value = String(qp.maxCps);
   if (maxLineInputEl) maxLineInputEl.value = String(qp.maxLineLength);
   if (brandInputEl && qp.brandTerms) brandInputEl.value = qp.brandTerms;
+  if (autoFixCheckEl && qp.autoFix) autoFixCheckEl.checked = true;
+  if (qp.outputTab && qp.outputTab !== "srt") {
+    activeOutputTab = qp.outputTab;
+    outputFormatTabs.forEach((b) => {
+      b.className =
+        b.getAttribute("data-srt-out-tab") === activeOutputTab
+          ? "fs-btn fs-btn-sm fs-btn-primary"
+          : "fs-btn fs-btn-sm fs-btn-secondary";
+    });
+  }
 
   if (inputEl) {
     if (qp.decodedSubtitle) {

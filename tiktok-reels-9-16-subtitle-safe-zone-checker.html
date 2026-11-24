@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok, Reels &amp; Shorts 9:16 Subtitle Safe-Zone Checker (1080x1920 CPS, Overlap &amp; .ASS Tool)</title>
+  <meta name="description" content="Free 100% client-side 9:16 (1080x1920) vertical subtitle safe-zone checker for TikTok, Instagram Reels, and YouTube Shorts. Enforce CPS &lt;= 20 reading speed, eliminate .SRT/.VTT timestamp overlaps, prevent right-rail button &amp; bottom-caption collisions, and export FFmpeg animated .ASS captions.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/tiktok-reels-9-16-subtitle-safe-zone-checker.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/tiktok-reels-9-16-subtitle-safe-zone-checker.html">
+  <meta property="og:title" content="TikTok, Instagram Reels &amp; YouTube Shorts 9:16 Subtitle Safe-Zone Checker (1080x1920 + .ASS)">
+  <meta property="og:description" content="Audit .SRT, .VTT, and .TXT captions against 1080x1920 TikTok/Reels/Shorts UI danger zones: lock CPS &lt;= 20, auto-fix cue overlaps, catch mid-sentence cuts, and export animated .ASS tracks.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TikTok, Reels &amp; Shorts 9:16 Subtitle Safe-Zone Checker (Free Browser + MCP v1.4.0)">
+  <meta name="twitter:description" content="Zero-upload 1080x1920 vertical caption auditor: CPS &lt;= 20 checker, overlap resolver, live 9:16 phone previewer, and FFmpeg PlayResX 1080 / PlayResY 1920 animated .ASS exporter.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ec4899'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-size='18' font-weight='800'%3E9:16%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ClipCaption Lab — TikTok, Reels & YouTube Shorts 9:16 Subtitle Safe-Zone Checker",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web, Windows, macOS, Linux (Node.js 20+ MCP)",
+    "url": "https://youthmy11-ai.github.io/tiktok-reels-9-16-subtitle-safe-zone-checker.html",
+    "softwareVersion": "1.4.0",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free Browser & MCP v1.4.0 9:16 Safe-Zone & CPS Auditor", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Cloud 9:16 MP4 Highlight Clipping (@short-video-clipper)", "price": "0.50", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Cloud 26-Language Neural Video Dubbing (@multi-lang-video-dubber)", "price": "0.65", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Single-Tool Pro Unlock (1080x1920 Animated .ASS + 25-File Batch)", "price": "15", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "AutoShorts Studio Pro Unlock (Desktop/CLI Batch Video + ClipCaption Pro)", "price": "19", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "All-Access Creator & Freelancer Bundle (All Pro Tools + Batch Studio)", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "Validates 1080x1920 (9:16) vertical subtitle safe zones against TikTok, Instagram Reels, and YouTube Shorts top status bars (13%), right engagement icons (16%), and bottom caption drawers (22%)",
+      "Enforces mobile reading-speed ergonomics (CPS <= 20 characters per second, <= 32 chars/line, <= 2 stacked lines) with 0-100 deterministic Caption Quality Scoring",
+      "Eliminates .SRT and .VTT timestamp overlaps with >= 40ms inter-cue guard intervals plus +/- ms offset shifting and frame-rate tempo scaling",
+      "Exports FFmpeg-ready PlayResX: 1080, PlayResY: 1920 SubStation Alpha (.ASS) animated pop-in tracks and runs locally via ForgeSuite MCP v1.4.0 Tool #9 (subtitle_caption_audit)"
+    ],
+    "description": "Zero-backend browser and Node.js MCP v1.4.0 vertical 9:16 subtitle safe-zone auditor, CPS <= 20 reading-speed verifier, timestamp overlap fixer, and 1080x1920 animated .ASS exporter."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "headline": "TikTok, Instagram Reels & YouTube Shorts 9:16 Subtitle Safe-Zone Specification (1080x1920 Pixel Coordinates, CPS <= 20 & Animated .ASS Mastering)",
+        "description": "Engineering guide for short-form video editors and AI media pipelines: mapping 1080x1920 UI obstruction zones on TikTok, Reels, and Shorts, fixing .SRT/.VTT timestamp overlaps, capping reading speed at CPS <= 20, and burning animated .ASS subtitles with FFmpeg.",
+        "url": "https://youthmy11-ai.github.io/tiktok-reels-9-16-subtitle-safe-zone-checker.html",
+        "datePublished": "2026-11-24",
+        "dateModified": "2026-11-24",
+        "proficiencyLevel": "Expert",
+        "author": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What are the exact 1080x1920 (9:16) subtitle safe-zone margins for TikTok, Instagram Reels, and YouTube Shorts?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Across a 1080x1920 vertical canvas, the top 250px (~13%) is covered by status bars, notch cutouts, and search/Live pills; the right 160-175px (X = 905-1080px) houses Like, Comment, Bookmark, Share, and spinning audio icons; and the bottom 420px (~22%, Y = 1500-1920px) is obscured by creator handles, expandable descriptions, Shop/Sponsored CTAs, and music tickers. Keeping captions inside X = 90-910px, Y = 1180-1500px (MarginL/R >= 90, MarginV = 420-430, <= 32 characters per line, <= 2 stacked lines) guarantees unobstructed readability on all three platforms."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why is CPS <= 20 (Characters Per Second) the golden threshold for mobile short-form video captions?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Broadcast standards (Netflix/BBC) target 17-20 CPS because above 20 CPS on a 6-inch vertical phone screen, viewers spend 100% of saccadic eye movement chasing flashing words instead of watching facial expressions or product demos, causing sharp 3-second swipe-away drop-offs. ClipCaption Lab flags any cue exceeding 20 CPS and expands rushed cues into adjacent silent intervals automatically."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you prevent .SRT or .VTT timestamp overlaps from stacking duplicate captions in FFmpeg or Premiere?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Whisper ASR word-level grouping and manual +/- ms shifts frequently leave Cue N+1 starting 50-300ms before Cue N ends, causing libass and mobile players to jump captions vertically into the speaker's face. ClipCaption Lab's 1-click auto-fix enforces a deterministic >= 40ms inter-cue guard gap while preserving >= 550ms minimum display duration."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can AI video pipelines audit 9:16 safe zones via MCP v1.4.0 or render full MP4s via cloud agents?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Run npx --yes github:youthmy11-ai/youthmy11-ai.github.io to invoke Tool #9 subtitle_caption_audit locally for free in VS Code, Claude Code, or Cursor (ForgeSuite MCP v1.4.0), or hire @short-video-clipper ($0.50 USDC/job) and @multi-lang-video-dubber ($0.65 USDC/job) on NEAR AI Market for end-to-end 1080x1920 H.264/AAC MP4 rendering."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .seo-code {
+      background: rgba(9, 13, 22, 0.88);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      margin: 10px 0 0;
+    }
+    [data-theme="light"] .seo-code {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+    .seo-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .seo-launch-box {
+      padding: 22px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.13), rgba(139, 92, 246, 0.12));
+      border: 1px solid var(--border-strong);
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body data-page="tiktok-reels-9-16-subtitle-safe-zone-checker">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);">CC</span>
+        <span>ClipCaption · 9:16 Safe Zone</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="srtlab.html" class="fs-btn fs-btn-sm fs-btn-secondary">Live ClipCaption Lab</a>
+        <a href="youtube-most-replayed-clipper-ai-dubbing-guide.html" class="fs-btn fs-btn-sm fs-btn-secondary">Clipper &amp; 26-Lang Dub Guide</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP Server (v1.4.0)</a>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="AS">AutoShorts Pro ($19)</button>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 64px;">
+    <!-- HERO + INTERACTIVE 1-CLICK 9:16 SAFE-ZONE LAUNCHER -->
+    <section style="margin-bottom:28px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span class="fs-badge fs-badge-accent">1080x1920 VERTICAL VIDEO · CPS &lt;= 20 · OVERLAP FIXER · ANIMATED .ASS</span>
+        <a href="https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite" target="_blank" rel="noopener noreferrer" class="fs-badge fs-badge-success">
+          ✓ Official MCP Registry: io.github.youthmy11-ai/forgesuite-mcp · v1.4.0 Active ↗
+        </a>
+      </div>
+
+      <h1 style="margin:12px 0 10px;font-size:clamp(1.85rem, 3.5vw, 2.65rem);line-height:1.15;letter-spacing:-0.025em;">
+        TikTok, Reels &amp; YouTube Shorts 9:16 Subtitle Safe-Zone Checker (<code>1080x1920</code>)
+      </h1>
+      <p class="fs-lead" style="margin:0;max-width:84ch;color:var(--text-muted);">
+        Default 16:9 subtitle exports destroy short-form retention: lines wider than <strong><code>32</code> characters</strong> collide with TikTok &amp; Reels right-rail engagement buttons, cues faster than <strong><code>CPS &lt;= 20</code></strong> flash unreadably on mobile, and <code>.srt</code>/<code>.vtt</code> timestamp overlaps stack captions over the speaker’s face. Audit, auto-fix, preview on a live <code>9:16</code> phone stage, and export FFmpeg-ready <strong>animated <code>.ass</code></strong> subtitles 100% client-side.
+      </p>
+
+      <!-- INTERACTIVE QUICK SAFE-ZONE LAUNCHER + 1-CLICK PRESETS -->
+      <div class="seo-launch-box" aria-label="Interactive 9:16 Subtitle Safe-Zone Checker Launcher">
+        <form id="ccSafeZoneForm" style="display:grid;gap:12px;">
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label" style="color:var(--text);">9:16 Platform &amp; Test Track Preset</span>
+              <select id="ccPresetSampleSelect" class="fs-select">
+                <option value="creator_hook_issues" selected>Broken TikTok/Reels Hook (Overlaps + CPS &gt; 20 + Safe-Zone Overflow)</option>
+                <option value="clean_vertical_vtt">Clean 1080x1920 WebVTT (Balanced &lt;= 32 Chars &amp; &lt;= 20 CPS)</option>
+                <option value="multilang_dub_srt">Localized Spanish Short (.SRT + Verbatim Brand-Term Check)</option>
+              </select>
+            </label>
+            <div class="cb-grid-2">
+              <label class="fs-field">
+                <span class="fs-field-label" style="color:var(--text);">Max Speed (<code>CPS</code>)</span>
+                <input id="ccMaxCpsInput" type="number" class="fs-input" min="12" max="35" value="20">
+              </label>
+              <label class="fs-field">
+                <span class="fs-field-label" style="color:var(--text);">Safe Line Width (Chars)</span>
+                <input id="ccMaxLineInput" type="number" class="fs-input" min="18" max="50" value="32">
+              </label>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <label style="display:inline-flex;align-items:center;gap:8px;font-size:0.88rem;cursor:pointer;">
+              <input id="ccAutoFixCheck" type="checkbox" checked>
+              <span>Auto-resolve timestamp overlaps (<code>&gt;= 40ms</code> guard) &amp; reflow to <code>9:16</code> safe width</span>
+            </label>
+            <button type="submit" class="fs-btn fs-btn-primary">Open Live 9:16 Simulator in ClipCaption Lab →</button>
+          </div>
+        </form>
+
+        <div style="margin-top:14px;">
+          <div class="fs-field-label" style="margin-bottom:8px;">1-Click Interactive Deep-Link Presets into <code>srtlab.html</code> (Zero Upload):</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="srtlab.html?sample=creator_hook_issues&amp;maxCps=20&amp;maxLine=32" class="fs-btn fs-btn-sm fs-btn-primary">
+              ⚠ Audit Broken 9:16 Hook (Overlaps + High CPS)
+            </a>
+            <a href="srtlab.html?sample=creator_hook_issues&amp;maxCps=20&amp;maxLine=32&amp;autoFix=1&amp;out=ass" class="fs-btn fs-btn-sm fs-btn-secondary">
+              ✨ 1-Click Auto-Fix + Preview 1080x1920 .ASS
+            </a>
+            <a href="srtlab.html?sample=clean_vertical_vtt&amp;maxCps=20&amp;maxLine=32&amp;out=vtt" class="fs-btn fs-btn-sm fs-btn-secondary">
+              ✓ Inspect Publish-Ready 9:16 WebVTT (100/100)
+            </a>
+            <a href="srtlab.html?sample=multilang_dub_srt&amp;maxCps=20&amp;maxLine=32&amp;brands=San+Diego%2CForgeSuite%2COpenAI%2CNEAR+Protocol" class="fs-btn fs-btn-sm fs-btn-ghost">
+              🌐 Audit Multi-Lang Dub + Brand Lock
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1080x1920 PIXEL SAFE-ZONE REFERENCE MATRIX -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-warn">1080 × 1920 PIXEL SPECIFICATION</span>
+          <h2 style="margin-top:6px;">TikTok vs. Instagram Reels vs. YouTube Shorts UI Danger Zones</h2>
+        </div>
+        <a href="srtlab.html?sample=creator_hook_issues&amp;maxCps=20&amp;maxLine=32" class="fs-btn fs-btn-sm fs-btn-secondary">Test Your .SRT / .VTT Live →</a>
+      </div>
+      <p class="inv-muted" style="margin:6px 0 12px;">
+        Cross-platform short-form publishers render a single master vertical MP4 (<code>1080x1920</code>) syndicated simultaneously across TikTok, Instagram Reels, and YouTube Shorts. Your burned-in captions must clear the union of all three native HUD overlays:
+      </p>
+      <div style="overflow-x:auto;">
+        <table class="fs-table">
+          <thead>
+            <tr>
+              <th>Vertical Screen Region</th>
+              <th>1080×1920 Pixel Bounds</th>
+              <th>Obstructing Platform UI Elements</th>
+              <th>ClipCaption Lab &amp; <code>.ASS</code> Rule</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Top HUD Danger Zone (13%)</strong></td>
+              <td><code>Y: 0 – 250 px</code></td>
+              <td>iOS Dynamic Island/Notch, Following/For You tabs, Live/Search bar, Reels camera icon</td>
+              <td>Never place <code>\an8</code> top captions above <code>Y = 260px</code></td>
+            </tr>
+            <tr>
+              <td><strong>Right Action Rail (16% Width)</strong></td>
+              <td><code>X: 905 – 1080 px</code><br><code>Y: 650 – 1495 px</code></td>
+              <td>Creator avatar+, Like ♥, Comment 💬, Bookmark, Share ↗, spinning audio disc</td>
+              <td><code>MarginL: 90</code>, <code>MarginR: 90+</code> &amp; <strong><code>&lt;= 32</code> chars/line</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Bottom Caption &amp; CTA Drawer (22%)</strong></td>
+              <td><code>Y: 1495 – 1920 px</code></td>
+              <td><code>@handle</code>, Follow pill, 2–3 line description, TikTok Shop / Paid promo tag, music ticker, scrub bar</td>
+              <td><code>Alignment: 2</code> with <strong><code>MarginV: 420–430 px</code></strong></td>
+            </tr>
+            <tr>
+              <td><strong>Golden 9:16 Safe Caption Box</strong></td>
+              <td><code>X: 90 – 905 px</code><br><code>Y: 1180 – 1490 px</code></td>
+              <td>Unobstructed lower-third sweet spot below chin/chest and above bottom HUD</td>
+              <td><strong><code>&lt;= 2</code> stacked lines</strong>, <strong><code>CPS &lt;= 20</code></strong>, <code>66–70px</code> bold outline</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6 TECHNICAL CAPTION ENGINEERING PILLARS -->
+    <section style="margin-bottom:28px;">
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-accent">CPS ERGONOMICS · OVERLAP GUARD · MID-SENTENCE FORENSICS · LIBASS BURN-IN</span>
+          <h2>6 Caption Quality Checks Before You Burn Subtitles into 9:16 MP4s</h2>
+          <p>Why raw Whisper ASR outputs fail mobile retention tests — and how ClipCaption Lab fixes them deterministically in browser memory.</p>
+        </div>
+      </div>
+
+      <div class="seo-grid-2">
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">SAFE-ZONE GEOMETRY</span>
+              <span class="fs-badge fs-badge-muted">&lt;= 32 CHARS · &lt;= 2 LINES</span>
+            </div>
+            <h3>1. Balanced Visual-Midpoint 9:16 Line Reflow</h3>
+            <p class="fs-card-desc">
+              Naive greedy word-wrappers produce ugly 31-character top lines followed by 4-character orphan words — or stack 3–4 lines that cover the speaker’s mouth. ClipCaption Lab computes balanced visual-midpoint splits capped at <strong><code>&lt;= 32</code> characters</strong> and <strong><code>&lt;= 2</code> lines per cue</strong> so text clears TikTok and Reels right-side action buttons cleanly.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="srtlab.html?sample=creator_hook_issues&amp;maxLine=32&amp;autoFix=1" class="fs-btn fs-btn-sm fs-btn-secondary">Test Balanced 9:16 Reflow →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">RETENTION PHYSICS</span>
+              <span class="fs-badge fs-badge-muted">CPS &lt;= 20 THRESHOLD</span>
+            </div>
+            <h3>2. Mobile Reading Speed (<code>CPS &lt;= 20</code>) &amp; Gap Expansion</h3>
+            <p class="fs-card-desc">
+              Fast hooks exceeding <strong><code>20</code> Characters Per Second</strong> force viewers to pause or swipe away. ClipCaption Lab measures exact visible character density per cue (stripping HTML, WebVTT karaoke tags <code>&lt;00:01.240&gt;</code>, and <code>{\an8}</code> overrides) and safely expands high-CPS cues into trailing silent gaps without colliding into the next spoken phrase.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="srtlab.html?sample=creator_hook_issues&amp;maxCps=20" class="fs-btn fs-btn-sm fs-btn-secondary">Inspect CPS Spikes Live →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">TIMING HYGIENE</span>
+              <span class="fs-badge fs-badge-muted">&gt;= 40MS GUARD + TEMPO</span>
+            </div>
+            <h3>3. Timestamp Overlap Elimination &amp; Drift Time-Shifter</h3>
+            <p class="fs-card-desc">
+              When two cues overlap by even <code>50ms</code>, <code>libass</code> and mobile players stack the second cue upward into the center of the frame. Apply linear <strong><code>+/- ms</code> offsets</strong> and frame-rate <strong>tempo scaling</strong> (<code>23.976 &lt;-&gt; 24/30 fps</code>), then run 1-click overlap resolution to enforce a crisp <code>&gt;= 40ms</code> separation across every cue.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="srtlab.html?sample=clean_vertical_vtt&amp;shift=-250" class="fs-btn fs-btn-sm fs-btn-secondary">Try +/- ms Time-Shifter →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">CLIP BOUNDARY QA</span>
+              <span class="fs-badge fs-badge-muted">ZERO ABRUPT CUTS</span>
+            </div>
+            <h3>4. Mid-Sentence Cut &amp; Dangling Connector Detection</h3>
+            <p class="fs-card-desc">
+              Fixed-duration AI clippers frequently chop clips on dangling conjunctions (<code>"because"</code>, <code>"and"</code>, <code>"with"</code>, <code>"that"</code>) or open commas, ruining loopability. ClipCaption Lab flags open-clause endings before long pauses or clip boundaries — pairing directly with our <a href="youtube-most-replayed-clipper-ai-dubbing-guide.html" style="text-decoration:underline;">YouTube Most Replayed Clipper Guide</a>.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="youtube-most-replayed-clipper-ai-dubbing-guide.html" class="fs-btn fs-btn-sm fs-btn-secondary">Most Replayed Clipper Guide →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">FFMPEG LIBASS READY</span>
+              <span class="fs-badge fs-badge-warn">PRO · $15 / $19 / $35</span>
+            </div>
+            <h3>5. Animated <code>1080x1920</code> SubStation Alpha (<code>.ASS</code>) Export</h3>
+            <p class="fs-card-desc">
+              Standard <code>.srt</code> burn-in lacks mobile safe-zone margins and motion styling. ClipCaption Lab Pro generates production <code>PlayResX: 1080, PlayResY: 1920</code> <code>.ass</code> scripts with <code>MobileBold</code>, <code>CreatorGold</code>, and <code>EmeraldHook</code> styles plus smooth <code>\fad(70,60)\t(0,110,\fscx106\fscy106)</code> pop-in tags ready for <code>ffmpeg -i clip.mp4 -vf "ass=captions.ass" out.mp4</code>.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="srtlab.html?sample=creator_hook_issues&amp;autoFix=1&amp;out=ass" class="fs-btn fs-btn-sm fs-btn-primary">Preview 1080x1920 .ASS →</a>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="AS">AutoShorts Pro ($19)</button>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">MULTI-EPISODE STUDIO</span>
+              <span class="fs-badge fs-badge-warn">25-FILE BATCH + BRAND QA</span>
+            </div>
+            <h3>6. Batch 25-File Subtitle Studio &amp; Brand-Term Lock</h3>
+            <p class="fs-card-desc">
+              Managing a daily Shorts/Reels agency roster or multi-language localization sprint? Audit up to <strong>25 <code>.srt</code>/<code>.vtt</code>/<code>.txt</code> files</strong> simultaneously, enforce canonical casing on protected brand terms (e.g. <code>ForgeSuite, OpenAI, San Diego</code>), export formula-safe CSV/JSON QA dossiers, and generate client invoices in 1 click.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">All-Access Bundle ($35)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="CB">Single Pro ($15)</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- MCP V1.4.0 (TOOL #9 subtitle_caption_audit) + 24/7 CLOUD VIDEO AGENTS -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-success">LOCAL STDIO MCP V1.4.0 (FREE · TOOL #9) + 24/7 CLOUD VIDEO AGENTS ($0.50 / $0.65 USDC)</span>
+          <h2 style="margin-top:6px;">Automate 9:16 Caption Audits in Claude Code, Cursor &amp; VS Code — or Hire Cloud MP4 Agents</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="vscode:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D" class="fs-btn fs-btn-sm fs-btn-primary">⚡ Install in VS Code</a>
+          <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-copy-target="ccMcpCmd">Copy npx Command</button>
+        </div>
+      </div>
+
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Run Tool #9 <code>subtitle_caption_audit</code> locally with zero npm dependencies via our Official MCP Registry server (<code>io.github.youthmy11-ai/forgesuite-mcp</code> · <strong>v1.4.0</strong>, 9 tools):
+      </p>
+      <pre class="seo-code"><code id="ccMcpCmd">npx --yes github:youthmy11-ai/youthmy11-ai.github.io</code></pre>
+
+      <div class="seo-grid-2">
+        <div class="fs-rail-box">
+          <h3>MCP v1.4.0 Call: <code>subtitle_caption_audit</code> (Free Offline Stdio)</h3>
+          <pre class="seo-code"><code>{
+  "name": "subtitle_caption_audit",
+  "arguments": {
+    "content": "1\n00:00:00,400 --&gt; 00:00:02,600\nMost AI video editors lose 68% of viewers in three seconds!\n\n2\n00:00:02,150 --&gt; 00:00:03,800\nLock 9:16 safe zones with ForgeSuite.",
+    "maxCps": 20,
+    "maxLineLength": 32,
+    "autoFix": true,
+    "brandTerms": ["ForgeSuite"],
+    "outputFormat": "both"
+  }
+}</code></pre>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">Full MCP v1.4.0 Docs (9 Tools) →</a>
+            <a href="https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.4.0/forgesuite-mcp.mcpb" class="fs-btn fs-btn-sm fs-btn-ghost">Download .mcpb (v1.4.0)</a>
+          </div>
+        </div>
+
+        <div class="fs-rail-box" style="display:grid;gap:12px;align-content:space-between;">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">24/7 NEAR AI CLOUD MEDIA FLEET</span>
+              <span class="fs-badge fs-badge-muted">FINISHED H.264/AAC MP4 + SRT</span>
+            </div>
+            <h3 style="margin-top:10px;">Need End-to-End 9:16 MP4 Clipping or 26-Language Dubbing?</h3>
+            <p class="inv-muted" style="margin:6px 0 10px;">
+              Skip local FFmpeg rendering and hire our autonomous 24/7 cloud media agents on NEAR AI Market — backed by verified sample MP4 &amp; SRT deliverables:
+            </p>
+            <ul class="fs-feature-list" style="margin:0;">
+              <li>
+                <strong><code>@short-video-clipper</code> ($0.50 USDC/job):</strong> Extracts 1–8 sentence-clean <code>9:16</code> (<code>1080x1920</code>), <code>1:1</code> &amp; <code>16:9</code> MP4 clips from YouTube <code>Most Replayed</code> peaks with burned-in mobile captions (<a href="samples/video-clipping-sample.md" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">Verified MP4 Sample Report ↗</a>).
+              </li>
+              <li>
+                <strong><code>@multi-lang-video-dubber</code> ($0.65 USDC/job):</strong> Translates &amp; dubs videos into 26 languages with multi-speaker stock voices, stereo Mid/Side music preservation &amp; synced <code>.srt</code> (<a href="samples/video-dubbing-sample.md" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">Verified ES/DE/JA Dub Report ↗</a>).
+              </li>
+            </ul>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="https://market.near.ai/agents/short-video-clipper" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Hire @short-video-clipper ($0.50 USDC) ↗</a>
+            <a href="https://market.near.ai/agents/multi-lang-video-dubber" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-secondary">Hire @multi-lang-video-dubber ($0.65 USDC) ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRO CONVERSION FUNNEL ($15 PRO / $19 AUTOSHORTS STUDIO PRO / $35 ALL-ACCESS BUNDLE) -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-warn">LIFETIME CREATOR PRO UNLOCK · $15 PRO · $19 AUTOSHORTS · $35 BUNDLE</span>
+          <h2 style="margin-top:6px;">Unlock 1080x1920 Animated <code>.ASS</code> Export, 25-File Batch &amp; AutoShorts Studio Pro</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="CB">Single Pro ($15)</button>
+          <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="AS">AutoShorts Studio Pro ($19)</button>
+          <button type="button" class="fs-btn fs-btn-primary" data-checkout-sku="BUNDLE">All-Access Bundle ($35 · Save $14)</button>
+        </div>
+      </div>
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Pay once with instant client-side on-chain verification via <strong>BSC BEP20 USDT</strong> or <strong>Solana SPL USDC</strong> (plus PayPal, TRC20 &amp; Binance Pay). <strong>AutoShorts Studio Pro ($19)</strong> unlocks both our desktop Python/FFmpeg batch 9:16/16:9/1:1 video assembler (SHA-256 clip deduplication + beat-synced <code>.srt</code>) and <strong>ClipCaption Lab Pro</strong> in browser; the <strong>$35 All-Access Bundle</strong> unlocks every Pro web &amp; desktop tool in ForgeSuite Studio for life.
+      </p>
+    </section>
+
+    <!-- FAQ -->
+    <section>
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-muted">TECHNICAL FAQ</span>
+          <h2>9:16 Vertical Subtitle Safe-Zone, CPS &amp; Animated .ASS Questions</h2>
+        </div>
+      </div>
+      <div class="fs-faq-grid">
+        <div class="fs-faq-item">
+          <h3>Where is the safest Y-axis position on a 1080x1920 frame?</h3>
+          <p>Anchor bottom-centered captions (<code>Alignment: 2</code>) with <code>MarginV: 420–430px</code> and <code>MarginL/R: 90px</code>. That places 1–2 caption lines cleanly between <code>Y = 1180px</code> and <code>Y = 1490px</code>, above bottom descriptions and left of action icons.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Why keep mobile captions at &lt;= 20 CPS and &lt;= 32 chars/line?</h3>
+          <p>Above <code>20 CPS</code>, viewers cannot read captions and watch visual action simultaneously on a vertical screen. Keeping lines <code>&lt;= 32</code> characters prevents horizontal collision with TikTok/Reels right-rail buttons.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>How do I burn exported .ASS captions into an MP4 with FFmpeg?</h3>
+          <p>Export your normalized <code>1080x1920</code> <code>.ass</code> file from ClipCaption Lab Pro and run <code>ffmpeg -i input_9x16.mp4 -vf "ass=captions-9x16-mobile.ass" -c:a copy output.mp4</code> for pixel-exact styling and pop-in motion.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Are my unreleased scripts or client .SRT files uploaded anywhere?</h3>
+          <p>Never. ClipCaption Lab (<code>srtlab.html</code>) and <code>forgesuite-mcp</code> run 100% locally in your browser or Node.js 20+ stdio process with zero ForgeSuite backend servers or telemetry.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="srtlab.html">ClipCaption Lab</a>
+        <a href="tiktok-reels-9-16-subtitle-safe-zone-checker.html">9:16 Safe-Zone Checker</a>
+        <a href="youtube-most-replayed-clipper-ai-dubbing-guide.html">Most Replayed Clipper &amp; Dub Guide</a>
+        <a href="walletcheck.html">WalletLens</a>
+        <a href="eip-7702-delegation-gnosis-safe-checker.html">EIP-7702 &amp; Safe Checker</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="solana-token-2022-scanner.html">Solana Token-2022 Scanner</a>
+        <a href="evm-proxy-honeypot-scanner.html">EVM Proxy &amp; Honeypot Scanner</a>
+        <a href="brandcheck.html">BrandGuard</a>
+        <a href="uspto-trademark-domain-brand-checker.html">USPTO &amp; Brand Checker</a>
+        <a href="mcp.html">MCP Server (v1.4.0)</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="llms.txt">llms.txt</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { bindCheckoutTriggers } from "./assets/checkout.js";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      bindCheckoutTriggers();
+
+      const form = document.getElementById("ccSafeZoneForm");
+      const sampleEl = document.getElementById("ccPresetSampleSelect");
+      const cpsEl = document.getElementById("ccMaxCpsInput");
+      const lineEl = document.getElementById("ccMaxLineInput");
+      const fixEl = document.getElementById("ccAutoFixCheck");
+
+      if (form && sampleEl && cpsEl && lineEl) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const params = new URLSearchParams();
+          params.set("sample", sampleEl.value || "creator_hook_issues");
+          params.set("maxCps", String(Number(cpsEl.value) || 20));
+          params.set("maxLine", String(Number(lineEl.value) || 32));
+          if (fixEl?.checked) {
+            params.set("autoFix", "1");
+          }
+          if (sampleEl.value === "multilang_dub_srt") {
+            params.set("brands", "San Diego,ForgeSuite,OpenAI,NEAR Protocol");
+          }
+          window.location.href = `srtlab.html?${params.toString()}`;
+        });
+      }
+
+      const themeBtn = document.getElementById("themeToggleBtn");
+      if (themeBtn) {
+        const saved = window.localStorage.getItem("forgesuite_theme") || "dark";
+        document.documentElement.dataset.theme = saved;
+        themeBtn.textContent = saved === "light" ? "☀ Light" : "🌙 Dark";
+        themeBtn.addEventListener("click", () => {
+          const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+          document.documentElement.dataset.theme = next;
+          window.localStorage.setItem("forgesuite_theme", next);
+          themeBtn.textContent = next === "light" ? "☀ Light" : "🌙 Dark";
+        });
+      }
+
+      document.querySelectorAll("[data-copy-target]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-copy-target");
+          const target = id ? document.getElementById(id) : null;
+          if (!target) return;
+          const prev = btn.textContent;
+          try {
+            await navigator.clipboard.writeText(target.textContent || "");
+            btn.textContent = "Copied ✓";
+            setTimeout(() => {
+              btn.textContent = prev;
+            }, 1600);
+          } catch {}
+        });
+      });
+    });
+  </script>
+</body>
+</html>

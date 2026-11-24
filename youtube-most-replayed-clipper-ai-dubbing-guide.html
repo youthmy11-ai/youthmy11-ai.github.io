@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Most Replayed Clipper &amp; 26-Language AI Video Dubbing Guide (Mid/Side BGM + 9:16 SRT)</title>
+  <meta name="description" content="Technical creator &amp; AI media guide to extracting YouTube Most Replayed retention peaks into sentence-clean 9:16/1:1/16:9 MP4 clips and localizing into 26 languages with stereo Mid/Side background music preservation, brand-term lock, ClipCaption Lab, and MCP v1.4.0.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/youtube-most-replayed-clipper-ai-dubbing-guide.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/youtube-most-replayed-clipper-ai-dubbing-guide.html">
+  <meta property="og:title" content="YouTube Most Replayed Short Clipper &amp; 26-Language AI Dubbing Guide (Stereo Mid/Side BGM)">
+  <meta property="og:description" content="Extract YouTube Most Replayed peaks without mid-sentence cuts, dub into 26 languages while preserving stereo Mid/Side music &amp; SFX, and audit 9:16 captions in ClipCaption Lab or MCP v1.4.0.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="YouTube Most Replayed Clipper &amp; 26-Language AI Dubbing Guide (Mid/Side BGM + MCP)">
+  <meta name="twitter:description" content="Sentence-clean YouTube Most Replayed clipping ($0.50 USDC), 26-language Mid/Side stereo dubbing ($0.65 USDC), AutoShorts Studio Pro ($19), and free browser 9:16 caption QC.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%238b5cf6'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-size='18' font-weight='800'%3EDUB%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ForgeSuite YouTube Most Replayed Clipper, 26-Language AI Dubbing & ClipCaption Lab Pipeline",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web, Windows, macOS, Linux (Python/FFmpeg + Node.js 20+ MCP)",
+    "url": "https://youthmy11-ai.github.io/youtube-most-replayed-clipper-ai-dubbing-guide.html",
+    "softwareVersion": "1.4.0",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free Browser ClipCaption Lab & MCP v1.4.0 Subtitle Auditor", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Autonomous YouTube Most Replayed Clipping (@short-video-clipper)", "price": "0.50", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Autonomous 26-Language Stereo Mid/Side AI Dubbing (@multi-lang-video-dubber)", "price": "0.65", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Single-Tool Pro Unlock (ClipCaption 1080x1920 .ASS + 25-File Batch)", "price": "15", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "AutoShorts Studio Pro Lifetime (Desktop/CLI Batch 9:16/16:9/1:1 + ClipCaption Pro)", "price": "19", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "All-Access Creator & Freelancer Bundle (All Pro Web & Desktop Tools)", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "Extracts non-overlapping YouTube Most Replayed viewer retention heatmap peaks and snaps cut points to sentence-onset and acoustic silence boundaries",
+      "Renders multi-aspect H.264/AAC MP4 deliverables across 9:16 (1080x1920), 1:1 (1080x1080), 16:9 (1920x1080), and 4:5 with burned-in safe-zone captions",
+      "Localizes videos into 26 languages using F0 pitch multi-speaker diarization, consent-safe stock neural voices, verbatim Do-Not-Translate brand locks, and stereo Mid/Side background music/SFX preservation",
+      "Audits synced .SRT/.VTT tracks locally in ClipCaption Lab (srtlab.html) or via ForgeSuite MCP v1.4.0 Tool #9 (subtitle_caption_audit)"
+    ],
+    "description": "End-to-end technical pipeline for turning YouTube Most Replayed peaks into sentence-clean vertical Shorts/Reels/TikToks and 26-language dubbed MP4 + .SRT tracks with preserved stereo Mid/Side background audio."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "headline": "YouTube Most Replayed Clipper & 26-Language AI Dubbing Architecture: Sentence-Clean Retention Cuts, Stereo Mid/Side BGM Preservation & 9:16 Caption QC",
+        "description": "Deep technical walkthrough of automated short-form clipping from YouTube Most Replayed heatmaps without mid-sentence cuts, combined with 26-language multi-speaker neural dubbing that preserves stereo Mid/Side background music and SFX.",
+        "url": "https://youthmy11-ai.github.io/youtube-most-replayed-clipper-ai-dubbing-guide.html",
+        "datePublished": "2026-11-24",
+        "dateModified": "2026-11-24",
+        "proficiencyLevel": "Expert",
+        "author": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do you clip YouTube Most Replayed peaks without cutting speakers mid-word or mid-sentence?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Raw YouTube Most Replayed heatmap markers represent bucketed replay intensity rather than linguistic boundaries. Our pipeline ranks non-overlapping replay maxima first, then snaps each clip's start timestamp backward to the nearest sentence onset and snaps the end timestamp forward to terminal punctuation aligned with an acoustic silence window (-35 dBFS), eliminating mid-word and dangling-conjunction cuts."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does stereo Mid/Side (M/S) processing preserve background music and SFX during 26-language AI dubbing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Spoken dialogue is mixed predominantly in the mono phantom center (Mid = (L + R) / 2), whereas stereo music width, room ambience, and SFX live across the Side channel (Side = (L - R) / 2) and non-speech frequency bands. Attenuating speech-band energy in the Mid channel only during active TTS cue windows preserves stereo Side music and SFX underneath dubbed voices (e.g. -27.1 dBFS ambient bed under -17.1 dBFS dialogue) without hollow Demucs stem artifacts."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How are multi-speaker voices and brand names handled across 26 target languages?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Fundamental frequency (F0 Hz) pitch profiling separates distinct speakers onto distinct studio stock neural voices (never cloning a speaker's personal voice without explicit consent), enforces sub-second start-time alignment (<= 1.0s offset, 0 speaker overlaps), and locks Do-Not-Translate proper nouns (such as ForgeSuite, OpenAI, or San Diego) verbatim in both synthesized audio and .SRT subtitles."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "When should I use ClipCaption Lab, AutoShorts Studio Pro ($19), MCP v1.4.0, or the NEAR AI cloud video agents?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Use ClipCaption Lab (srtlab.html) and ForgeSuite MCP v1.4.0 (subtitle_caption_audit) free locally to audit .SRT/.VTT timing, CPS <= 20, brand locks, and 9:16 safe zones; unlock AutoShorts Studio Pro ($19 or $35 Bundle) for unlimited local Python/FFmpeg batch 9:16/16:9/1:1 video assembly and animated 1080x1920 .ASS exports; or call @short-video-clipper ($0.50 USDC) and @multi-lang-video-dubber ($0.65 USDC) on NEAR AI Market for turnkey cloud MP4 rendering."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .seo-code {
+      background: rgba(9, 13, 22, 0.88);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      margin: 10px 0 0;
+    }
+    [data-theme="light"] .seo-code {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+    .seo-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .seo-launch-box {
+      padding: 22px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.14), rgba(16, 185, 129, 0.11));
+      border: 1px solid var(--border-strong);
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body data-page="youtube-most-replayed-clipper-ai-dubbing-guide">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark" style="background:linear-gradient(135deg,#8b5cf6,#10b981);">AI</span>
+        <span>AutoShorts &amp; AI Dubbing</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="srtlab.html" class="fs-btn fs-btn-sm fs-btn-secondary">Live ClipCaption Lab</a>
+        <a href="tiktok-reels-9-16-subtitle-safe-zone-checker.html" class="fs-btn fs-btn-sm fs-btn-secondary">9:16 Safe-Zone Checker</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP Server (v1.4.0)</a>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="AS">AutoShorts Pro ($19)</button>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 64px;">
+    <!-- HERO + INTERACTIVE CLIP & DUB SUBTITLE QC LAUNCHER -->
+    <section style="margin-bottom:28px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span class="fs-badge fs-badge-accent">YOUTUBE MOST REPLAYED PEAKS · 26-LANGUAGE AI DUBBING · STEREO MID/SIDE BGM</span>
+        <a href="https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite" target="_blank" rel="noopener noreferrer" class="fs-badge fs-badge-success">
+          ✓ Official MCP Registry: io.github.youthmy11-ai/forgesuite-mcp · v1.4.0 Active ↗
+        </a>
+      </div>
+
+      <h1 style="margin:12px 0 10px;font-size:clamp(1.85rem, 3.5vw, 2.65rem);line-height:1.15;letter-spacing:-0.025em;">
+        YouTube Most Replayed Clipper &amp; 26-Language AI Video Dubbing Guide
+      </h1>
+      <p class="fs-lead" style="margin:0;max-width:84ch;color:var(--text-muted);">
+        Guessing timestamps produces boring clips with jarring mid-sentence cuts — and naive TTS dubbing wipes out your stereo music bed. Learn how our creator media stack anchors highlights directly to <strong>YouTube <code>Most Replayed</code> retention peaks</strong>, dubs into <strong>26 languages</strong> while preserving <strong>stereo <code>Mid/Side</code> background music &amp; SFX</strong>, and validates synced <code>.srt</code>/<code>.ass</code> captions locally in <strong>ClipCaption Lab</strong>.
+      </p>
+
+      <!-- INTERACTIVE CLIP & DUB SUBTITLE INSPECTOR LAUNCHER + 1-CLICK PRESETS -->
+      <div class="seo-launch-box" aria-label="Interactive Clip and Multi-Language Dub Subtitle Launcher">
+        <form id="dubQuickLaunchForm" style="display:grid;gap:12px;">
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label" style="color:var(--text);">Workflow Subtitle Track to Inspect in <code>srtlab.html</code></span>
+              <select id="dubSampleSelect" class="fs-select">
+                <option value="multilang_dub_srt" selected>26-Language Dub Track (Spanish .SRT + Verbatim Brand Lock)</option>
+                <option value="clean_vertical_vtt">YouTube Most Replayed Highlight Clip (Sentence-Clean 9:16 .VTT)</option>
+                <option value="creator_hook_issues">Raw Unsnapped Clipper Output (Mid-Sentence Cut + Overlap Warning)</option>
+              </select>
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label" style="color:var(--text);">Do-Not-Translate Brand Terms (Case-Exact Lock)</span>
+              <div class="fs-input-row">
+                <input id="dubBrandsInput" type="text" class="fs-input" value="San Diego, ForgeSuite, OpenAI, NEAR Protocol" spellcheck="false">
+                <button type="submit" class="fs-btn fs-btn-primary">Audit in ClipCaption Lab →</button>
+              </div>
+            </label>
+          </div>
+        </form>
+
+        <div style="margin-top:14px;">
+          <div class="fs-field-label" style="margin-bottom:8px;">1-Click Workflow Deep-Link Presets into <code>srtlab.html</code>:</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="srtlab.html?sample=clean_vertical_vtt&amp;maxCps=20&amp;maxLine=32" class="fs-btn fs-btn-sm fs-btn-primary">
+              🎯 Preview Sentence-Clean Most Replayed Clip (9:16)
+            </a>
+            <a href="srtlab.html?sample=multilang_dub_srt&amp;brands=San+Diego%2CForgeSuite%2COpenAI%2CNEAR+Protocol&amp;maxCps=20&amp;maxLine=32" class="fs-btn fs-btn-sm fs-btn-secondary">
+              🌐 Verify Dubbed .SRT Sync &amp; Brand-Term Lock
+            </a>
+            <a href="srtlab.html?sample=creator_hook_issues&amp;maxCps=20&amp;maxLine=32" class="fs-btn fs-btn-sm fs-btn-secondary">
+              ✂ Catch Mid-Sentence Clip Cut Warning
+            </a>
+            <a href="srtlab.html?sample=multilang_dub_srt&amp;shift=-150&amp;autoFix=1&amp;out=ass" class="fs-btn fs-btn-sm fs-btn-ghost">
+              ⚡ Shift -150ms + Export 1080x1920 .ASS
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VERIFIED CLOUD BENCHMARKS & SAMPLE DELIVERABLES -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-success">VERIFIED PRODUCTION DELIVERABLES · SHA-256 AUDITED MP4 + SRT</span>
+          <h2 style="margin-top:6px;">Live Cloud Video Agents vs. Local Desktop &amp; Browser Tooling</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="samples/video-clipping-sample.md" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-secondary">View Clipping Sample Report ↗</a>
+          <a href="samples/video-dubbing-sample.md" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-secondary">View 3-Lang Dubbing Sample Report ↗</a>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;margin-top:10px;">
+        <table class="fs-table">
+          <thead>
+            <tr>
+              <th>Stage / Tool</th>
+              <th>Execution Mode</th>
+              <th>Core Technical Spec</th>
+              <th>Pricing &amp; Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><code>@short-video-clipper</code></strong></td>
+              <td>24/7 Cloud A2A Daemon</td>
+              <td>YouTube <code>Most Replayed</code> peak ranking, sentence + silence snapping, 1–8 clips in <code>9:16</code>, <code>1:1</code>, <code>16:9</code> &amp; <code>4:5</code> H.264/AAC MP4 with burned-in captions</td>
+              <td><a href="https://market.near.ai/agents/short-video-clipper" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:600;">$0.50 USDC / job ↗</a></td>
+            </tr>
+            <tr>
+              <td><strong><code>@multi-lang-video-dubber</code></strong></td>
+              <td>24/7 Cloud A2A Daemon</td>
+              <td><strong>26 languages</strong> (<code>es, de, ja, fr, pt, ko, zh, hi, ar, vi...</code>), F0 multi-speaker voices, <code>&lt;= 1.0s</code> sync, stereo <code>Mid/Side</code> BGM bed (<code>-27.1 dBFS</code>), MP4 + <code>.srt</code></td>
+              <td><a href="https://market.near.ai/agents/multi-lang-video-dubber" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:600;">$0.65 USDC / job ↗</a></td>
+            </tr>
+            <tr>
+              <td><strong>AutoShorts Studio Pro</strong></td>
+              <td>Local Python + FFmpeg CLI/GUI</td>
+              <td>Batch 500-clip <code>9:16/16:9/1:1</code> assembly, SQLite WAL SHA-256 clip deduplication, beat-milestone audio slicer, EBU R128 <code>-14 LUFS</code> + ClipCaption Pro unlock</td>
+              <td><strong>$19</strong> Lifetime (<a href="https://github.com/youthmy11-ai/autoshorts-studio" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">MIT Repo ↗</a>)</td>
+            </tr>
+            <tr>
+              <td><strong>ClipCaption Lab + MCP v1.4.0</strong></td>
+              <td>100% Browser + Node 20+ Stdio</td>
+              <td><code>.srt &lt;-&gt; .vtt &lt;-&gt; .txt</code> converter, <code>CPS &lt;= 20</code> &amp; 9:16 safe-zone auditor, Pro <code>1080x1920</code> animated <code>.ass</code> + 25-file batch, Tool #9 <code>subtitle_caption_audit</code></td>
+              <td><strong>$0</strong> Free / <strong>$15–$35</strong> Pro (<a href="srtlab.html" style="text-decoration:underline;">Open Lab →</a>)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6 ENGINEERING ARCHITECTURE STAGES -->
+    <section style="margin-bottom:28px;">
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-accent">HEATMAP EXTRACTION · SENTENCE SNAPPING · STEREO MID/SIDE · 26-LANG DIARIZATION</span>
+          <h2>Inside the Retention-Peak Clipping &amp; Stereo Mid/Side Dubbing Pipeline</h2>
+          <p>How every stage avoids robotic jump-cuts, muted music beds, speaker collisions, and translated brand names.</p>
+        </div>
+      </div>
+
+      <div class="seo-grid-2">
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">RETENTION TELEMETRY</span>
+              <span class="fs-badge fs-badge-muted">MOST REPLAYED HEATMAP</span>
+            </div>
+            <h3>1. YouTube <code>Most Replayed</code> Peak Ranking</h3>
+            <p class="fs-card-desc">
+              Instead of relying solely on LLM transcript summaries that miss visual punchlines, <code>@short-video-clipper</code> parses platform viewer replay intensity curves (<code>0–100%</code> relative replay score) with non-maximum suppression so multi-clip batches capture distinct, non-overlapping high-retention hooks across chapters.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="samples/video-clipping-sample.md" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-secondary">See 100% Peak Clip Sample ↗</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">BOUNDARY PRECISION</span>
+              <span class="fs-badge fs-badge-muted">SENTENCE + SILENCE SNAP</span>
+            </div>
+            <h3>2. Sentence-Clean Cut Snapping (Zero Mid-Word Cuts)</h3>
+            <p class="fs-card-desc">
+              Replay buckets often start mid-clause. Each candidate window snaps its ingress to a clean sentence onset (e.g. <code>00:01.1</code>) and snaps egress to terminal punctuation backed by an acoustic silence floor (e.g. <code>00:13.5</code>). You can double-check any transcript in ClipCaption Lab’s <strong>Mid-Sentence Cut Detector</strong> before publishing.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="srtlab.html?sample=clean_vertical_vtt&amp;maxCps=20&amp;maxLine=32" class="fs-btn fs-btn-sm fs-btn-secondary">Verify Clean Boundaries in Lab →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">AUDIO DSP</span>
+              <span class="fs-badge fs-badge-muted">STEREO MID/SIDE DUCKING</span>
+            </div>
+            <h3>3. Stereo <code>Mid/Side</code> Background Music &amp; SFX Preservation</h3>
+            <p class="fs-card-desc">
+              Replacing the entire audio track kills emotional pacing. By decomposing stereo audio into <strong><code>Mid = (L+R)/2</code></strong> (center dialogue) and <strong><code>Side = (L-R)/2</code></strong> (wide stereo music, room reverb &amp; SFX), our dubbing mixer carves vocal frequencies out of <code>Mid</code> during active speech while keeping the stereo music bed audible at <code>~-27.1 dBFS</code> underneath <code>-17.1 dBFS</code> dubbed dialogue.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="samples/video-dubbing-sample.md" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-secondary">Inspect -27.1 dBFS Mix Metrics ↗</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">26 LANGUAGES</span>
+              <span class="fs-badge fs-badge-muted">F0 PITCH DIARIZATION</span>
+            </div>
+            <h3>4. 26-Language Multi-Speaker Sync &amp; Voice Consent Guard</h3>
+            <p class="fs-card-desc">
+              <code>@multi-lang-video-dubber</code> profiles speaker fundamental pitch (e.g. Speaker 1 <code>~132.2 Hz</code> vs. Speaker 2 <code>~115.1 Hz</code>) to assign distinct studio stock neural voices across <strong>26 languages</strong> (Spanish, German, Japanese, French, Portuguese, Korean, Mandarin, Hindi, Arabic, Vietnamese &amp; 16 more) with <code>0.000s</code>–<code>&lt;= 1.0s</code> start sync, <code>0</code> overlaps, and strict voice-cloning consent enforcement.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="https://market.near.ai/agents/multi-lang-video-dubber" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Hire 26-Lang Dubber ($0.65) ↗</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">BRAND TERMINOLOGY QA</span>
+              <span class="fs-badge fs-badge-muted">DO-NOT-TRANSLATE LOCK</span>
+            </div>
+            <h3>5. Verbatim Brand-Term Lock &amp; 9:16 Safe-Zone Reflow</h3>
+            <p class="fs-card-desc">
+              German and Spanish translations expand character length by <code>20–35%</code>, pushing 16:9 subtitles into TikTok/Reels UI buttons or mistranslating product names. Lock protected terms (<code>ForgeSuite, San Diego, OpenAI</code>) verbatim, then reflow localized <code>.srt</code> files to <code>&lt;= 32</code> chars/line in our <a href="tiktok-reels-9-16-subtitle-safe-zone-checker.html" style="text-decoration:underline;">9:16 Safe-Zone Checker</a>.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="tiktok-reels-9-16-subtitle-safe-zone-checker.html" class="fs-btn fs-btn-sm fs-btn-secondary">9:16 Safe-Zone Specification →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">LOCAL BATCH ENGINE</span>
+              <span class="fs-badge fs-badge-warn">AUTOSHORTS PRO · $19 / $35</span>
+            </div>
+            <h3>6. AutoShorts Studio Pro: SHA-256 Dedup &amp; 500-Clip Batch</h3>
+            <p class="fs-card-desc">
+              Scaling faceless channels or podcast clip farms locally without per-minute cloud bills? <strong>AutoShorts Studio Pro ($19)</strong> combines SQLite WAL <strong>SHA-256 media deduplication</strong>, beat-milestone audio trimming, multi-aspect <code>9:16 / 16:9 / 1:1</code> FFmpeg presets, and full browser unlock for ClipCaption Lab’s 25-file batch &amp; animated <code>.ass</code> studio.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="AS">Buy AutoShorts Pro ($19)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="BUNDLE">All-Access ($35)</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- MCP V1.4.0 AUTOMATION + DIRECT CLOUD AGENT HIRE -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-success">FORGESUITE MCP V1.4.0 (TOOL #9) + NEAR AI A2A AGENTS ($0.50 &amp; $0.65 USDC)</span>
+          <h2 style="margin-top:6px;">Validate Dubbed <code>.SRT</code> Tracks via MCP v1.4.0 &amp; Trigger 24/7 Cloud Rendering</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="vscode:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D" class="fs-btn fs-btn-sm fs-btn-primary">⚡ Install in VS Code</a>
+          <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-copy-target="dubMcpCmd">Copy npx Command</button>
+        </div>
+      </div>
+
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Let your AI agent audit translated <code>.srt</code>/<code>.vtt</code> timing, reading speed, 9:16 line widths, and verbatim brand terms automatically via Tool #9 <code>subtitle_caption_audit</code> in <strong>ForgeSuite MCP v1.4.0</strong>:
+      </p>
+      <pre class="seo-code"><code id="dubMcpCmd">npx --yes github:youthmy11-ai/youthmy11-ai.github.io</code></pre>
+
+      <div class="seo-grid-2">
+        <div class="fs-rail-box">
+          <h3>MCP v1.4.0 Call: <code>subtitle_caption_audit</code> (Dubbing &amp; Brand QA)</h3>
+          <pre class="seo-code"><code>{
+  "name": "subtitle_caption_audit",
+  "arguments": {
+    "content": "1\n00:00:01,200 --&gt; 00:00:03,600\nMuy bien, aqui estamos en San Diego\nprobando ForgeSuite Studio.\n\n2\n00:00:04,000 --&gt; 00:00:06,800\nCada pista mantiene la musica con OpenAI.",
+    "maxCps": 20,
+    "maxLineLength": 32,
+    "brandTerms": ["San Diego", "ForgeSuite", "OpenAI"],
+    "autoFix": true,
+    "outputFormat": "srt"
+  }
+}</code></pre>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">Full MCP v1.4.0 Docs (9 Tools) →</a>
+            <a href="https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.4.0/forgesuite-mcp.mcpb" class="fs-btn fs-btn-sm fs-btn-ghost">Download .mcpb (v1.4.0)</a>
+          </div>
+        </div>
+
+        <div class="fs-rail-box" style="display:flex;flex-direction:column;justify-content:space-between;gap:12px;">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">ESCROW-BACKED CLOUD A2A</span>
+              <span class="fs-badge fs-badge-muted">$0.50 CLIPPER · $0.65 DUBBER</span>
+            </div>
+            <h3 style="margin-top:10px;">Hire 24/7 Cloud Clipping &amp; 26-Language Dubbing Agents</h3>
+            <p class="inv-muted" style="margin:6px 0 10px;">
+              Submit a YouTube URL or MP4 on NEAR AI Market to receive downloadable multi-aspect H.264/AAC MP4 clips and multi-speaker localized dubs with SHA-256 checksums:
+            </p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:0.84rem;">
+              <a href="samples/video-clipping-sample.md" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:underline;">📄 samples/video-clipping-sample.md ↗</a>
+              <a href="samples/video-dubbing-sample.md" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:underline;">📄 samples/video-dubbing-sample.md ↗</a>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="https://market.near.ai/agents/short-video-clipper" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Hire @short-video-clipper ($0.50 USDC) ↗</a>
+            <a href="https://market.near.ai/agents/multi-lang-video-dubber" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Hire @multi-lang-video-dubber ($0.65 USDC) ↗</a>
+            <a href="sowbuilder.html" class="fs-btn fs-btn-sm fs-btn-ghost">Localization SOW →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIFETIME PRO UNLOCK BANNER ($15 / $19 / $35) -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-warn">ONE-TIME LIFETIME LICENSE · ZERO SUBSCRIPTIONS · INSTANT BSC &amp; SOLANA UNLOCK</span>
+          <h2 style="margin-top:6px;">Own the Complete Local Short-Form &amp; Localization Stack ($15 / $19 / $35)</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="CB">ClipCaption + CryptoBill Pro ($15)</button>
+          <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="AS">AutoShorts Studio Pro ($19)</button>
+          <button type="button" class="fs-btn fs-btn-primary" data-checkout-sku="BUNDLE">All-Access Bundle ($35 · Save $14)</button>
+        </div>
+      </div>
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Verify <strong>BSC BEP20 USDT</strong> or <strong>Solana SPL USDC</strong> on-chain in seconds to issue your deterministic <code>FS-PRO-...</code> key offline. Unlock <strong>AutoShorts Studio Pro ($19)</strong> for unlimited local 9:16/16:9/1:1 FFmpeg batching + ClipCaption Lab Pro animated <code>.ass</code> &amp; 25-file batch — or choose the <strong>$35 All-Access Bundle</strong> to unlock every creator, freelancer, brand, and Web3 Pro tool in ForgeSuite Studio.
+      </p>
+    </section>
+
+    <!-- FAQ -->
+    <section>
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-muted">TECHNICAL FAQ</span>
+          <h2>YouTube Most Replayed Clipping &amp; 26-Language Dubbing Questions</h2>
+        </div>
+      </div>
+      <div class="fs-faq-grid">
+        <div class="fs-faq-item">
+          <h3>What happens if a source video has no Most Replayed heatmap?</h3>
+          <p>When platform retention telemetry is unavailable on brand-new uploads, <code>@short-video-clipper</code> falls back automatically to hook-density scoring, vocal energy peaks, and sentence-boundary segmentation.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Why use Mid/Side stereo ducking instead of muting background audio?</h3>
+          <p>Stereo <code>Mid/Side</code> separation preserves the original room tone, sound effects, and wide musical stereo image (<code>Side = (L-R)/2</code>) while cleanly ducking center-panned original vocals during dubbed lines.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Does @multi-lang-video-dubber clone voices without permission?</h3>
+          <p>Never. By default (<code>voiceConsentConfirmed = false</code>), all 26 languages use studio stock neural voices matched by speaker pitch and cadence, ensuring strict creator and copyright compliance.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>How do I fix expanded German or Spanish lines overflowing 9:16?</h3>
+          <p>Drop the delivered <code>.srt</code> into <a href="srtlab.html" style="text-decoration:underline;">ClipCaption Lab</a> and click <strong>1-Click Auto-Fix Overlaps &amp; 9:16 Wrap</strong> to reflow lines to <code>&lt;= 32</code> characters and export an animated <code>1080x1920</code> <code>.ass</code> file.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="srtlab.html">ClipCaption Lab</a>
+        <a href="tiktok-reels-9-16-subtitle-safe-zone-checker.html">9:16 Safe-Zone Checker</a>
+        <a href="youtube-most-replayed-clipper-ai-dubbing-guide.html">Most Replayed Clipper &amp; Dub Guide</a>
+        <a href="walletcheck.html">WalletLens</a>
+        <a href="eip-7702-delegation-gnosis-safe-checker.html">EIP-7702 &amp; Safe Checker</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="solana-token-2022-scanner.html">Solana Token-2022 Scanner</a>
+        <a href="evm-proxy-honeypot-scanner.html">EVM Proxy &amp; Honeypot Scanner</a>
+        <a href="brandcheck.html">BrandGuard</a>
+        <a href="uspto-trademark-domain-brand-checker.html">USPTO &amp; Brand Checker</a>
+        <a href="mcp.html">MCP Server (v1.4.0)</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="llms.txt">llms.txt</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { bindCheckoutTriggers } from "./assets/checkout.js";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      bindCheckoutTriggers();
+
+      const form = document.getElementById("dubQuickLaunchForm");
+      const sampleEl = document.getElementById("dubSampleSelect");
+      const brandsEl = document.getElementById("dubBrandsInput");
+      if (form && sampleEl && brandsEl) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const params = new URLSearchParams();
+          params.set("sample", sampleEl.value || "multilang_dub_srt");
+          params.set("maxCps", "20");
+          params.set("maxLine", "32");
+          const brands = brandsEl.value.trim();
+          if (brands) {
+            params.set("brands", brands);
+          }
+          window.location.href = `srtlab.html?${params.toString()}`;
+        });
+      }
+
+      const themeBtn = document.getElementById("themeToggleBtn");
+      if (themeBtn) {
+        const saved = window.localStorage.getItem("forgesuite_theme") || "dark";
+        document.documentElement.dataset.theme = saved;
+        themeBtn.textContent = saved === "light" ? "☀ Light" : "🌙 Dark";
+        themeBtn.addEventListener("click", () => {
+          const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+          document.documentElement.dataset.theme = next;
+          window.localStorage.setItem("forgesuite_theme", next);
+          themeBtn.textContent = next === "light" ? "☀ Light" : "🌙 Dark";
+        });
+      }
+
+      document.querySelectorAll("[data-copy-target]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-copy-target");
+          const target = id ? document.getElementById(id) : null;
+          if (!target) return;
+          const prev = btn.textContent;
+          try {
+            await navigator.clipboard.writeText(target.textContent || "");
+            btn.textContent = "Copied ✓";
+            setTimeout(() => {
+              btn.textContent = prev;
+            }, 1600);
+          } catch {}
+        });
+      });
+    });
+  </script>
+</body>
+</html>
