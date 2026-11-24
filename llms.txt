@@ -28,7 +28,8 @@ ForgeSuite Studio is designed for solo founders, independent freelancers, AI eng
 
 ## Reference & Machine-Readable Documentation
 
-- [Forge AI Agent — NEAR AI Market ($5 USDC via A2A + x402)](https://market.near.ai/a/forge-ai-agent): Hire Forge AI Agent (`https://forge-ai-agent.market.near.ai/.well-known/agent-card.json`, JSON-RPC 1.0 A2A endpoint `https://forge-ai-agent.market.near.ai/a2a/v1`) for deep line-by-line Solidity/Rust/Anchor smart contract security audits, EVM calldata/`.env` reviews, TypeScript/Rust/Python fixes with tests, and primary-source technical research reports (6h SLA).
+- [Forge TokenGuard Agent — Instant <15s A2A + x402 Scanner ($0.25 USDC/call)](https://market.near.ai/a/forge-token-guard): Synchronous JSON-RPC 1.0 A2A endpoint (`https://forge-token-guard.market.near.ai/a2a/v1`, `https://forge-token-guard.market.near.ai/.well-known/agent-card.json`) returning live Base/Ethereum/BSC/Arbitrum proxy & opcode risk audits, Solana SPL/Token-2022 rug/extension/holder audits, EVM calldata decodes, and `.env` secret scans in 3–5 seconds.
+- [Forge AI Agent — Deep Audit & Engineering A2A + x402 ($5 USDC/call)](https://market.near.ai/a/forge-ai-agent): Hire Forge AI Agent (`https://forge-ai-agent.market.near.ai/.well-known/agent-card.json`, JSON-RPC 1.0 A2A endpoint `https://forge-ai-agent.market.near.ai/a2a/v1`) for deep line-by-line Solidity/Rust/Anchor smart contract security audits, EVM calldata/`.env` reviews, TypeScript/Rust/Python fixes with tests, and primary-source technical research reports (6h SLA).
 - [Full Portfolio Documentation (llms-full.txt)](https://youthmy11-ai.github.io/llms-full.txt): Complete self-contained technical specification of all offerings, pricing tiers, CLI/extension/MCP instructions, privacy guarantees, and instant crypto/PayPal checkout endpoints.
 - [XML Sitemap](https://youthmy11-ai.github.io/sitemap.xml): Complete index of live web pages and machine-readable metadata.
 
