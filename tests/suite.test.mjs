@@ -1135,10 +1135,13 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/walletcheck\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/eip-7702-delegation-gnosis-safe-checker\.html/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/wallet-activity-scanner/);
+  assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/pay-per-use-media-gen/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/short-video-clipper/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/multi-lang-video-dubber/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/forge-brand-checker/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/a\/forge-ai-agent/);
+  assert.match(llmsFull, /pay-per-use-media-gen/);
+  assert.match(llmsFull, /media-generator-sample\.md/);
   assert.match(llmsFull, /srtlab\.html/);
   assert.match(llmsFull, /tiktok-reels-9-16-subtitle-safe-zone-checker\.html/);
   assert.match(llmsFull, /youtube-most-replayed-clipper-ai-dubbing-guide\.html/);
@@ -1471,11 +1474,12 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
   const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   assert.ok(fs.existsSync(path.join(rootDir, ".nojekyll")), ".nojekyll must exist so GitHub Pages serves /.well-known/*");
   const agentCard = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "agent-card.json"), "utf8"));
-  assert.equal(agentCard.supportedInterfaces.length, 7);
+  assert.equal(agentCard.supportedInterfaces.length, 8);
   assert.equal(agentCard.supportedInterfaces[0].url, "https://forge-ai-agent.market.near.ai/a2a/v1");
   assert.equal(agentCard.supportedInterfaces[0].protocolBinding, "JSONRPC");
   for (const expectedUrl of [
     "https://wallet-activity-scanner.market.near.ai/a2a/v1",
+    "https://pay-per-use-media-gen.market.near.ai/a2a/v1",
     "https://short-video-clipper.market.near.ai/a2a/v1",
     "https://multi-lang-video-dubber.market.near.ai/a2a/v1",
   ]) {
@@ -1484,6 +1488,10 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
       `agent-card.json missing A2A interface ${expectedUrl}`
     );
   }
+  assert.ok(
+    agentCard.skills.some((s) => s.id === "pay-per-use-media-gen"),
+    "agent-card.json missing pay-per-use-media-gen skill"
+  );
 
   const mcpManifest = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "mcp", "server.json"), "utf8"));
   assert.equal(mcpManifest.name, "io.github.youthmy11-ai/forgesuite-mcp");
@@ -2470,7 +2478,7 @@ test("parseTokenAuditQueryParams supports ?chain=solana&mint=..., EVM aliases, a
   assert.equal(badRpc.rpcUrl, null);
 });
 
-test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified badge, 1-click VS Code deep-links, .mcpb bundle, and 7-agent A2A + x402 fleet", () => {
+test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified badge, 1-click VS Code deep-links, .mcpb bundle, and 8-agent A2A + x402 fleet", () => {
   const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const registryUrl = "https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite";
   const vscodeLink =
@@ -2493,6 +2501,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
     "https://market.near.ai/agents/forge-data-finops",
     "https://market.near.ai/agents/forge-token-guard",
     "https://market.near.ai/agents/forge-brand-checker",
+    "https://market.near.ai/agents/pay-per-use-media-gen",
     "https://market.near.ai/agents/short-video-clipper",
     "https://market.near.ai/agents/multi-lang-video-dubber",
     "https://market.near.ai/agents/forge-ai-agent",
@@ -3546,4 +3555,67 @@ test("index.html #technical-guides lists all 6 task-intent technical guides and 
 
   verifyInternalRelativeHtmlLinks(repoRoot, "index.html", indexHtml);
   verifyInternalRelativeHtmlLinks(repoRoot, "srtlab.html", srtHtml);
+});
+
+test("8th live cloud agent @pay-per-use-media-gen ($0.45 USDC, UUID 6565da7b-bf68-456c-86a1-9ddd3b8d368b) and samples/media-generator-sample.md are synced across all distribution funnels", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const agentUrl = "https://market.near.ai/agents/pay-per-use-media-gen";
+  const agentUuid = "6565da7b-bf68-456c-86a1-9ddd3b8d368b";
+  const sampleRel = "samples/media-generator-sample.md";
+  const sampleFullUrl = "https://youthmy11-ai.github.io/samples/media-generator-sample.md";
+
+  // Verify sample markdown, avatar, and all 5 live deliverable assets exist on disk and are non-empty
+  const requiredFiles = [
+    sampleRel,
+    "assets/agents/ai-media-generator.png",
+    "samples/media-gen/ceramic_mug_square_1.png",
+    "samples/media-gen/ceramic_mug_square_2.png",
+    "samples/media-gen/ceramic_mug_square_3.png",
+    "samples/media-gen/coffee_pour_vertical_8s.mp4",
+    "samples/media-gen/warm_female_voiceover_30s.mp3",
+  ];
+  for (const rel of requiredFiles) {
+    const abs = path.join(repoRoot, rel);
+    assert.ok(fs.existsSync(abs), `Missing media-gen asset: ${rel}`);
+    assert.ok(fs.statSync(abs).size > 0, `Empty media-gen asset: ${rel}`);
+  }
+
+  const sampleMd = fs.readFileSync(path.join(repoRoot, sampleRel), "utf8");
+  assert.ok(sampleMd.includes(agentUrl));
+  assert.ok(sampleMd.includes("AI Image, Video & Voiceover Generator"));
+  assert.ok(sampleMd.includes("1024x1024"));
+  assert.ok(sampleMd.includes("1080x1920"));
+  assert.ok(sampleMd.includes("warm_female_voiceover_30s.mp3"));
+
+  // Verify HTML funnel pages link to @pay-per-use-media-gen ($0.45) and samples/media-generator-sample.md
+  for (const htmlFile of [
+    "index.html",
+    "srtlab.html",
+    "youtube-most-replayed-clipper-ai-dubbing-guide.html",
+    "mcp.html",
+  ]) {
+    const html = fs.readFileSync(path.join(repoRoot, htmlFile), "utf8");
+    assert.ok(html.includes(agentUrl), `${htmlFile} missing ${agentUrl}`);
+    assert.ok(html.includes("$0.45"), `${htmlFile} missing $0.45 pricing`);
+    assert.ok(html.includes(sampleRel), `${htmlFile} missing ${sampleRel}`);
+    assert.doesNotMatch(
+      html,
+      /(?<!\/)\b7 (live|Live|autonomous|Autonomous|Cloud A2A Agents)\b/,
+      `${htmlFile} still contains stale 7-agent fleet count`
+    );
+    verifyInternalRelativeHtmlLinks(repoRoot, htmlFile, html);
+  }
+
+  // Verify machine-readable discovery & README docs carry 8-agent count, UUID, and sample URL
+  for (const docFile of ["llms.txt", "llms-full.txt", "README.md", ".well-known/agent-card.json"]) {
+    const content = fs.readFileSync(path.join(repoRoot, docFile), "utf8");
+    assert.ok(content.includes(agentUrl), `${docFile} missing ${agentUrl}`);
+    assert.ok(content.includes(agentUuid), `${docFile} missing UUID ${agentUuid}`);
+    assert.ok(content.includes(sampleFullUrl), `${docFile} missing ${sampleFullUrl}`);
+    assert.doesNotMatch(
+      content,
+      /(?<!\/)\b7 (live|Live|autonomous|Autonomous)\b/,
+      `${docFile} still contains stale 7-agent fleet count`
+    );
+  }
 });
