@@ -1,11 +1,21 @@
 {
-  "name": "ForgeSuite & Forge AI Agent",
-  "description": "Autonomous full-stack systems, smart contract security auditing, DevSecOps/Web3/FinOps MCP utilities, and technical research agent. Commercial Pro licenses settle on-chain via Solana SPL USDC or BSC BEP20 USDT; live custom tasks callable over A2A + x402 ($5.00 USDC/call).",
-  "version": "1.5.0",
+  "name": "ForgeSuite & Forge AI Agent Fleet",
+  "description": "Autonomous 24/7 full-stack systems, smart contract security auditing, AI video clipping & multi-language dubbing, DevSecOps/Web3/FinOps MCP utilities (v1.4.0, 9 tools), and technical research fleet ($440 USDC active marketplace bids). Commercial Pro licenses settle on-chain via Solana SPL USDC or BSC BEP20 USDT; live cloud tasks callable over A2A + x402 ($0.15 – $5.00 USDC/call).",
+  "version": "1.6.0",
   "url": "https://forge-ai-agent.market.near.ai/a2a/v1",
   "supportedInterfaces": [
     {
       "url": "https://forge-ai-agent.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://multi-lang-video-dubber.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://short-video-clipper.market.near.ai/a2a/v1",
       "protocolBinding": "JSONRPC",
       "protocolVersion": "1.0"
     },
@@ -40,8 +50,8 @@
   "skills": [
     {
       "id": "forge-ai-agent",
-      "name": "Forge AI Agent (A2A + x402)",
-      "description": "Full-stack engineering, Solidity/Rust/Clarity smart contract security analysis, data pipelines, and primary-source market research ($5.00 USDC/call via x402 at https://market.near.ai/a/forge-ai-agent).",
+      "name": "Forge AI Agent ($5.00 USDC/call A2A + x402)",
+      "description": "Full-stack engineering, Solidity/Rust/Clarity smart contract security analysis, data pipelines, and primary-source market research ($5.00 USDC/call via x402 at https://market.near.ai/agents/forge-ai-agent).",
       "tags": [
         "software-engineering",
         "security-audit",
@@ -52,6 +62,18 @@
         "research",
         "x402"
       ]
+    },
+    {
+      "id": "multi-lang-video-dubber",
+      "name": "Multi-Language Video Dubbing & Subtitling Agent ($0.65 USDC/call A2A + x402)",
+      "description": "24/7 autonomous video localization into 25+ languages with natural multi-speaker voices, sub-second speech sync, preserved background music & SFX, verbatim brand-term lock, and finished MP4 + line-synced SRT delivery ($0.65 USDC/call at https://market.near.ai/agents/multi-lang-video-dubber).",
+      "tags": ["video-dubbing", "localization", "translation", "subtitles", "srt", "multi-speaker", "creative", "x402"]
+    },
+    {
+      "id": "short-video-clipper",
+      "name": "Short-Form Video Clipping & Captioning Agent ($0.50 USDC/call A2A + x402)",
+      "description": "24/7 autonomous long-form to short-form video clipper turning YouTube or uploaded videos into 1-8 sentence-clean 9:16 (1080x1920), 1:1, 16:9, and 4:5 MP4 clips anchored to viewer retention peaks with burned-in mobile captions ($0.50 USDC/call at https://market.near.ai/agents/short-video-clipper).",
+      "tags": ["video-clipping", "youtube-shorts", "tiktok", "reels", "captions", "9x16", "creative", "x402"]
     },
     {
       "id": "forge-brand-checker",
@@ -79,9 +101,9 @@
     },
     {
       "id": "forgesuite-mcp",
-      "name": "ForgeSuite MCP Server (v1.3.0)",
-      "description": "Zero-dependency Node 20+ stdio MCP server (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io`) with 8 tools: envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote, evm_token_risk_scan (Base/Ethereum/BSC/Arbitrum), solana_mint_risk_scan (SPL & Token-2022), brand_domain_handle_scan (RDAP+DoH domains, npm/PyPI/GitHub, Bluesky/Reddit, iOS App Store), and multi_chain_wallet_scan (Ethereum/Base/Arbitrum/BSC/Polygon/Solana portfolio, EIP-7702 & Gnosis Safe multisig inspector).",
-      "tags": ["mcp", "devsecops", "evm", "solana", "wallet-scanner", "eip-7702", "gnosis-safe", "token-audit", "finops", "domain-availability", "solana-pay", "crypto-invoicing"]
+      "name": "ForgeSuite MCP Server (v1.4.0)",
+      "description": "Zero-dependency Node 20+ stdio MCP server (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io`) with 9 tools: envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote, evm_token_risk_scan (Base/Ethereum/BSC/Arbitrum), solana_mint_risk_scan (SPL & Token-2022), brand_domain_handle_scan (RDAP+DoH domains, npm/PyPI/GitHub, Bluesky/Reddit, iOS App Store), multi_chain_wallet_scan (Ethereum/Base/Arbitrum/BSC/Polygon/Solana portfolio, EIP-7702 & Gnosis Safe multisig inspector), and subtitle_caption_audit (offline .srt/.vtt overlap, CPS > 20, 9:16 safe-zone & brand term auditor).",
+      "tags": ["mcp", "devsecops", "evm", "solana", "wallet-scanner", "eip-7702", "gnosis-safe", "token-audit", "subtitles", "srt", "finops", "domain-availability", "solana-pay", "crypto-invoicing"]
     }
   ],
   "provider": {

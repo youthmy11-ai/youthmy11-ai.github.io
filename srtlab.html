@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClipCaption Lab — Free .SRT / .VTT Converter, Time-Shifter &amp; 9:16 Safe-Zone Caption Checker</title>
+  <meta name="description" content="100% client-side .SRT, .VTT &amp; .TXT subtitle converter, +/- ms time-shifter, tempo scaler, overlap &amp; CPS &gt; 20 checker, mid-sentence cut detector, live 9:16 TikTok/Reels/Shorts safe-zone previewer, and Pro animated 1080x1920 .ASS + 25-file batch processor.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/srtlab.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/srtlab.html">
+  <meta property="og:title" content="ClipCaption Lab — 9:16 Vertical Subtitle Checker, .SRT/.VTT Converter &amp; Animated .ASS Exporter">
+  <meta property="og:description" content="Audit and fix .SRT, .VTT, and .TXT captions in browser: detect timestamp overlaps, fast reading speed (CPS &gt; 20), 9:16 safe-zone overflows, and mid-sentence cuts with live vertical phone preview.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ClipCaption Lab — Browser .SRT / .VTT Time-Shifter &amp; 9:16 Safe-Zone Caption Lab">
+  <meta name="twitter:description" content="Zero-upload .SRT &lt;-&gt; .VTT &lt;-&gt; .TXT subtitle converter, CPS/overlap/cut auditor, live 9:16 phone previewer, and Pro 1080x1920 animated .ASS exporter.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ec4899'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='21' font-weight='800'%3ECC%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ClipCaption Lab",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web",
+    "url": "https://youthmy11-ai.github.io/srtlab.html",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free .SRT/.VTT/.TXT Converter, Time-Shifter & 9:16 Safe-Zone Auditor", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Single-Tool Pro Unlock (Animated .ASS + 25-File Batch)", "price": "15", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "AutoShorts Studio Pro Unlock (Desktop CLI + ClipCaption Pro)", "price": "19", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "All-Access Creator & Freelancer Bundle", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "100% client-side bidirectional .SRT, .VTT, and .TXT transcript conversion with markup cleanup",
+      "Millisecond timestamp shifting (+/- ms), frame-rate tempo scaling, and 1-click overlap & line-wrap auto-fix",
+      "Deterministic 0–100 Caption Quality Score auditing timestamp overlaps, CPS > 20 reading speed, 9:16 mobile safe-zone width, mid-sentence cuts, and brand term casing",
+      "Interactive 9:16 vertical phone screen simulator previewing TikTok, Reels, and YouTube Shorts UI danger zones in real time",
+      "Pro 1080x1920 animated SubStation Alpha (.ASS) export and 25-file batch subtitle processing + 1-click handoff to @short-video-clipper ($0.50 USDC) & @multi-lang-video-dubber ($0.65 USDC)"
+    ],
+    "description": "Zero-backend browser subtitle analyzer, .SRT/.VTT/.TXT converter, time-shifter, live 9:16 mobile safe-zone previewer, and Pro animated .ASS generator."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Does ClipCaption Lab upload my .SRT, .VTT, or video transcript files to any server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. ClipCaption Lab runs 100% locally inside your browser using pure ES Module JavaScript (assets/srtlab.js). Your transcripts, unreleased scripts, and subtitle tracks never leave your device."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the 9:16 vertical safe-zone and animated .ASS export work with FFmpeg?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "ClipCaption Lab checks that lines stay within <= 32 characters and <= 2 stacked lines so captions never collide with TikTok, Instagram Reels, or YouTube Shorts action buttons and bottom descriptions. Pro users can export PlayResX: 1080, PlayResY: 1920 SubStation Alpha (.ASS) files with bold outlines and pop-in tags ready for ffmpeg -i input.mp4 -vf ass=captions.ass output.mp4."
+        }
+      }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .cc-phone-stage {
+      display: grid;
+      grid-template-columns: 236px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+    }
+    .cc-phone-frame {
+      position: relative;
+      width: 236px;
+      aspect-ratio: 9 / 16;
+      border-radius: 26px;
+      border: 3px solid rgba(148, 163, 184, 0.38);
+      background:
+        radial-gradient(circle at 30% 22%, rgba(59, 130, 246, 0.34), transparent 52%),
+        radial-gradient(circle at 75% 68%, rgba(236, 72, 153, 0.28), transparent 50%),
+        linear-gradient(180deg, #0b1222 0%, #151c30 52%, #090d16 100%);
+      box-shadow: 0 20px 44px rgba(2, 6, 23, 0.65);
+      overflow: hidden;
+      color: #ffffff;
+      user-select: none;
+    }
+    .cc-zone-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 13%;
+      background: rgba(239, 68, 68, 0.14);
+      border-bottom: 1px dashed rgba(248, 113, 113, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #fca5a5;
+      text-transform: uppercase;
+    }
+    .cc-zone-right {
+      position: absolute;
+      top: 34%;
+      right: 6px;
+      bottom: 24%;
+      width: 36px;
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px dashed rgba(251, 191, 36, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      font-size: 0.66rem;
+      color: #fde68a;
+      padding: 6px 0;
+    }
+    .cc-zone-bottom {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 22%;
+      background: rgba(239, 68, 68, 0.16);
+      border-top: 1px dashed rgba(248, 113, 113, 0.55);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      font-size: 0.65rem;
+      color: rgba(241, 245, 249, 0.78);
+    }
+    .cc-safe-box {
+      position: absolute;
+      left: 12px;
+      right: 46px;
+      bottom: 24%;
+      min-height: 68px;
+      border: 1px dashed rgba(16, 185, 129, 0.58);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.42);
+      padding: 8px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .cc-caption-render {
+      font-family: "Arial Black", Impact, system-ui, sans-serif;
+      font-weight: 900;
+      font-size: 0.92rem;
+      line-height: 1.24;
+      color: #ffffff;
+      text-shadow:
+        -2px -2px 0 #000,
+         2px -2px 0 #000,
+        -2px  2px 0 #000,
+         2px  2px 0 #000,
+         0px  3px 6px rgba(0, 0, 0, 0.85);
+      word-break: break-word;
+    }
+    @media (max-width: 680px) {
+      .cc-phone-stage {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+    }
+  </style>
+</head>
+<body data-page="srtlab">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);">CC</span>
+        <span>ClipCaption Lab</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP v1.4.0 (9 Tools)</a>
+        <a href="tokencalc.html" class="fs-btn fs-btn-sm fs-btn-secondary">TokenCost</a>
+        <a href="brandcheck.html" class="fs-btn fs-btn-sm fs-btn-secondary">BrandGuard</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill</a>
+        <button type="button" id="srtBundleBtn" class="fs-btn fs-btn-sm fs-btn-primary">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 60px;">
+    <div class="fs-section-head" style="margin-bottom:20px;">
+      <div>
+        <span class="fs-badge fs-badge-accent">WEB APP #10 · 100% CLIENT-SIDE · .SRT &lt;-&gt; .VTT &lt;-&gt; .TXT · 9:16 SAFE-ZONE PREVIEW · ANIMATED .ASS</span>
+        <h1 style="margin-top:10px;">ClipCaption Lab — 9:16 Subtitle Auditor, Time-Shifter &amp; Converter</h1>
+        <p class="fs-lead" style="margin-top:6px;">
+          Convert and normalize <code>.srt</code>, <code>.vtt</code>, and <code>.txt</code> transcripts locally, shift timestamps (<code>+/- ms</code> &amp; tempo scale), catch <strong>overlaps</strong>, <strong>fast reading speed (<code>CPS &gt; 20</code>)</strong>, <strong>9:16 TikTok/Reels/Shorts safe-zone overflows</strong>, and <strong>mid-sentence cuts</strong> — or export Pro <code>1080x1920</code> animated <code>.ass</code> captions.
+        </p>
+      </div>
+    </div>
+
+    <div class="cb-workspace">
+      <!-- LEFT COLUMN: EDITOR, TIMING CONTROLS, CLOUD VIDEO AGENTS & PRO 25-FILE BATCH -->
+      <section class="cb-editor-pane" aria-label="Subtitle Editor, Timing Controls & Cloud Video Handoffs">
+        <!-- 1. FREE SUBTITLE & TRANSCRIPT AUDITOR / CONVERTER -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Subtitle &amp; Transcript Input (Free · Zero Upload)</h2>
+            <span class="fs-badge fs-badge-success">FREE · .SRT / .VTT / .TXT</span>
+          </div>
+
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-srt-sample="creator_hook_issues">Sample: Shorts Hook (Overlaps + High CPS)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-srt-sample="clean_vertical_vtt">Sample: Clean 9:16 WebVTT</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-srt-sample="multilang_dub_srt">Sample: Spanish Dub + Brand Lock</button>
+            <label class="fs-btn fs-btn-sm fs-btn-ghost cb-file-btn">
+              📂 Load File
+              <input id="srtSingleFileInput" type="file" accept=".srt,.vtt,.txt,text/plain,text/vtt">
+            </label>
+          </div>
+
+          <label class="fs-field">
+            <span class="fs-field-label">Paste <code>.srt</code>, <code>WEBVTT</code> (<code>.vtt</code>), or raw/timestamped <code>.txt</code> transcript</span>
+            <textarea id="srtInputArea" class="fs-textarea" rows="9" spellcheck="false" style="font-family:var(--font-mono);font-size:0.83rem;"></textarea>
+          </label>
+
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">Time-Shift Offset (<code>+/- ms</code>)</span>
+              <input id="srtShiftMs" type="number" class="fs-input" step="50" value="0" placeholder="e.g. -250 or +500">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Tempo Scale (<code>1.000</code> = 1x)</span>
+              <input id="srtTempoScale" type="number" class="fs-input" step="0.001" min="0.25" max="4" value="1">
+            </label>
+          </div>
+
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">Max Reading Speed (<code>CPS</code>)</span>
+              <input id="srtMaxCps" type="number" class="fs-input" min="10" max="40" value="20">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">9:16 Safe Line Width (Chars)</span>
+              <input id="srtMaxLineChars" type="number" class="fs-input" min="16" max="60" value="32">
+            </label>
+          </div>
+
+          <label class="fs-field">
+            <span class="fs-field-label">Protected Brand / Technical Terms (Comma-separated case check)</span>
+            <input id="srtBrandTerms" type="text" class="fs-input" placeholder="ForgeSuite, San Diego, OpenAI, NEAR Protocol" value="ForgeSuite">
+          </label>
+
+          <label style="display:inline-flex;align-items:center;gap:8px;font-size:0.86rem;cursor:pointer;">
+            <input id="srtAutoFixToggle" type="checkbox">
+            <span>Auto-resolve overlaps &amp; reflow lines to 9:16 safe width on every audit</span>
+          </label>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="srtAuditBtn" class="fs-btn fs-btn-primary">Audit &amp; Convert</button>
+            <button type="button" id="srtAutoFixBtn" class="fs-btn fs-btn-secondary">✨ 1-Click Auto-Fix Overlaps &amp; 9:16 Wrap</button>
+            <button type="button" id="srtShareLinkBtn" class="fs-btn fs-btn-ghost">🔗 Copy #srt= Link</button>
+          </div>
+
+          <div id="srtStatusMsg" class="fs-status-msg" aria-live="polite"></div>
+        </div>
+
+        <!-- 2. 1-CLICK CLOUD AI VIDEO AGENTS (@short-video-clipper $0.50 & @multi-lang-video-dubber $0.65) -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h3>Need Full MP4 Video Clipping or 25+ Language Neural Dubbing?</h3>
+            <span class="fs-badge fs-badge-accent">LIVE 24/7 NEAR AI AGENTS</span>
+          </div>
+          <p class="inv-muted" style="margin:2px 0 10px;">
+            Hire our autonomous 24/7 cloud video agents on NEAR AI Market for end-to-end <code>H.264/AAC MP4</code> rendering, YouTube <code>Most Replayed</code> highlight extraction, burned-in mobile captions, and multi-speaker neural dubbing with preserved background music &amp; SFX — or run Tool #9 <code>subtitle_caption_audit</code> free in <strong>ForgeSuite MCP v1.4.0</strong>:
+          </p>
+          <div style="display:grid;gap:10px;">
+            <div class="fs-rail-box" style="padding:12px;">
+              <div class="fs-card-top">
+                <strong><code>@short-video-clipper</code> — $0.50 USDC / job</strong>
+                <a href="samples/video-clipping-sample.md" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem;color:var(--accent);text-decoration:underline;">Sample MP4 Output ↗</a>
+              </div>
+              <small class="inv-muted">Turns YouTube or uploaded long-form videos into 1–8 sentence-clean <code>9:16</code>, <code>1:1</code>, <code>16:9</code> &amp; <code>4:5</code> MP4 clips with burned-in mobile captions.</small>
+              <div>
+                <a href="https://market.near.ai/agents/short-video-clipper" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Hire @short-video-clipper ($0.50 USDC) ↗</a>
+              </div>
+            </div>
+
+            <div class="fs-rail-box" style="padding:12px;">
+              <div class="fs-card-top">
+                <strong><code>@multi-lang-video-dubber</code> — $0.65 USDC / job</strong>
+                <a href="samples/video-dubbing-sample.md" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem;color:var(--accent);text-decoration:underline;">Sample ES/DE/JA Dub ↗</a>
+              </div>
+              <small class="inv-muted">Dubs videos into 25+ languages with multi-speaker stock voices, sub-second sync, preserved music/SFX, protected brand terms &amp; synced <code>.srt</code> files.</small>
+              <div>
+                <a href="https://market.near.ai/agents/multi-lang-video-dubber" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Hire @multi-lang-video-dubber ($0.65 USDC) ↗</a>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+            <button type="button" id="srtSendInvoiceBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Invoice Video/Caption Job →</button>
+            <button type="button" id="srtSendSowBtn" class="fs-btn fs-btn-sm fs-btn-ghost">1-Click Localization SOW →</button>
+          </div>
+        </div>
+
+        <!-- 3. PRO TIER: ANIMATED 1080x1920 .ASS + 25-FILE BATCH SUBTITLE PROCESSOR -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Pro Animated <code>.ASS</code> &amp; 25-File Batch Studio</h2>
+            <span id="srtProBadge" class="fs-badge fs-badge-warn">PRO FEATURE · $15 PRO / $19 AUTOSHORTS / $35 BUNDLE</span>
+          </div>
+
+          <div id="srtProLockBanner" class="cb-pro-lock">
+            <strong>Creator &amp; AI Video Editor Pro Mode:</strong> Export FFmpeg-ready <strong><code>PlayResX: 1080, PlayResY: 1920</code> animated <code>.ass</code></strong> subtitle tracks matching our <code>@short-video-clipper</code> pipeline plus <strong>Batch 25-File Subtitle Audit &amp; Conversion</strong> with <strong>Single Pro ($15)</strong>, <strong>AutoShorts Studio Pro ($19)</strong>, or the <strong>All-Access Bundle ($35)</strong>.
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">All-Access Bundle ($35)</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="AS">AutoShorts Pro ($19)</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="CB">Single Tool Pro ($15)</button>
+              <button type="button" id="srtActivateKeyBtn" class="fs-btn fs-btn-sm fs-btn-ghost">Activate Pro Key</button>
+            </div>
+          </div>
+
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">1080x1920 <code>.ASS</code> Typography Style</span>
+              <select id="srtAssPresetSelect" class="fs-select">
+                <option value="mobile_bold" selected>MobileBold White + Outline (@short-video-clipper)</option>
+                <option value="hormozi_gold">CreatorGold High-Retention Yellow Pop</option>
+                <option value="emerald_hook">EmeraldHook Tech Accent</option>
+              </select>
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label"><code>.ASS</code> Pop-In Animation Tags</span>
+              <div style="padding-top:8px;font-size:0.86rem;">
+                <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
+                  <input id="srtAssPopToggle" type="checkbox" checked>
+                  <span>Include <code>\fad + \fscx106</code> pop</span>
+                </label>
+              </div>
+            </label>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <label class="fs-btn fs-btn-sm fs-btn-secondary cb-file-btn">
+              📁 Select Up to 25 Files (.srt/.vtt/.txt)
+              <input id="srtBatchFilesInput" type="file" accept=".srt,.vtt,.txt" multiple>
+            </label>
+            <button type="button" id="srtBatchDemoBtn" class="fs-btn fs-btn-sm fs-btn-ghost">Load 3-Episode Demo Cohort</button>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="srtBatchRunBtn" class="fs-btn fs-btn-primary">Unlock 25-File Batch &amp; .ASS — Pro ($19 / $35)</button>
+            <button type="button" id="srtBatchCsvBtn" class="fs-btn fs-btn-secondary" disabled>Export Batch CSV</button>
+            <button type="button" id="srtBatchJsonBtn" class="fs-btn fs-btn-secondary" disabled>Export JSON Dossier</button>
+          </div>
+          <div id="srtBatchStatusMsg" class="fs-status-msg" aria-live="polite"></div>
+
+          <div style="overflow-x:auto;">
+            <table class="fs-table">
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Cues</th>
+                  <th>Score</th>
+                  <th>Audit Summary</th>
+                  <th>1080x1920</th>
+                </tr>
+              </thead>
+              <tbody id="srtBatchBody">
+                <tr>
+                  <td colspan="5" class="inv-muted">Select up to 25 subtitle files to batch-audit overlaps, CPS, 9:16 safe zones &amp; export animated <code>.ass</code> tracks.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: LIVE 9:16 PHONE SAFE-ZONE SIMULATOR, CONVERTED EXPORTS & AUDIT TABLE -->
+      <section class="cb-preview-pane" aria-label="Live 9:16 Phone Safe-Zone Preview and Normalized Subtitle Output">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <div>
+              <h2>Live 9:16 Phone Safe-Zone Simulator &amp; Quality Audit</h2>
+              <div class="inv-muted" style="margin-top:2px;font-size:0.85rem;">Click any cue below or scrub the timeline to verify mobile readability before burning captions.</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span id="srtVerdictBadge" class="fs-badge fs-badge-muted">READY</span>
+              <button type="button" id="srtCopyMdBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Copy Audit MD</button>
+            </div>
+          </div>
+
+          <div id="srtMetricsGrid" class="cb-grid-2"></div>
+
+          <!-- INTERACTIVE 9:16 PHONE PREVIEW STAGE -->
+          <div class="fs-rail-box" style="padding:16px;">
+            <div class="cc-phone-stage">
+              <div class="cc-phone-frame" aria-label="9:16 Vertical Video Safe-Zone Simulator">
+                <div class="cc-zone-top">Top Status / Notch UI (13%)</div>
+                <div style="position:absolute;top:24%;left:14px;right:52px;text-align:center;opacity:0.32;font-size:0.75rem;">
+                  1080 × 1920 Vertical Canvas<br>(Subject / Speaker Face Area)
+                </div>
+                <div class="cc-zone-right" title="TikTok / Reels / Shorts Right Action Icons">
+                  <span>♥</span>
+                  <span>💬</span>
+                  <span>↗</span>
+                  <span>🎵</span>
+                </div>
+                <div class="cc-safe-box">
+                  <div id="srtPhoneCaptionBox" class="cc-caption-render">Loading 9:16 preview…</div>
+                </div>
+                <div class="cc-zone-bottom">
+                  <strong>@creator_handle · Follow</strong>
+                  <span>Bottom Caption &amp; Audio Ticker Danger Zone (22%)</span>
+                </div>
+              </div>
+
+              <div style="display:grid;gap:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <button type="button" id="srtPlayPreviewBtn" class="fs-btn fs-btn-sm fs-btn-primary">▶ Play 9:16 Preview</button>
+                  <code id="srtPhoneTimeBadge" class="fs-mono-chip">00:00.000 / 00:08.000</code>
+                </div>
+
+                <label class="fs-field">
+                  <span class="fs-field-label">Scrub Timeline (ms)</span>
+                  <input id="srtTimelineRange" type="range" min="0" max="10000" step="25" value="500" style="width:100%;">
+                </label>
+
+                <div id="srtPhoneSafeAlert" class="cb-pro-lock" hidden></div>
+
+                <div>
+                  <span class="fs-field-label" style="display:block;margin-bottom:6px;">Instant Normalized Downloads</span>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button type="button" id="srtDownloadSrtBtn" class="fs-btn fs-btn-sm fs-btn-secondary">⬇ .SRT (Free)</button>
+                    <button type="button" id="srtDownloadVttBtn" class="fs-btn fs-btn-sm fs-btn-secondary">⬇ .VTT (Free)</button>
+                    <button type="button" id="srtDownloadTxtBtn" class="fs-btn fs-btn-sm fs-btn-secondary">⬇ .TXT (Free)</button>
+                    <button type="button" id="srtDownloadAssBtn" class="fs-btn fs-btn-sm fs-btn-primary">🔒 Export 9:16 .ASS (Pro)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NORMALIZED OUTPUT CONVERTER TABS -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-srt-out-tab="srt">Normalized .SRT</button>
+                <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-srt-out-tab="vtt">WebVTT (.VTT)</button>
+                <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-srt-out-tab="txt">Clean .TXT Transcript</button>
+                <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-srt-out-tab="ass">1080x1920 .ASS (Pro)</button>
+              </div>
+              <button type="button" id="srtCopyOutputBtn" class="fs-btn fs-btn-sm fs-btn-ghost">📋 Copy Output</button>
+            </div>
+            <textarea id="srtNormalizedOutput" class="fs-textarea" rows="7" readonly style="font-family:var(--font-mono);font-size:0.81rem;"></textarea>
+          </div>
+
+          <!-- DETECTED WARNINGS & ISSUES -->
+          <div>
+            <h3 style="margin:6px 0 10px;font-size:0.95rem;">Detected Timing, CPS, 9:16 Safe-Zone &amp; Mid-Sentence Cut Warnings</h3>
+            <div style="overflow-x:auto;">
+              <table class="fs-table">
+                <thead>
+                  <tr>
+                    <th>Severity</th>
+                    <th>Timestamp</th>
+                    <th>Rule</th>
+                    <th>Diagnostic Detail</th>
+                  </tr>
+                </thead>
+                <tbody id="srtIssuesBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- CUE-BY-CUE TIMELINE INSPECTOR -->
+          <div>
+            <h3 style="margin:6px 0 10px;font-size:0.95rem;">Cue-by-Cue Timeline Inspector (Click Any Row to Preview on 9:16 Screen)</h3>
+            <div style="overflow-x:auto;max-height:340px;overflow-y:auto;">
+              <table class="fs-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Window</th>
+                    <th>Speed / Width</th>
+                    <th>Caption Lines</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="srtCuesBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="mcp.html">MCP Server (v1.4.0)</a>
+        <a href="srtlab.html">ClipCaption Lab</a>
+        <a href="walletcheck.html">WalletLens</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="brandcheck.html">BrandGuard</a>
+        <a href="txdecode.html">Calldata Lens</a>
+        <a href="envshield.html">EnvShield</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="json2sheet.html">JSON2Sheet Lab</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="https://market.near.ai/agents/short-video-clipper" target="_blank" rel="noopener noreferrer">@short-video-clipper ($0.50)</a>
+        <a href="https://market.near.ai/agents/multi-lang-video-dubber" target="_blank" rel="noopener noreferrer">@multi-lang-video-dubber ($0.65)</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/srtlab.js"></script>
+</body>
+</html>

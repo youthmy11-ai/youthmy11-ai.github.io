@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.youthmy11-ai/forgesuite-mcp",
-  "title": "ForgeSuite DevSecOps, Web3 Risk, Multi-Chain Wallet, Brand Launch & Crypto FinOps MCP Server",
-  "description": "Zero-dependency Node.js 20+ stdio MCP server (v1.3.0, 8 tools — run instantly via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`): .env secret leak scanner, EVM calldata/risk decoder, LLM token cost calculator, crypto invoice URI generator, live EVM token/proxy/opcode risk scanner, live Solana SPL/Token-2022 mint risk scanner, live RDAP+DoH domain & developer/social handle availability scanner, and live 6-chain EVM/Solana wallet portfolio, EIP-7702 & Gnosis Safe multisig inspector.",
-  "version": "1.3.0",
+  "title": "ForgeSuite DevSecOps, Web3 Risk, Multi-Chain Wallet, Creator Media, Brand Launch & Crypto FinOps MCP Server",
+  "description": "Zero-dependency Node.js 20+ stdio MCP server (v1.4.0, 9 tools — run instantly via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`): .env secret leak scanner, EVM calldata/risk decoder, LLM token cost calculator, crypto invoice URI generator, live EVM token/proxy/opcode risk scanner, live Solana SPL/Token-2022 mint risk scanner, live RDAP+DoH domain & developer/social handle availability scanner, live 6-chain EVM/Solana wallet portfolio, EIP-7702 & Gnosis Safe multisig inspector, and offline .srt/.vtt 9:16 subtitle & caption quality auditor.",
+  "version": "1.4.0",
   "websiteUrl": "https://youthmy11-ai.github.io/mcp.html",
   "repository": {
     "url": "https://github.com/youthmy11-ai/youthmy11-ai.github.io",
@@ -13,7 +13,7 @@
     {
       "registryType": "npm",
       "identifier": "github:youthmy11-ai/youthmy11-ai.github.io",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "transport": {
         "type": "stdio"
       }
@@ -51,6 +51,10 @@
     {
       "name": "multi_chain_wallet_scan",
       "description": "Inspect 1 to 5 EVM (0x...) and/or Solana (Base58) wallets across Ethereum, Base, Arbitrum, BSC, Polygon, and Solana Mainnet for native & stablecoin balances, nonces, EIP-7702 delegations, Gnosis Safe M-of-N signers, SPL/Token-2022 holdings, and recent Solana signatures."
+    },
+    {
+      "name": "subtitle_caption_audit",
+      "description": "Audit .srt and .vtt subtitle tracks offline for timestamp overlaps, CPS > 20 reading speed, 9:16 vertical safe-zone line width, mid-sentence cuts, and brand term fidelity — returning a 0–100 quality score plus normalized .srt/.vtt output."
     }
   ]
 }

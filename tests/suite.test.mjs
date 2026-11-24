@@ -85,6 +85,7 @@ import {
 } from "../assets/tokenaudit.js";
 import {
   SERVER_INFO as MCP_SERVER_INFO,
+  auditSubtitleCaptions,
   classifyWalletEvmBytecode,
   deriveSolanaAssociatedTokenAddress,
   handleJsonRpcMessage,
@@ -131,6 +132,33 @@ import {
   scoreBrandReadiness,
   validateLicenseKeyFormat as brandGuardValidateKey,
 } from "../assets/brandcheck.js";
+import {
+  ASS_STYLE_PRESETS,
+  DEFAULT_MAX_CPS,
+  DEFAULT_MAX_LINE_CHARS,
+  MAX_BATCH_SUBTITLE_FILES,
+  NEAR_VIDEO_CLIPPER_URL,
+  NEAR_VIDEO_DUBBER_URL,
+  SRTLAB_SAMPLES,
+  applyTimingTransform,
+  auditSubtitles,
+  autoFixSubtitleCues,
+  buildCaptionLocalizationInvoicePayload,
+  buildCaptionSowState,
+  detectSubtitleFormat,
+  exportBatchSubtitleCsv,
+  formatAssTimestamp,
+  formatSrtTimestamp,
+  formatVttTimestamp,
+  parseSrtLabQueryParams,
+  parseSubtitles,
+  parseTimestampMs,
+  runBatchSubtitleAudit,
+  serializeToSrt,
+  serializeToTranscriptTxt,
+  serializeToVerticalAss,
+  serializeToVtt,
+} from "../assets/srtlab.js";
 
 test("verifySolanaUsdcTx and verifySolanaUsdcTxOnChain validate SPL USDC transfers and issue keys", async () => {
   const sampleTx = {
@@ -1089,12 +1117,14 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsFull, /TokenGuard/);
   assert.match(llmsFull, /BrandGuard/);
   assert.match(llmsFull, /WalletLens/);
+  assert.match(llmsFull, /ClipCaption Lab/);
   assert.match(llmsFull, /ForgeSuite MCP Server/);
   assert.doesNotMatch(llmsTxt, /\b7 web (applications|utilities|tools)\b/i);
   assert.doesNotMatch(llmsFull, /\b7 web (applications|utilities|tools)\b/i);
-  assert.match(llmsTxt, /All 9 web applications/);
-  assert.match(llmsFull, /All 9 web applications/);
+  assert.match(llmsTxt, /All 10 web applications/);
+  assert.match(llmsFull, /All 10 web applications/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/mcp\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/srtlab\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/tokenaudit\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/solana-token-2022-scanner\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/evm-proxy-honeypot-scanner\.html/);
@@ -1103,8 +1133,11 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/walletcheck\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/eip-7702-delegation-gnosis-safe-checker\.html/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/wallet-activity-scanner/);
+  assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/short-video-clipper/);
+  assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/multi-lang-video-dubber/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/forge-brand-checker/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/a\/forge-ai-agent/);
+  assert.match(llmsFull, /srtlab\.html/);
   assert.match(llmsFull, /solana-token-2022-scanner\.html/);
   assert.match(llmsFull, /evm-proxy-honeypot-scanner\.html/);
   assert.match(llmsFull, /eip-7702-delegation-gnosis-safe-checker\.html/);
@@ -1132,6 +1165,7 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
     { file: "sowbuilder.html", url: "https://youthmy11-ai.github.io/sowbuilder.html", category: "BusinessApplication" },
     { file: "txdecode.html", url: "https://youthmy11-ai.github.io/txdecode.html", category: "DeveloperApplication" },
     { file: "envshield.html", url: "https://youthmy11-ai.github.io/envshield.html", category: "SecurityApplication" },
+    { file: "srtlab.html", url: "https://youthmy11-ai.github.io/srtlab.html", category: "MultimediaApplication" },
     { file: "mcp.html", url: "https://youthmy11-ai.github.io/mcp.html", category: "DeveloperApplication" },
   ];
 
@@ -1233,15 +1267,15 @@ test("ForgeSuite MCP stdio server handles initialize, notifications/initialized,
   assert.equal(messages[0].id, 1);
   assert.equal(messages[0].result.protocolVersion, "2024-11-05");
   assert.equal(messages[0].result.serverInfo.name, "forgesuite-mcp");
-  assert.equal(messages[0].result.serverInfo.version, "1.3.0");
-  assert.equal(MCP_SERVER_INFO.version, "1.3.0");
+  assert.equal(messages[0].result.serverInfo.version, "1.4.0");
+  assert.equal(MCP_SERVER_INFO.version, "1.4.0");
   assert.ok(messages[0].result.capabilities.tools);
 
   assert.equal(messages[1].id, 2);
   assert.deepEqual(messages[1].result, {});
 
   assert.equal(messages[2].id, 3);
-  assert.equal(messages[2].result.tools.length, 8);
+  assert.equal(messages[2].result.tools.length, 9);
   const toolNames = messages[2].result.tools.map((t) => t.name).sort();
   assert.deepEqual(toolNames, [
     "brand_domain_handle_scan",
@@ -1251,6 +1285,7 @@ test("ForgeSuite MCP stdio server handles initialize, notifications/initialized,
     "evm_token_risk_scan",
     "multi_chain_wallet_scan",
     "solana_mint_risk_scan",
+    "subtitle_caption_audit",
     "tokencost_estimate",
   ]);
   for (const tool of messages[2].result.tools) {
@@ -1430,18 +1465,23 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
   const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   assert.ok(fs.existsSync(path.join(rootDir, ".nojekyll")), ".nojekyll must exist so GitHub Pages serves /.well-known/*");
   const agentCard = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "agent-card.json"), "utf8"));
-  assert.equal(agentCard.supportedInterfaces.length, 5);
+  assert.equal(agentCard.supportedInterfaces.length, 7);
   assert.equal(agentCard.supportedInterfaces[0].url, "https://forge-ai-agent.market.near.ai/a2a/v1");
   assert.equal(agentCard.supportedInterfaces[0].protocolBinding, "JSONRPC");
-  assert.ok(
-    agentCard.supportedInterfaces.some(
-      (i) => i.url === "https://wallet-activity-scanner.market.near.ai/a2a/v1"
-    )
-  );
+  for (const expectedUrl of [
+    "https://wallet-activity-scanner.market.near.ai/a2a/v1",
+    "https://short-video-clipper.market.near.ai/a2a/v1",
+    "https://multi-lang-video-dubber.market.near.ai/a2a/v1",
+  ]) {
+    assert.ok(
+      agentCard.supportedInterfaces.some((i) => i.url === expectedUrl),
+      `agent-card.json missing A2A interface ${expectedUrl}`
+    );
+  }
 
   const mcpManifest = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "mcp", "server.json"), "utf8"));
   assert.equal(mcpManifest.name, "io.github.youthmy11-ai/forgesuite-mcp");
-  assert.equal(mcpManifest.version, "1.3.0");
+  assert.equal(mcpManifest.version, "1.4.0");
   assert.deepEqual(
     mcpManifest.tools.map((t) => t.name),
     [
@@ -1453,6 +1493,7 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
       "solana_mint_risk_scan",
       "brand_domain_handle_scan",
       "multi_chain_wallet_scan",
+      "subtitle_caption_audit",
     ]
   );
 });
@@ -1865,7 +1906,7 @@ test("ForgeSuite MCP v1.1.0 executes evm_token_risk_scan and solana_mint_risk_sc
  * 14. ForgeSuite MCP v1.2.0 Packaging, LF Line-Endings & Tool #7 Brand Scanner
  * ========================================================================== */
 
-test("root package.json, .gitattributes, shebang LF line-endings, and v1.3.0 npx discovery docs are valid", () => {
+test("root package.json, .gitattributes, shebang LF line-endings, and v1.4.0 npx discovery docs are valid", () => {
   const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const pkgPath = path.join(rootDir, "package.json");
   const gitAttrPath = path.join(rootDir, ".gitattributes");
@@ -1874,7 +1915,7 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.3.0 npx
   assert.ok(fs.existsSync(pkgPath), "root package.json must exist for npx github:... execution");
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
   assert.equal(pkg.name, "forgesuite-mcp");
-  assert.equal(pkg.version, "1.3.0");
+  assert.equal(pkg.version, "1.4.0");
   assert.equal(pkg.type, "module");
   assert.deepEqual(pkg.bin, { "forgesuite-mcp": "./mcp/forgesuite-mcp.mjs" });
   assert.equal(pkg.engines?.node, ">=20.0.0");
@@ -1898,7 +1939,7 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.3.0 npx
     "mcp/forgesuite-mcp.mjs must use strict LF (\\n) with zero CR (\\r) bytes"
   );
 
-  // Check v1.3.0 and 1-command npx across discovery & storefront files
+  // Check v1.4.0 and 1-command npx across discovery & storefront files
   const npxCmd = "npx --yes github:youthmy11-ai/youthmy11-ai.github.io";
   for (const rel of [
     ".well-known/mcp/server.json",
@@ -1913,7 +1954,8 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.3.0 npx
     assert.ok(content.includes(npxCmd), `${rel} must showcase ${npxCmd}`);
     assert.ok(content.includes("brand_domain_handle_scan"), `${rel} must list brand_domain_handle_scan`);
     assert.ok(content.includes("multi_chain_wallet_scan"), `${rel} must list multi_chain_wallet_scan`);
-    assert.ok(content.includes("1.3.0"), `${rel} must reference v1.3.0`);
+    assert.ok(content.includes("subtitle_caption_audit"), `${rel} must list subtitle_caption_audit`);
+    assert.ok(content.includes("1.4.0"), `${rel} must reference v1.4.0`);
   }
 });
 
@@ -2036,7 +2078,7 @@ test("brand_domain_handle_scan (Tool #7) audits RDAP+DoH domains, npm/PyPI/GitHu
   assert.match(direct.checkedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
   assert.deepEqual(direct.tldsChecked, ["com", "io", "ai", "dev", "app", "org"]);
   assert.equal(direct.upgradeLinks.proBundlePriceUsd, 35);
-  assert.equal(direct.upgradeLinks.nearAgentFleet.length, 5);
+  assert.equal(direct.upgradeLinks.nearAgentFleet.length, 7);
 
   const nova = direct.results[0];
   assert.equal(nova.normalizedSlug, "novaforgex");
@@ -2422,7 +2464,7 @@ test("parseTokenAuditQueryParams supports ?chain=solana&mint=..., EVM aliases, a
   assert.equal(badRpc.rpcUrl, null);
 });
 
-test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified badge, 1-click VS Code deep-links, .mcpb bundle, and 5-agent A2A + x402 fleet", () => {
+test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified badge, 1-click VS Code deep-links, .mcpb bundle, and 7-agent A2A + x402 fleet", () => {
   const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const registryUrl = "https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite";
   const vscodeLink =
@@ -2430,7 +2472,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   const vscodeInsidersLink =
     "vscode-insiders:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D";
   const mcpbAssetUrl =
-    "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.3.0/forgesuite-mcp.mcpb";
+    "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.4.0/forgesuite-mcp.mcpb";
 
   // Verify encoded VS Code deep-link payload decodes cleanly to valid JSON
   const decodedPayload = JSON.parse(decodeURIComponent(vscodeLink.split("?")[1]));
@@ -2445,6 +2487,8 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
     "https://market.near.ai/agents/forge-data-finops",
     "https://market.near.ai/agents/forge-token-guard",
     "https://market.near.ai/agents/forge-brand-checker",
+    "https://market.near.ai/agents/short-video-clipper",
+    "https://market.near.ai/agents/multi-lang-video-dubber",
     "https://market.near.ai/agents/forge-ai-agent",
   ];
 
@@ -2458,7 +2502,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   ]) {
     assert.ok(doc.includes(registryUrl), `${label} missing Official MCP Registry URL`);
     assert.ok(doc.includes("io.github.youthmy11-ai/forgesuite-mcp"), `${label} missing registry name`);
-    assert.ok(doc.includes("v1.3.0 Active"), `${label} missing v1.3.0 Active badge`);
+    assert.ok(doc.includes("v1.4.0 Active"), `${label} missing v1.4.0 Active badge`);
     assert.ok(doc.includes(vscodeLink), `${label} missing 1-click VS Code MCP install link`);
     assert.ok(doc.includes(vscodeInsidersLink), `${label} missing 1-click VS Code Insiders MCP install link`);
     assert.ok(doc.includes(mcpbAssetUrl), `${label} missing .mcpb release bundle download link`);
@@ -2468,7 +2512,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   }
 
   assert.ok(indexHtml.includes(registryUrl), "index.html missing Official MCP Registry URL");
-  assert.ok(indexHtml.includes("v1.3.0 Active"), "index.html missing v1.3.0 Active badge");
+  assert.ok(indexHtml.includes("v1.4.0 Active"), "index.html missing v1.4.0 Active badge");
   for (const agentUrl of fleetAgents) {
     assert.ok(indexHtml.includes(agentUrl), `index.html missing A2A fleet agent ${agentUrl}`);
   }
@@ -2480,6 +2524,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
     assert.ok(profileMd.includes(vscodeLink), "profile README missing VS Code install link");
     assert.ok(profileMd.includes(vscodeInsidersLink), "profile README missing VS Code Insiders install link");
     assert.ok(profileMd.includes(mcpbAssetUrl), "profile README missing .mcpb bundle link");
+    assert.ok(profileMd.includes("srtlab.html"), "profile README missing ClipCaption Lab link");
     for (const agentUrl of fleetAgents) {
       assert.ok(profileMd.includes(agentUrl), `profile README missing ${agentUrl}`);
     }
@@ -3132,4 +3177,213 @@ test("uspto-trademark-domain-brand-checker.html ships valid SoftwareApplication 
   }
   verifyInternalRelativeHtmlLinks(repoRoot, file, html);
   verifyInternalRelativeHtmlLinks(repoRoot, "index.html", indexHtml);
+});
+
+/* ============================================================================
+ * 19. Web App #10 (`ClipCaption Lab` — srtlab.html / assets/srtlab.js) &
+ *     ForgeSuite MCP v1.4.0 Tool #9 (`subtitle_caption_audit`)
+ * ========================================================================== */
+
+test("ClipCaption Lab engine parses .srt/.vtt/.txt, shifts/scales timestamps, detects overlaps/CPS/9:16 overflows/mid-sentence cuts/brand terms, auto-fixes, and exports 1080x1920 .ASS", () => {
+  assert.equal(parseTimestampMs("00:01:02,345"), 62345);
+  assert.equal(parseTimestampMs("01:02.345"), 62345);
+  assert.equal(formatSrtTimestamp(62345), "00:01:02,345");
+  assert.equal(formatVttTimestamp(62345), "00:01:02.345");
+  assert.equal(formatAssTimestamp(62345), "0:01:02.35");
+
+  assert.equal(detectSubtitleFormat(SRTLAB_SAMPLES.creator_hook_issues), "srt");
+  assert.equal(detectSubtitleFormat(SRTLAB_SAMPLES.clean_vertical_vtt), "vtt");
+  assert.equal(detectSubtitleFormat("Plain spoken transcript sentence one. Sentence two!"), "txt");
+
+  // Audit defective sample (overlap + CPS > 20 + 9:16 overflow + 3-line stack + mid-sentence cut)
+  const rawAudit = auditSubtitles(SRTLAB_SAMPLES.creator_hook_issues, {
+    maxCps: DEFAULT_MAX_CPS,
+    maxLineLength: DEFAULT_MAX_LINE_CHARS,
+    brandTerms: "ForgeSuite, MissingBrand, autoshorts studio",
+    autoFix: false,
+  });
+  assert.equal(rawAudit.ok, true);
+  assert.equal(rawAudit.detectedFormat, "srt");
+  assert.equal(rawAudit.cueCount, 4);
+  assert.ok(rawAudit.metrics.overlapCount >= 1, "Must detect overlapping cues");
+  assert.ok(rawAudit.metrics.highCpsCount >= 1, "Must detect CPS > 20 reading speed");
+  assert.ok(rawAudit.metrics.safeZoneOverflowCount >= 1, "Must detect >32 char 9:16 line overflow");
+  assert.ok(rawAudit.metrics.multiLineOverflowCount >= 1, "Must detect >2 stacked lines");
+  assert.ok(rawAudit.metrics.midSentenceCutCount >= 1, "Must detect mid-sentence cut at clip end");
+  assert.ok(rawAudit.qualityScore < 75);
+  assert.deepEqual(rawAudit.brandCheck.exactMatches, ["ForgeSuite"]);
+  assert.deepEqual(rawAudit.brandCheck.caseMismatches, ["autoshorts studio"]);
+  assert.deepEqual(rawAudit.brandCheck.missingTerms, ["MissingBrand"]);
+
+  // Auto-fix eliminates overlaps and wraps lines cleanly inside 9:16 safe width
+  const fixedAudit = auditSubtitles(SRTLAB_SAMPLES.creator_hook_issues, {
+    maxCps: DEFAULT_MAX_CPS,
+    maxLineLength: DEFAULT_MAX_LINE_CHARS,
+    autoFix: true,
+  });
+  assert.equal(fixedAudit.metrics.overlapCount, 0);
+  assert.equal(fixedAudit.metrics.safeZoneOverflowCount, 0);
+  assert.ok(fixedAudit.qualityScore > rawAudit.qualityScore);
+
+  // Bidirectional .SRT <-> .VTT <-> .TXT roundtrips + time-shift & tempo scale
+  const vttParsed = parseSubtitles(SRTLAB_SAMPLES.clean_vertical_vtt);
+  assert.equal(vttParsed.format, "vtt");
+  assert.equal(vttParsed.cues.length, 3);
+  const shifted = applyTimingTransform(vttParsed.cues, { shiftMs: 500, tempoScale: 1 });
+  assert.equal(shifted[0].startMs, vttParsed.cues[0].startMs + 500);
+  assert.match(serializeToSrt(shifted), /00:00:01,500 --> 00:00:04,700/);
+  assert.match(serializeToVtt(shifted), /^WEBVTT\n\n1\n00:00:01\.500 --> 00:00:04\.700/);
+  const txtWithTs = serializeToTranscriptTxt(shifted, { includeTimestamps: true });
+  assert.equal(parseSubtitles(txtWithTs).cues.length, 3);
+
+  // Pro 1080x1920 Animated .ASS export verification
+  for (const presetKey of Object.keys(ASS_STYLE_PRESETS)) {
+    const ass = serializeToVerticalAss(fixedAudit.cues, { preset: presetKey, animatePop: true });
+    assert.match(ass, /PlayResX: 1080/);
+    assert.match(ass, /PlayResY: 1920/);
+    assert.match(ass, /\\fad\(70,60\)/);
+    assert.match(ass, /Dialogue: 0,/);
+  }
+});
+
+test("ClipCaption Lab Pro 25-File Batch Studio enforces <= 25 cap, guards CSV formula injection, parses URL params, and roundtrips CryptoBill/ScopeGuard handoffs", () => {
+  const batchPack = runBatchSubtitleAudit([
+    { name: "=InjectedHook.srt", content: SRTLAB_SAMPLES.creator_hook_issues },
+    { name: "clean_reel.vtt", content: SRTLAB_SAMPLES.clean_vertical_vtt },
+    { name: "dub_es.srt", content: SRTLAB_SAMPLES.multilang_dub_srt },
+  ]);
+  assert.equal(batchPack.ok, true);
+  assert.equal(batchPack.totalFiles, 3);
+  assert.equal(batchPack.okFiles, 3);
+  assert.match(batchPack.reports[0].assOutput, /PlayResX: 1080/);
+
+  const csv = exportBatchSubtitleCsv(batchPack);
+  assert.match(csv, /file_name,detected_format,cue_count,duration_sec,quality_score/);
+  assert.match(csv, /'=InjectedHook\.srt/, "CSV must guard leading = against formula injection");
+
+  const overCap = Array.from({ length: MAX_BATCH_SUBTITLE_FILES + 1 }, (_, i) => ({
+    name: `ep_${i + 1}.srt`,
+    content: SRTLAB_SAMPLES.clean_vertical_vtt,
+  }));
+  assert.throws(() => runBatchSubtitleAudit(overCap), /up to 25/i);
+
+  const qp = parseSrtLabQueryParams("?sample=clean_vertical_vtt&shift=-250&maxCps=18&maxLine=28&brands=ForgeSuite,NEAR");
+  assert.equal(qp.sample, "clean_vertical_vtt");
+  assert.equal(qp.shiftMs, -250);
+  assert.equal(qp.maxCps, 18);
+  assert.equal(qp.maxLineLength, 28);
+
+  const inv = buildCaptionLocalizationInvoicePayload(batchPack);
+  assert.equal(decodeInvoicePayload(encodeInvoicePayload(inv)).items.length, 2);
+
+  const sow = buildCaptionSowState(batchPack);
+  const decodedSow = decodeSowHandoffPayload(`#sow=${encodeSowHandoffPayload(sow)}`);
+  assert.equal(computeSowTotals(decodedSow).isBalanced, true);
+});
+
+test("ForgeSuite MCP v1.4.0 Tool #9 (subtitle_caption_audit) audits .srt/.vtt over direct call, JSON-RPC, and stdio", async () => {
+  const direct = auditSubtitleCaptions({
+    content: SRTLAB_SAMPLES.creator_hook_issues,
+    brandTerms: ["ForgeSuite", "autoshorts studio"],
+    autoFix: true,
+  });
+  assert.equal(direct.ok, true);
+  assert.equal(direct.cueCount, 4);
+  assert.ok(direct.metrics.overlapCount >= 1);
+  assert.equal(direct.postFixMetrics.overlapCount, 0);
+  assert.equal(direct.postFixMetrics.safeZoneOverflowCount, 0);
+  assert.ok(direct.qualityScore >= 0 && direct.qualityScore <= 100);
+  assert.ok(direct.postFixQualityScore > direct.qualityScore);
+  assert.deepEqual(direct.brandCheck.exactMatches, ["ForgeSuite"]);
+  assert.deepEqual(direct.brandCheck.caseMismatches, ["autoshorts studio"]);
+  assert.match(direct.normalizedSrt, /00:00:/);
+  assert.match(direct.normalizedVtt, /^WEBVTT/);
+
+  const rpc = await handleJsonRpcMessage({
+    jsonrpc: "2.0",
+    id: "sub-1",
+    method: "tools/call",
+    params: {
+      name: "subtitle_caption_audit",
+      arguments: {
+        content: SRTLAB_SAMPLES.clean_vertical_vtt,
+        shiftMs: 200,
+        brandTerms: ["ForgeSuite"],
+      },
+    },
+  });
+  assert.equal(rpc.id, "sub-1");
+  assert.equal(rpc.result.isError, false);
+  assert.equal(rpc.result.structuredContent.qualityScore, 100);
+  assert.match(rpc.result.content[0].text, /srtlab\.html/);
+  assert.match(rpc.result.content[0].text, /short-video-clipper/);
+  assert.match(rpc.result.content[0].text, /multi-lang-video-dubber/);
+
+  const stdioRes = await runMcpStdioSession([
+    JSON.stringify({
+      jsonrpc: "2.0",
+      id: "sub-stdio",
+      method: "tools/call",
+      params: {
+        name: "subtitle_caption_audit",
+        arguments: { content: SRTLAB_SAMPLES.creator_hook_issues, outputFormat: "srt" },
+      },
+    }) + "\n",
+    JSON.stringify({
+      jsonrpc: "2.0",
+      id: "sub-empty",
+      method: "tools/call",
+      params: { name: "subtitle_caption_audit", arguments: { content: "" } },
+    }) + "\n",
+  ]);
+  assert.equal(stdioRes.code, 0);
+  assert.equal(stdioRes.messages[0].result.isError, false);
+  assert.equal(stdioRes.messages[1].result.isError, true);
+});
+
+test("srtlab.html and all 10 core client-side web apps carry valid links, Pro controls, and cloud video agent handoffs", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const srtHtml = fs.readFileSync(path.join(repoRoot, "srtlab.html"), "utf8");
+  const { types } = extractAllJsonLdObjects(srtHtml);
+  assert.ok(types.has("SoftwareApplication"));
+  assert.ok(types.has("FAQPage"));
+
+  for (const term of [
+    NEAR_VIDEO_CLIPPER_URL,
+    NEAR_VIDEO_DUBBER_URL,
+    "$0.50 USDC",
+    "$0.65 USDC",
+    "PlayResX: 1080",
+    "PlayResY: 1920",
+    "subtitle_caption_audit",
+    'data-checkout-sku="BUNDLE"',
+    'data-checkout-sku="AS"',
+    'data-checkout-sku="CB"',
+  ]) {
+    assert.ok(srtHtml.includes(term), `srtlab.html missing "${term}"`);
+  }
+  verifyInternalRelativeHtmlLinks(repoRoot, "srtlab.html", srtHtml);
+
+  const tenCoreWebApps = [
+    "cryptobill.html",
+    "tokencalc.html",
+    "json2sheet.html",
+    "sowbuilder.html",
+    "txdecode.html",
+    "envshield.html",
+    "tokenaudit.html",
+    "brandcheck.html",
+    "walletcheck.html",
+    "srtlab.html",
+  ];
+  const indexHtml = fs.readFileSync(path.join(repoRoot, "index.html"), "utf8");
+  const sitemapXml = fs.readFileSync(path.join(repoRoot, "sitemap.xml"), "utf8");
+  for (const appFile of tenCoreWebApps) {
+    assert.ok(fs.existsSync(path.join(repoRoot, appFile)), `Missing core web app ${appFile}`);
+    assert.ok(indexHtml.includes(`href="${appFile}"`), `index.html missing link to ${appFile}`);
+    assert.ok(
+      sitemapXml.includes(`<loc>https://youthmy11-ai.github.io/${appFile}</loc>`),
+      `sitemap.xml missing ${appFile}`
+    );
+  }
 });

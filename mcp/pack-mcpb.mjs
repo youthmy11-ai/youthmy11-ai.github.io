@@ -111,10 +111,10 @@ export function buildMcpbManifest(version) {
   return {
     manifest_version: "0.3",
     name: "forgesuite-mcp",
-    display_name: "ForgeSuite Web3, FinOps & Brand Security MCP",
+    display_name: "ForgeSuite Web3, FinOps, Brand & Media MCP",
     version,
     description:
-      "Zero-dependency Node 20+ MCP server with 8 tools for multi-chain EVM/Solana wallet & portfolio inspection, token risk scanning, calldata decoding, .env secret redaction, LLM cost estimation, crypto invoicing, and brand availability.",
+      "Zero-dependency Node 20+ MCP server with 9 tools for multi-chain EVM/Solana wallet & portfolio inspection, token risk scanning, calldata decoding, .env secret redaction, SRT/VTT 9:16 caption auditing, LLM cost estimation, crypto invoicing, and brand availability.",
     author: {
       name: "ForgeSuite Studio (youthmy11-ai)",
       email: "youthmy11@gmail.com",
@@ -167,6 +167,10 @@ export function buildMcpbManifest(version) {
       {
         name: "multi_chain_wallet_scan",
         description: "Inspect 1-5 EVM & Solana wallets across 6 chains for balances, EIP-7702, Gnosis Safe, SPL/Token-2022 & tx activity.",
+      },
+      {
+        name: "subtitle_caption_audit",
+        description: "Audit .srt/.vtt captions offline for overlaps, CPS > 20, 9:16 safe zones & brand terms and return normalized .srt/.vtt.",
       },
     ],
   };

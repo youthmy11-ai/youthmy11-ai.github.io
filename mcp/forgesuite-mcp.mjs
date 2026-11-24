@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * ForgeSuite MCP Server (v1.3.0)
+ * ForgeSuite MCP Server (v1.4.0)
  * Zero-dependency Node 20+ Model Context Protocol (MCP) stdio JSON-RPC 2.0 server.
  *
  * 1-Command Global Run:
  *   npx --yes github:youthmy11-ai/youthmy11-ai.github.io
  *
- * 8 Developer, FinOps, Brand Launch & Web3 Security Tools:
+ * 9 Developer, FinOps, Creator Media, Brand Launch & Web3 Security Tools:
  *   1. envshield_scan           — Scan .env/configs/logs offline for leaked secrets & return redacted output
  *   2. calldata_decode          — Decode EVM calldata selectors offline & flag unlimited MaxUint256 approvals
  *   3. tokencost_estimate       — Estimate LLM API & multi-turn AI agent run costs (Claude/GPT/Gemini/DeepSeek)
@@ -15,6 +15,7 @@
  *   6. solana_mint_risk_scan    — Live Solana SPL / Token-2022 authority, extension & holder concentration audit
  *   7. brand_domain_handle_scan — Live RDAP + DoH domain (.com/.io/.ai/.dev/.app/.org), npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability audit
  *   8. multi_chain_wallet_scan  — Live 6-chain EVM & Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector
+ *   9. subtitle_caption_audit   — Audit .srt/.vtt captions offline for overlaps, CPS reading speed, 9:16 mobile safe zones, mid-sentence cuts & brand terms + return normalized .srt/.vtt & 0-100 quality score
  *
  * Docs & Pro Bundle ($35 Lifetime): https://youthmy11-ai.github.io/mcp.html
  * License: MIT (youthmy11-ai)
@@ -28,7 +29,7 @@ import { fileURLToPath } from "node:url";
 
 export const SERVER_INFO = Object.freeze({
   name: "forgesuite-mcp",
-  version: "1.3.0",
+  version: "1.4.0",
 });
 
 export const SUPPORTED_PROTOCOL_VERSIONS = Object.freeze([
@@ -44,6 +45,7 @@ export const FORGESUITE_LINKS = Object.freeze({
   tokenaudit: "https://youthmy11-ai.github.io/tokenaudit.html",
   brandcheck: "https://youthmy11-ai.github.io/brandcheck.html",
   walletcheck: "https://youthmy11-ai.github.io/walletcheck.html",
+  srtlab: "https://youthmy11-ai.github.io/srtlab.html",
   tokencalc: "https://youthmy11-ai.github.io/tokencalc.html",
   cryptobill: "https://youthmy11-ai.github.io/cryptobill.html",
   pricing: "https://youthmy11-ai.github.io/#pricing",
@@ -52,6 +54,8 @@ export const FORGESUITE_LINKS = Object.freeze({
   forgeBrandChecker: "https://market.near.ai/agents/forge-brand-checker",
   forgeDataFinops: "https://market.near.ai/a/forge-data-finops",
   walletActivityScanner: "https://market.near.ai/agents/wallet-activity-scanner",
+  shortVideoClipper: "https://market.near.ai/agents/short-video-clipper",
+  multiLangVideoDubber: "https://market.near.ai/agents/multi-lang-video-dubber",
 });
 
 /* ============================================================================
@@ -2246,6 +2250,18 @@ export const NEAR_AGENT_FLEET = Object.freeze([
     a2aEndpoint: "https://forge-ai-agent.market.near.ai/a2a/v1",
   },
   {
+    id: "multi-lang-video-dubber",
+    name: "Multi-Language Video Dubbing & Subtitling Agent — 25+ Languages, Preserved Music/SFX & Synced SRT ($0.65 USDC/call)",
+    marketUrl: FORGESUITE_LINKS.multiLangVideoDubber,
+    a2aEndpoint: "https://multi-lang-video-dubber.market.near.ai/a2a/v1",
+  },
+  {
+    id: "short-video-clipper",
+    name: "Short-Form Video Clipping & Captioning Agent — 9:16/1:1/16:9 Retention-Peak MP4 Clips & Burned Captions ($0.50 USDC/call)",
+    marketUrl: FORGESUITE_LINKS.shortVideoClipper,
+    a2aEndpoint: "https://short-video-clipper.market.near.ai/a2a/v1",
+  },
+  {
     id: "forge-brand-checker",
     name: "Brand Name Availability Checker — USPTO Trademark, WHOIS/RDAP & 10-Platform Handle Scanner ($0.35 USDC/call)",
     marketUrl: FORGESUITE_LINKS.forgeBrandChecker,
@@ -4219,7 +4235,503 @@ export async function scanMultiChainWallets(input = {}, options = {}) {
 }
 
 /* ============================================================================
- * 8. MCP Tool Definitions & Dispatch (8 Tools)
+ * 9. ClipCaption Lab Subtitle & 9:16 Vertical Safe-Zone Auditor (v1.4.0 Offline)
+ * ========================================================================== */
+
+const CAPTION_DANGLING_WORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "are",
+  "as",
+  "at",
+  "because",
+  "before",
+  "but",
+  "by",
+  "for",
+  "from",
+  "if",
+  "in",
+  "into",
+  "is",
+  "of",
+  "on",
+  "or",
+  "since",
+  "so",
+  "than",
+  "that",
+  "the",
+  "their",
+  "then",
+  "this",
+  "through",
+  "to",
+  "unless",
+  "until",
+  "via",
+  "was",
+  "when",
+  "where",
+  "which",
+  "while",
+  "with",
+  "without",
+]);
+
+function mcpParseSubtitleTimestampMs(raw) {
+  const clean = String(raw ?? "")
+    .trim()
+    .replace(/^\[|\]$/g, "");
+  if (!clean) return null;
+  const m3 = clean.match(/^(\d{1,3}):([0-5]?\d):([0-5]?\d)(?:[,.](\d{1,3}))?$/);
+  if (m3) {
+    const ms = m3[4] ? Number(m3[4].padEnd(3, "0")) : 0;
+    return ((Number(m3[1]) * 3600 + Number(m3[2]) * 60 + Number(m3[3])) * 1000 + ms) >>> 0;
+  }
+  const m2 = clean.match(/^([0-5]?\d):([0-5]?\d)(?:[,.](\d{1,3}))?$/);
+  if (m2) {
+    const ms = m2[3] ? Number(m2[3].padEnd(3, "0")) : 0;
+    return ((Number(m2[1]) * 60 + Number(m2[2])) * 1000 + ms) >>> 0;
+  }
+  return null;
+}
+
+function mcpFormatSrtTs(msInput) {
+  const total = Math.max(0, Math.round(Number(msInput) || 0));
+  const ms = total % 1000;
+  const totalSec = Math.floor(total / 1000);
+  const s = totalSec % 60;
+  const m = Math.floor(totalSec / 60) % 60;
+  const h = Math.floor(totalSec / 3600);
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")},${String(ms).padStart(3, "0")}`;
+}
+
+function mcpFormatVttTs(msInput) {
+  return mcpFormatSrtTs(msInput).replace(",", ".");
+}
+
+function mcpWrapVerticalLines(rawText, maxChars = 32) {
+  const limit = Math.max(12, Math.min(80, Number(maxChars) || 32));
+  const words = String(rawText ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean);
+  if (words.length === 0) return [];
+  const joined = words.join(" ");
+  if (joined.length <= limit) return [joined];
+
+  if (joined.length <= limit * 2 + 1) {
+    let bestIdx = -1;
+    let bestDiff = Infinity;
+    for (let i = 1; i < words.length; i += 1) {
+      const left = words.slice(0, i).join(" ");
+      const right = words.slice(i).join(" ");
+      if (left.length <= limit && right.length <= limit) {
+        const diff = Math.abs(left.length - right.length);
+        if (diff < bestDiff) {
+          bestDiff = diff;
+          bestIdx = i;
+        }
+      }
+    }
+    if (bestIdx > 0) {
+      return [words.slice(0, bestIdx).join(" "), words.slice(bestIdx).join(" ")];
+    }
+  }
+
+  const lines = [];
+  let cur = "";
+  for (const w of words) {
+    if (!cur) cur = w;
+    else if (cur.length + 1 + w.length <= limit) cur += ` ${w}`;
+    else {
+      lines.push(cur);
+      cur = w;
+    }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function mcpParseSubtitleCues(rawContent) {
+  const cleaned = String(rawContent ?? "")
+    .replace(/^\uFEFF/, "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .trim();
+  if (!cleaned) return { format: "srt", cues: [] };
+
+  const isVtt =
+    /^WEBVTT(?:\s|$)/i.test(cleaned) ||
+    /(?:^|\n)(?:\d{1,3}:)?\d{2}:\d{2}\.\d{1,3}\s*-->\s*(?:\d{1,3}:)?\d{2}:\d{2}\.\d{1,3}/.test(
+      cleaned
+    );
+  const isSrt =
+    !isVtt &&
+    /(?:^|\n)\d{1,3}:\d{2}:\d{2},\d{1,3}\s*-->\s*\d{1,3}:\d{2}:\d{2},\d{1,3}/.test(cleaned);
+
+  if (isSrt || isVtt) {
+    const blocks = cleaned.split(/\n{2,}/);
+    const arrowRx =
+      /^((?:\d{1,3}:)?\d{1,2}:\d{2}(?:[,.]\d{1,3})?)\s*-->\s*((?:\d{1,3}:)?\d{1,2}:\d{2}(?:[,.]\d{1,3})?)(?:\s+.*)?$/;
+    const cues = [];
+    for (const rawBlock of blocks) {
+      const lines = rawBlock
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean);
+      if (lines.length === 0) continue;
+      const head = lines[0].toUpperCase();
+      if (
+        head.startsWith("WEBVTT") ||
+        head.startsWith("NOTE") ||
+        head.startsWith("STYLE") ||
+        head.startsWith("REGION")
+      ) {
+        continue;
+      }
+      let arrowIdx = -1;
+      for (let i = 0; i < Math.min(3, lines.length); i += 1) {
+        if (arrowRx.test(lines[i])) {
+          arrowIdx = i;
+          break;
+        }
+      }
+      if (arrowIdx === -1) continue;
+      const m = lines[arrowIdx].match(arrowRx);
+      const startMs = mcpParseSubtitleTimestampMs(m[1]);
+      const endMs = mcpParseSubtitleTimestampMs(m[2]);
+      if (startMs === null || endMs === null) continue;
+      const textLines = lines
+        .slice(arrowIdx + 1)
+        .map((l) =>
+          l
+            .replace(/<\d{1,2}:\d{2}(?::\d{2})?[.,]\d{1,3}>/g, "")
+            .replace(/<\/?[a-zA-Z][^>]*>/g, "")
+            .replace(/\{\\[^}]*\}/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+        )
+        .filter(Boolean);
+      if (textLines.length === 0) continue;
+      cues.push({
+        index: cues.length + 1,
+        startMs,
+        endMs: Math.max(startMs + 100, endMs),
+        lines: textLines,
+      });
+    }
+    return { format: isVtt ? "vtt" : "srt", cues };
+  }
+
+  return { format: "txt", cues: [] };
+}
+
+export function auditSubtitleCaptions(params = {}) {
+  const rawText = String(
+    params.content ?? params.subtitle ?? params.srt ?? params.vtt ?? params.text ?? ""
+  );
+  const shiftMs = Number.isFinite(Number(params.shiftMs)) ? Number(params.shiftMs) : 0;
+  const tempoScale =
+    Number.isFinite(Number(params.tempoScale)) && Number(params.tempoScale) > 0.1
+      ? Math.min(4, Math.max(0.25, Number(params.tempoScale)))
+      : 1;
+  const maxCps = Math.max(8, Math.min(50, Number(params.maxCps) || 20));
+  const maxLineLength = Math.max(14, Math.min(80, Number(params.maxLineLength) || 32));
+  const autoFix = params.autoFix !== false;
+  const outputFormat = ["srt", "vtt", "both"].includes(
+    String(params.outputFormat || "").toLowerCase()
+  )
+    ? String(params.outputFormat).toLowerCase()
+    : "both";
+
+  const brandTerms = Array.isArray(params.brandTerms)
+    ? [...new Set(params.brandTerms.map((t) => String(t || "").trim()).filter(Boolean))]
+    : typeof params.brandTerms === "string" && params.brandTerms.trim()
+      ? [
+          ...new Set(
+            params.brandTerms
+              .split(/[,;\n|]+/)
+              .map((t) => t.trim())
+              .filter(Boolean)
+          ),
+        ]
+      : [];
+
+  const parsed = mcpParseSubtitleCues(rawText);
+  if (parsed.cues.length === 0) {
+    return {
+      ok: false,
+      error:
+        "No valid .srt or .vtt subtitle cues detected. Provide standard SubRip (00:00:01,000 --> 00:00:03,000) or WEBVTT cues.",
+    };
+  }
+
+  // Transform timestamps first
+  const shiftedCues = parsed.cues.map((c, idx) => {
+    const startMs = Math.max(0, Math.round(c.startMs * tempoScale + shiftMs));
+    const endMs = Math.max(startMs + 100, Math.round(c.endMs * tempoScale + shiftMs));
+    return {
+      index: idx + 1,
+      startMs,
+      endMs,
+      lines: [...c.lines],
+    };
+  });
+
+  const evaluateCues = (cueList) => {
+    const issues = [];
+    let overlapCount = 0;
+    let highCpsCount = 0;
+    let safeZoneOverflowCount = 0;
+    let multiLineOverflowCount = 0;
+    let midSentenceCutCount = 0;
+    let maxCpsObserved = 0;
+    let cpsSum = 0;
+    let maxLineCharsObserved = 0;
+
+    for (let i = 0; i < cueList.length; i += 1) {
+      const cur = cueList[i];
+      const prev = i > 0 ? cueList[i - 1] : null;
+      const next = i + 1 < cueList.length ? cueList[i + 1] : null;
+      const durMs = Math.max(1, cur.endMs - cur.startMs);
+      const visible = cur.lines.join(" ").replace(/\s+/g, " ").trim();
+      const cps = Number(((visible.length / durMs) * 1000).toFixed(1));
+      const longestLine = cur.lines.reduce((m, l) => Math.max(m, l.length), 0);
+
+      if (cps > maxCpsObserved) maxCpsObserved = cps;
+      cpsSum += cps;
+      if (longestLine > maxLineCharsObserved) maxLineCharsObserved = longestLine;
+
+      if (prev && cur.startMs < prev.endMs) {
+        overlapCount += 1;
+        issues.push({
+          cueIndex: i + 1,
+          timestamp: mcpFormatSrtTs(cur.startMs),
+          severity: "CRITICAL",
+          code: "TIMESTAMP_OVERLAP",
+          message: `Cue #${i + 1} overlaps Cue #${i} by ${prev.endMs - cur.startMs}ms.`,
+        });
+      }
+      if (cps > maxCps) {
+        highCpsCount += 1;
+        issues.push({
+          cueIndex: i + 1,
+          timestamp: mcpFormatSrtTs(cur.startMs),
+          severity: cps > maxCps + 8 ? "HIGH" : "MEDIUM",
+          code: "HIGH_CPS",
+          message: `Cue #${i + 1} reads at ${cps} CPS (threshold: <= ${maxCps} CPS).`,
+        });
+      }
+      if (longestLine > maxLineLength) {
+        safeZoneOverflowCount += 1;
+        issues.push({
+          cueIndex: i + 1,
+          timestamp: mcpFormatSrtTs(cur.startMs),
+          severity: "HIGH",
+          code: "VERTICAL_9_16_OVERFLOW",
+          message: `Cue #${i + 1} has ${longestLine} chars on one line (9:16 safe limit: <= ${maxLineLength} chars).`,
+        });
+      }
+      if (cur.lines.length > 2) {
+        multiLineOverflowCount += 1;
+        issues.push({
+          cueIndex: i + 1,
+          timestamp: mcpFormatSrtTs(cur.startMs),
+          severity: "MEDIUM",
+          code: "VERTICAL_LINE_STACK",
+          message: `Cue #${i + 1} stacks ${cur.lines.length} lines (recommended <= 2 lines for 9:16 mobile).`,
+        });
+      }
+
+      const isLast = i === cueList.length - 1;
+      const gapAfter = next ? next.startMs - cur.endMs : Infinity;
+      if (isLast || gapAfter >= 1500) {
+        const words = visible
+          .replace(/["')\]}]+$/g, "")
+          .split(/\s+/)
+          .filter(Boolean);
+        const lastWord = (words.at(-1) || "").toLowerCase().replace(/[^a-z']/g, "");
+        if (/[,:;—–-]$/.test(visible) || CAPTION_DANGLING_WORDS.has(lastWord)) {
+          midSentenceCutCount += 1;
+          issues.push({
+            cueIndex: i + 1,
+            timestamp: mcpFormatSrtTs(cur.startMs),
+            severity: "MEDIUM",
+            code: "MID_SENTENCE_CUT",
+            message: `Cue #${i + 1} appears cut mid-sentence ("...${visible.slice(-28)}").`,
+          });
+        }
+      }
+    }
+
+    const corpus = cueList.map((c) => c.lines.join(" ")).join("\n");
+    const corpusLower = corpus.toLowerCase();
+    const exactMatches = [];
+    const caseMismatches = [];
+    const missingTerms = [];
+    for (const term of brandTerms) {
+      if (corpus.includes(term)) {
+        exactMatches.push(term);
+      } else if (corpusLower.includes(term.toLowerCase())) {
+        caseMismatches.push(term);
+        issues.push({
+          cueIndex: 0,
+          timestamp: "GLOBAL",
+          severity: "MEDIUM",
+          code: "BRAND_TERM_CASE_MISMATCH",
+          message: `Brand term "${term}" appears with non-matching letter case.`,
+        });
+      } else {
+        missingTerms.push(term);
+        issues.push({
+          cueIndex: 0,
+          timestamp: "GLOBAL",
+          severity: "LOW",
+          code: "BRAND_TERM_MISSING",
+          message: `Expected brand term "${term}" not found in captions.`,
+        });
+      }
+    }
+
+    const penalty =
+      overlapCount * 18 +
+      safeZoneOverflowCount * 10 +
+      highCpsCount * 8 +
+      multiLineOverflowCount * 6 +
+      midSentenceCutCount * 7 +
+      caseMismatches.length * 6 +
+      missingTerms.length * 4;
+    const qualityScore = Math.max(0, Math.min(100, 100 - penalty));
+    const verdict =
+      qualityScore >= 88
+        ? "PUBLISH_READY"
+        : qualityScore >= 65
+          ? "NEEDS_POLISH"
+          : "TIMING_OR_SAFEZONE_ISSUES";
+
+    return {
+      qualityScore,
+      verdict,
+      metrics: {
+        overlapCount,
+        highCpsCount,
+        safeZoneOverflowCount,
+        multiLineOverflowCount,
+        midSentenceCutCount,
+        maxCpsObserved,
+        avgCps: Number((cpsSum / cueList.length).toFixed(1)),
+        maxLineCharsObserved,
+      },
+      brandCheck: {
+        requestedTerms: brandTerms,
+        exactMatches,
+        caseMismatches,
+        missingTerms,
+      },
+      issues,
+    };
+  };
+
+  const preFixEval = evaluateCues(shiftedCues);
+
+  let normalizedCues = shiftedCues.map((c) => ({ ...c, lines: [...c.lines] }));
+  if (autoFix) {
+    normalizedCues = normalizedCues
+      .map((c) => ({
+        ...c,
+        lines: mcpWrapVerticalLines(c.lines.join(" "), maxLineLength),
+      }))
+      .sort((a, b) => a.startMs - b.startMs || a.endMs - b.endMs);
+
+    const minGapMs = 40;
+    const minDurMs = 550;
+    for (let i = 1; i < normalizedCues.length; i += 1) {
+      const prev = normalizedCues[i - 1];
+      const cur = normalizedCues[i];
+      if (cur.startMs < prev.endMs + minGapMs) {
+        const trimmedPrevEnd = cur.startMs - minGapMs;
+        if (trimmedPrevEnd - prev.startMs >= minDurMs) {
+          prev.endMs = trimmedPrevEnd;
+        } else {
+          prev.endMs = Math.max(prev.startMs + minDurMs, trimmedPrevEnd);
+          const origDur = Math.max(minDurMs, cur.endMs - cur.startMs);
+          cur.startMs = prev.endMs + minGapMs;
+          cur.endMs = Math.max(cur.endMs, cur.startMs + origDur);
+        }
+      }
+    }
+    for (let i = 0; i < normalizedCues.length; i += 1) {
+      const cur = normalizedCues[i];
+      const chars = cur.lines.join(" ").replace(/\s+/g, " ").trim().length;
+      const idealMs = Math.ceil((chars / maxCps) * 1000);
+      const curDur = cur.endMs - cur.startMs;
+      if (idealMs > curDur) {
+        const nextStart = normalizedCues[i + 1]?.startMs;
+        const maxAllowed =
+          nextStart !== undefined ? nextStart - minGapMs : cur.startMs + Math.min(idealMs, curDur + 2000);
+        if (maxAllowed > cur.endMs) {
+          cur.endMs = Math.min(cur.startMs + idealMs, maxAllowed);
+        }
+      }
+      cur.index = i + 1;
+    }
+  }
+
+  const postFixEval = autoFix ? evaluateCues(normalizedCues) : preFixEval;
+
+  const normalizedSrt =
+    normalizedCues
+      .map(
+        (c, i) =>
+          `${i + 1}\n${mcpFormatSrtTs(c.startMs)} --> ${mcpFormatSrtTs(c.endMs)}\n${c.lines.join("\n")}`
+      )
+      .join("\n\n") + "\n";
+
+  const normalizedVtt =
+    `WEBVTT\n\n` +
+    normalizedCues
+      .map(
+        (c, i) =>
+          `${i + 1}\n${mcpFormatVttTs(c.startMs)} --> ${mcpFormatVttTs(c.endMs)}\n${c.lines.join("\n")}`
+      )
+      .join("\n\n") +
+    "\n";
+
+  return {
+    ok: true,
+    detectedFormat: parsed.format,
+    cueCount: normalizedCues.length,
+    totalDurationMs: Math.max(0, normalizedCues.at(-1).endMs - normalizedCues[0].startMs),
+    qualityScore: preFixEval.qualityScore,
+    verdict: preFixEval.verdict,
+    autoFixApplied: autoFix,
+    postFixQualityScore: postFixEval.qualityScore,
+    postFixVerdict: postFixEval.verdict,
+    metrics: preFixEval.metrics,
+    postFixMetrics: postFixEval.metrics,
+    brandCheck: preFixEval.brandCheck,
+    issues: preFixEval.issues,
+    outputFormat,
+    normalizedSrt,
+    normalizedVtt,
+    links: {
+      clipCaptionLabUrl: FORGESUITE_LINKS.srtlab,
+      shortVideoClipperAgentUrl: FORGESUITE_LINKS.shortVideoClipper,
+      shortVideoClipperPriceUsdc: 0.5,
+      multiLangVideoDubberAgentUrl: FORGESUITE_LINKS.multiLangVideoDubber,
+      multiLangVideoDubberPriceUsdc: 0.65,
+      proBundleUrl: FORGESUITE_LINKS.pricing,
+      proBundlePriceUsd: 35,
+    },
+  };
+}
+
+/* ============================================================================
+ * 10. MCP Tool Definitions & Dispatch (9 Tools)
  * ========================================================================== */
 
 export const TOOLS = Object.freeze([
@@ -4475,6 +4987,57 @@ export const TOOLS = Object.freeze([
           default: 10,
         },
       },
+    },
+  },
+  {
+    name: "subtitle_caption_audit",
+    description:
+      "Audit and normalize .srt or WEBVTT (.vtt) subtitle files 100% offline. Checks timestamp overlaps, reading speed in characters per second (CPS > 20), 9:16 vertical mobile safe-zone line length (TikTok/Reels/Shorts), mid-sentence cuts, and brand term fidelity — returning a 0-100 quality score plus normalized .srt and .vtt outputs.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        content: {
+          type: "string",
+          description: "Raw .srt or WEBVTT (.vtt) subtitle content to audit and normalize.",
+        },
+        outputFormat: {
+          type: "string",
+          enum: ["srt", "vtt", "both"],
+          description: "Preferred normalized subtitle output format (default: both).",
+          default: "both",
+        },
+        shiftMs: {
+          type: "number",
+          description: "Optional timestamp shift offset in milliseconds (+/- ms, default: 0).",
+          default: 0,
+        },
+        tempoScale: {
+          type: "number",
+          description: "Optional linear timestamp tempo scale factor (default: 1).",
+          default: 1,
+        },
+        maxCps: {
+          type: "number",
+          description: "Maximum reading speed threshold in characters per second (default: 20).",
+          default: 20,
+        },
+        maxLineLength: {
+          type: "number",
+          description: "Maximum characters per line for 9:16 vertical mobile safe zones (default: 32).",
+          default: 32,
+        },
+        autoFix: {
+          type: "boolean",
+          description: "Automatically resolve overlaps and wrap lines to 9:16 safe width in normalized output (default: true).",
+          default: true,
+        },
+        brandTerms: {
+          type: "array",
+          items: { type: "string" },
+          description: "Optional brand or do-not-translate keywords to verify for exact casing and presence.",
+        },
+      },
+      required: ["content"],
     },
   },
 ]);
@@ -4754,6 +5317,8 @@ function executeTool(name, args = {}, options = {}) {
             `Upgrade to ForgeSuite All-Access Pro Bundle ($35 Lifetime, Save $14): ${FORGESUITE_LINKS.pricing}`,
             `NEAR AI Agent Market Fleet (A2A + x402):`,
             `- Forge AI Agent ($5.00 USDC/call): ${FORGESUITE_LINKS.forgeAgent}`,
+            `- Multi-Language Video Dubber ($0.65 USDC/call): ${FORGESUITE_LINKS.multiLangVideoDubber}`,
+            `- Short-Form Video Clipper ($0.50 USDC/call): ${FORGESUITE_LINKS.shortVideoClipper}`,
             `- Brand Availability Checker ($0.35 USDC/call): ${FORGESUITE_LINKS.forgeBrandChecker}`,
             `- Forge TokenGuard ($0.25 USDC/call): ${FORGESUITE_LINKS.forgeTokenGuard}`,
             `- Forge Data & FinOps ($0.15 USDC/call): ${FORGESUITE_LINKS.forgeDataFinops}`,
@@ -4892,6 +5457,68 @@ function executeTool(name, args = {}, options = {}) {
         }));
     }
 
+    case "subtitle_caption_audit": {
+      const rawSub =
+        safeArgs.content ?? safeArgs.subtitle ?? safeArgs.srt ?? safeArgs.vtt ?? safeArgs.text;
+      if (typeof rawSub !== "string" || !rawSub.trim()) {
+        return {
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: "Invalid argument: 'content' must be a non-empty .srt or .vtt subtitle string.",
+            },
+          ],
+        };
+      }
+      const res = auditSubtitleCaptions({ ...safeArgs, content: rawSub });
+      if (!res.ok) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: `Subtitle Caption Audit Error: ${res.error}` }],
+          structuredContent: res,
+        };
+      }
+
+      const lines = [
+        `ClipCaption Lab — Subtitle & 9:16 Safe-Zone Audit (${res.detectedFormat.toUpperCase()} · ${res.cueCount} cues)`,
+        `Quality Score: ${res.qualityScore}/100 (${res.verdict})${res.autoFixApplied ? ` -> Post-Fix Score: ${res.postFixQualityScore}/100 (${res.postFixVerdict})` : ""}`,
+        `Metrics: Overlaps=${res.metrics.overlapCount} | High CPS=${res.metrics.highCpsCount} (Max ${res.metrics.maxCpsObserved} CPS, Avg ${res.metrics.avgCps} CPS) | 9:16 Line Overflows=${res.metrics.safeZoneOverflowCount} (Max ${res.metrics.maxLineCharsObserved} chars) | Mid-Sentence Cuts=${res.metrics.midSentenceCutCount}`,
+      ];
+      if (res.brandCheck.requestedTerms.length > 0) {
+        lines.push(
+          `Brand Terms: Exact=[${res.brandCheck.exactMatches.join(", ") || "none"}] | CaseMismatch=[${res.brandCheck.caseMismatches.join(", ") || "none"}] | Missing=[${res.brandCheck.missingTerms.join(", ") || "none"}]`
+        );
+      }
+      if (res.issues.length > 0) {
+        lines.push("", "Detected Issues:");
+        for (const iss of res.issues.slice(0, 15)) {
+          lines.push(`- [${iss.severity}] ${iss.timestamp} ${iss.code}: ${iss.message}`);
+        }
+      } else {
+        lines.push("", "Detected Issues: CLEAN (0 timing, CPS, or 9:16 safe-zone issues).");
+      }
+
+      if (res.outputFormat === "srt" || res.outputFormat === "both") {
+        lines.push("", "Normalized .SRT:", "```srt", res.normalizedSrt.trim(), "```");
+      }
+      if (res.outputFormat === "vtt" || res.outputFormat === "both") {
+        lines.push("", "Normalized .VTT:", "```vtt", res.normalizedVtt.trim(), "```");
+      }
+
+      lines.push(
+        "",
+        `Live 9:16 Safe-Zone Simulator & Pro 1080x1920 Animated .ASS Studio: ${FORGESUITE_LINKS.srtlab}`,
+        `Autonomous Cloud Video Agents: @short-video-clipper ($0.50 USDC): ${FORGESUITE_LINKS.shortVideoClipper} | @multi-lang-video-dubber ($0.65 USDC): ${FORGESUITE_LINKS.multiLangVideoDubber}`
+      );
+
+      return {
+        isError: false,
+        content: [{ type: "text", text: lines.join("\n") }],
+        structuredContent: res,
+      };
+    }
+
     default:
       return null;
   }
@@ -4948,7 +5575,7 @@ export function handleJsonRpcMessage(msg, options = {}) {
         },
         serverInfo: SERVER_INFO,
         instructions:
-          "ForgeSuite MCP Server (v1.3.0) provides 8 zero-dependency developer, FinOps, brand launch & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner), brand_domain_handle_scan (authoritative RDAP + Google DoH .com/.io/.ai/.dev/.app/.org domains, npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability scanner), and multi_chain_wallet_scan (live 6-chain Ethereum/Base/Arbitrum/BSC/Polygon/Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector). Global run: npx --yes github:youthmy11-ai/youthmy11-ai.github.io | Docs: https://youthmy11-ai.github.io/mcp.html",
+          "ForgeSuite MCP Server (v1.4.0) provides 9 zero-dependency developer, FinOps, creator media, brand launch & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner), brand_domain_handle_scan (authoritative RDAP + Google DoH .com/.io/.ai/.dev/.app/.org domains, npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability scanner), multi_chain_wallet_scan (live 6-chain Ethereum/Base/Arbitrum/BSC/Polygon/Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector), and subtitle_caption_audit (offline .srt/.vtt timing overlap, CPS reading speed, 9:16 vertical safe-zone, mid-sentence cut & brand keyword auditor + normalizer). Global run: npx --yes github:youthmy11-ai/youthmy11-ai.github.io | Docs: https://youthmy11-ai.github.io/mcp.html",
       });
     }
 
