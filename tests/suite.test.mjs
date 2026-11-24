@@ -70,6 +70,7 @@ import {
   buildAuditInvoicePayload,
   EVM_CHAIN_CONFIG as TOKENGUARD_EVM_CHAINS,
   exportBatchReportsCsv,
+  parseTokenAuditQueryParams,
   parseWatchlistEntries,
   runBatchWatchlistScan,
   scanEvmTokenOnChain,
@@ -1069,9 +1070,13 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsFull, /ForgeSuite MCP Server/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/mcp\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/tokenaudit\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/solana-token-2022-scanner\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/evm-proxy-honeypot-scanner\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/brandcheck\.html/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/forge-brand-checker/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/a\/forge-ai-agent/);
+  assert.match(llmsFull, /solana-token-2022-scanner\.html/);
+  assert.match(llmsFull, /evm-proxy-honeypot-scanner\.html/);
   assert.match(llmsFull, /BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx/);
 
   const robots = fs.readFileSync(path.join(repoRoot, "robots.txt"), "utf8");
@@ -1085,6 +1090,8 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   const toolPages = [
     { file: "cryptobill.html", url: "https://youthmy11-ai.github.io/cryptobill.html", category: "BusinessApplication" },
     { file: "tokenaudit.html", url: "https://youthmy11-ai.github.io/tokenaudit.html", category: "SecurityApplication" },
+    { file: "solana-token-2022-scanner.html", url: "https://youthmy11-ai.github.io/solana-token-2022-scanner.html", category: "SecurityApplication" },
+    { file: "evm-proxy-honeypot-scanner.html", url: "https://youthmy11-ai.github.io/evm-proxy-honeypot-scanner.html", category: "SecurityApplication" },
     { file: "brandcheck.html", url: "https://youthmy11-ai.github.io/brandcheck.html", category: "BusinessApplication" },
     { file: "tokencalc.html", url: "https://youthmy11-ai.github.io/tokencalc.html", category: "DeveloperApplication" },
     { file: "json2sheet.html", url: "https://youthmy11-ai.github.io/json2sheet.html", category: "DeveloperApplication" },
@@ -2326,4 +2333,209 @@ test("root server.json, deterministic .mcpb packer, and GitHub OIDC MCP Registry
   assert.match(wf, /contents:\s*write/);
   assert.match(wf, /mcp-publisher login github-oidc/);
   assert.match(wf, /mcp-publisher publish/);
+});
+
+/* ============================================================================
+ * 16. Funnel Upgrades: Query Deep-Links, MCP Registry IDE Buttons & SEO Pages
+ * ========================================================================== */
+
+test("parseTokenAuditQueryParams supports ?chain=solana&mint=..., EVM aliases, auto-detection, custom HTTPS RPCs, and autorun overrides", () => {
+  const empty = parseTokenAuditQueryParams("");
+  assert.equal(empty.hasTarget, false);
+  assert.equal(empty.chain, "base");
+  assert.equal(empty.autorun, false);
+
+  const solMint = parseTokenAuditQueryParams(
+    "?chain=solana&mint=2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo"
+  );
+  assert.equal(solMint.hasTarget, true);
+  assert.equal(solMint.chain, "solana");
+  assert.equal(solMint.address, "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo");
+  assert.equal(solMint.autorun, true);
+
+  // Base58 mint without chain param auto-switches to solana
+  const autoSol = parseTokenAuditQueryParams(
+    "address=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&autorun=0"
+  );
+  assert.equal(autoSol.hasTarget, true);
+  assert.equal(autoSol.chain, "solana");
+  assert.equal(autoSol.autorun, false);
+
+  // EVM aliases + HTTPS RPC sanitization
+  const arb = parseTokenAuditQueryParams(
+    "?chain=arb&address=0xaf88d065e77c8cC2239327C5EDb3A432268e5831&rpc=https://arbitrum-one-rpc.publicnode.com"
+  );
+  assert.equal(arb.hasTarget, true);
+  assert.equal(arb.chain, "arbitrum");
+  assert.equal(arb.address, "0xaf88d065e77c8cC2239327C5EDb3A432268e5831");
+  assert.equal(arb.rpcUrl, "https://arbitrum-one-rpc.publicnode.com/");
+  assert.equal(arb.autorun, true);
+
+  // Reject unsafe non-HTTPS custom RPC gracefully without throwing
+  const badRpc = parseTokenAuditQueryParams(
+    "?chain=eth&address=0xdAC17F958D2ee523a2206206994597C13D831ec7&rpc=ftp://evil.example"
+  );
+  assert.equal(badRpc.chain, "ethereum");
+  assert.equal(badRpc.rpcUrl, null);
+});
+
+test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified badge, 1-click VS Code deep-links, .mcpb bundle, and 4-tier A2A + x402 fleet", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const registryUrl = "https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite";
+  const vscodeLink =
+    "vscode:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D";
+  const vscodeInsidersLink =
+    "vscode-insiders:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D";
+  const mcpbAssetUrl =
+    "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.2.0/forgesuite-mcp.mcpb";
+
+  // Verify encoded VS Code deep-link payload decodes cleanly to valid JSON
+  const decodedPayload = JSON.parse(decodeURIComponent(vscodeLink.split("?")[1]));
+  assert.deepEqual(decodedPayload, {
+    name: "forgesuite",
+    command: "npx",
+    args: ["-y", "github:youthmy11-ai/youthmy11-ai.github.io"],
+  });
+
+  const fleetAgents = [
+    "https://market.near.ai/agents/forge-data-finops",
+    "https://market.near.ai/agents/forge-token-guard",
+    "https://market.near.ai/agents/forge-brand-checker",
+    "https://market.near.ai/agents/forge-ai-agent",
+  ];
+
+  const mcpHtml = fs.readFileSync(path.join(repoRoot, "mcp.html"), "utf8");
+  const indexHtml = fs.readFileSync(path.join(repoRoot, "index.html"), "utf8");
+  const readmeMd = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");
+
+  for (const [label, doc] of [
+    ["mcp.html", mcpHtml],
+    ["README.md", readmeMd],
+  ]) {
+    assert.ok(doc.includes(registryUrl), `${label} missing Official MCP Registry URL`);
+    assert.ok(doc.includes("io.github.youthmy11-ai/forgesuite-mcp"), `${label} missing registry name`);
+    assert.ok(doc.includes("v1.2.0 Active"), `${label} missing v1.2.0 Active badge`);
+    assert.ok(doc.includes(vscodeLink), `${label} missing 1-click VS Code MCP install link`);
+    assert.ok(doc.includes(vscodeInsidersLink), `${label} missing 1-click VS Code Insiders MCP install link`);
+    assert.ok(doc.includes(mcpbAssetUrl), `${label} missing .mcpb release bundle download link`);
+    for (const agentUrl of fleetAgents) {
+      assert.ok(doc.includes(agentUrl), `${label} missing A2A fleet agent ${agentUrl}`);
+    }
+  }
+
+  assert.ok(indexHtml.includes(registryUrl), "index.html missing Official MCP Registry URL");
+  assert.ok(indexHtml.includes("v1.2.0 Active"), "index.html missing v1.2.0 Active badge");
+  for (const agentUrl of fleetAgents) {
+    assert.ok(indexHtml.includes(agentUrl), `index.html missing A2A fleet agent ${agentUrl}`);
+  }
+
+  const siblingProfileReadme = path.resolve(repoRoot, "..", "youthmy11-ai-profile", "README.md");
+  if (fs.existsSync(siblingProfileReadme)) {
+    const profileMd = fs.readFileSync(siblingProfileReadme, "utf8");
+    assert.ok(profileMd.includes(registryUrl), "profile README missing Official MCP Registry URL");
+    assert.ok(profileMd.includes(vscodeLink), "profile README missing VS Code install link");
+    assert.ok(profileMd.includes(vscodeInsidersLink), "profile README missing VS Code Insiders install link");
+    assert.ok(profileMd.includes(mcpbAssetUrl), "profile README missing .mcpb bundle link");
+    for (const agentUrl of fleetAgents) {
+      assert.ok(profileMd.includes(agentUrl), `profile README missing ${agentUrl}`);
+    }
+  }
+});
+
+function extractAllJsonLdObjects(html) {
+  const regex = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+  const types = new Set();
+  const parsedBlocks = [];
+  let m;
+  while ((m = regex.exec(html)) !== null) {
+    const obj = JSON.parse(m[1]);
+    parsedBlocks.push(obj);
+    if (obj["@type"]) types.add(obj["@type"]);
+    if (Array.isArray(obj["@graph"])) {
+      for (const node of obj["@graph"]) {
+        if (node["@type"]) types.add(node["@type"]);
+      }
+    }
+  }
+  return { types, parsedBlocks };
+}
+
+test("solana-token-2022-scanner.html ships valid SoftwareApplication + TechArticle + FAQPage JSON-LD, Token-2022 forensics, deep-links, MCP snippet, and Pro CTAs", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const html = fs.readFileSync(path.join(repoRoot, "solana-token-2022-scanner.html"), "utf8");
+
+  const { types } = extractAllJsonLdObjects(html);
+  assert.ok(types.has("SoftwareApplication"), "Missing SoftwareApplication JSON-LD");
+  assert.ok(types.has("TechArticle"), "Missing TechArticle JSON-LD");
+  assert.ok(types.has("FAQPage"), "Missing FAQPage JSON-LD");
+
+  for (const term of [
+    "PermanentDelegate",
+    "TransferHook",
+    "TransferFeeConfig",
+    "100%",
+    "FreezeAuthority",
+    "solana_mint_risk_scan",
+    "npx --yes github:youthmy11-ai/youthmy11-ai.github.io",
+    "https://market.near.ai/agents/forge-token-guard",
+    "$0.25",
+    'data-checkout-sku="BUNDLE"',
+  ]) {
+    assert.ok(html.includes(term), `solana-token-2022-scanner.html missing "${term}"`);
+  }
+
+  const deepLinks = [...html.matchAll(/href="tokenaudit\.html\?([^"]+)"/g)].map((m) =>
+    m[1].replace(/&amp;/g, "&")
+  );
+  assert.ok(deepLinks.length >= 4, "Expected at least 4 interactive Solana deep-links");
+  for (const qs of deepLinks) {
+    const parsed = parseTokenAuditQueryParams(qs);
+    assert.equal(parsed.hasTarget, true);
+    assert.equal(parsed.chain, "solana");
+    assert.equal(parsed.autorun, true);
+  }
+});
+
+test("evm-proxy-honeypot-scanner.html ships valid SoftwareApplication + TechArticle + FAQPage JSON-LD, proxy/opcode forensics, deep-links, MCP snippet, and Pro CTAs", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const html = fs.readFileSync(path.join(repoRoot, "evm-proxy-honeypot-scanner.html"), "utf8");
+
+  const { types } = extractAllJsonLdObjects(html);
+  assert.ok(types.has("SoftwareApplication"), "Missing SoftwareApplication JSON-LD");
+  assert.ok(types.has("TechArticle"), "Missing TechArticle JSON-LD");
+  assert.ok(types.has("FAQPage"), "Missing FAQPage JSON-LD");
+
+  for (const term of [
+    "EIP-1967",
+    "EIP-1167",
+    "DELEGATECALL",
+    "SELFDESTRUCT",
+    "blacklist",
+    "setSellTax",
+    "evm_token_risk_scan",
+    "npx --yes github:youthmy11-ai/youthmy11-ai.github.io",
+    "https://market.near.ai/agents/forge-token-guard",
+    "$0.25",
+    'data-checkout-sku="BUNDLE"',
+  ]) {
+    assert.ok(html.includes(term), `evm-proxy-honeypot-scanner.html missing "${term}"`);
+  }
+
+  const deepLinks = [...html.matchAll(/href="tokenaudit\.html\?([^"]+)"/g)].map((m) =>
+    m[1].replace(/&amp;/g, "&")
+  );
+  assert.ok(deepLinks.length >= 4, "Expected at least 4 interactive EVM deep-links");
+  const seenChains = new Set();
+  for (const qs of deepLinks) {
+    const parsed = parseTokenAuditQueryParams(qs);
+    assert.equal(parsed.hasTarget, true);
+    assert.match(parsed.address, /^0x[0-9a-fA-F]{40}$/);
+    assert.equal(parsed.autorun, true);
+    seenChains.add(parsed.chain);
+  }
+  assert.deepEqual(
+    [...seenChains].sort(),
+    ["arbitrum", "base", "bsc", "ethereum"],
+    "EVM deep-links should cover Base, Ethereum, BSC, and Arbitrum"
+  );
 });

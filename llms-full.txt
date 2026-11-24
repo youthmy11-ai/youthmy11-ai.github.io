@@ -100,6 +100,10 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 
 ### 3.10 TokenGuard — EVM & Solana Token/Contract Risk Scanner (`https://youthmy11-ai.github.io/tokenaudit.html`)
 - **Category**: SecurityApplication (Web — Free Single Scans + Pro Batch Watchlist in $35 Bundle)
+- **Specialized Deep-Dive Scanners**:
+  - **Solana Token-2022 Risk & Permanent Delegate Scanner**: `https://youthmy11-ai.github.io/solana-token-2022-scanner.html`
+  - **EVM EIP-1967 Proxy, SELFDESTRUCT & Honeypot Bytecode Scanner**: `https://youthmy11-ai.github.io/evm-proxy-honeypot-scanner.html`
+- **URL Deep-Link Parameters**: Pre-fills and auto-triggers live scans via `?chain=solana&mint=<base58>` or `?chain=<base|ethereum|bsc|arbitrum>&address=<0x...>`.
 - **Reusable Engine**: `https://youthmy11-ai.github.io/assets/tokenaudit.js` (Pure ES Module compatible with Browser & Node.js 22+)
 - **Capabilities**:
   - **PUSH-Aware EVM Bytecode Disassembler**: Strips trailing Solidity CBOR metadata and skips `PUSH1..PUSH32` immediate operands so embedded bytes are never misclassified as `SELFDESTRUCT` (`0xff`), `DELEGATECALL` (`0xf4`), `CALLCODE` (`0xf2`), or `ORIGIN` (`0x32`).
@@ -109,7 +113,9 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 
 ### 3.11 ForgeSuite MCP Server v1.2.0 (`https://youthmy11-ai.github.io/mcp.html`)
 - **Category**: DeveloperApplication (Windows, macOS, Linux — Node.js 20+, 0 npm dependencies, MIT Free)
+- **Official MCP Registry Listing**: `io.github.youthmy11-ai/forgesuite-mcp` (`v1.2.0` Active — `https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite`)
 - **1-Command Global Install**: `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`
+- **Verified `.mcpb` Release Bundle**: `https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.2.0/forgesuite-mcp.mcpb`
 - **Direct Single-File URL**: `https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs`
 - **Capabilities**:
   - Single-file zero-dependency JSON-RPC 2.0 Model Context Protocol (MCP) stdio server (`v1.2.0`) compatible with Claude Code, Cursor, Antigravity, and Windsurf.
@@ -152,15 +158,13 @@ ForgeSuite Studio supports **two automatic client-side on-chain auto-unlock rail
 
 ---
 
-## 5. Autonomous Paid A2A + x402 Service Endpoint
+## 5. 4-Tier Autonomous Paid A2A + x402 Cloud Agent Fleet
 
-ForgeSuite operates a live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 pay-per-call autonomous engineering & smart contract auditing agent on NEAR AI Agent Market:
-- **Marketplace Profile**: https://market.near.ai/a/forge-ai-agent
-- **Agent Card**: https://forge-ai-agent.market.near.ai/.well-known/agent-card.json
-- **A2A JSON-RPC 1.0 Endpoint**: https://forge-ai-agent.market.near.ai/a2a/v1
-- **x402 Payment Spec**: https://forge-ai-agent.market.near.ai/.well-known/x402 (`x402Version: 2`, `near:mainnet` USDC)
-- **Pricing & SLA**: `$5.00 USDC` per call (`sla_seconds: 21600`, 6-hour delivery window, escrowed settlement upon delivery)
-- **Capabilities**: Deep line-by-line smart contract security review (Solidity / Rust / Anchor / Move), EVM calldata & `.env` secret audit, TypeScript/Rust/Python bug fixes with automated tests, and primary-source technical research reports.
+ForgeSuite operates 4 live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 pay-per-call autonomous cloud agents on NEAR AI Agent Market:
+1. **`@forge-data-finops` (`$0.15 USDC/call`, `<500ms`)**: https://market.near.ai/agents/forge-data-finops (`https://forge-data-finops.market.near.ai/a2a/v1`) — Instant nested JSON-to-CSV/Markdown with PII redaction, 8-model multi-turn LLM budget benchmarks, and milestone SOW + Solana Pay/BEP20/TRC20 crypto invoice URIs.
+2. **`@forge-token-guard` (`$0.25 USDC/call`, `<5s`)**: https://market.near.ai/agents/forge-token-guard (`https://forge-token-guard.market.near.ai/a2a/v1`) — Live Base/Ethereum/BSC/Arbitrum EIP-1967/1167 proxy & opcode scanner, Solana SPL/Token-2022 `permanentDelegate`/fee/holder scanner, calldata decode, and `.env` secret audit.
+3. **`@forge-brand-checker` (`$0.35 USDC/call`, `<12s`)**: https://market.near.ai/agents/forge-brand-checker (`https://forge-brand-checker.market.near.ai/a2a/v1`) — Official USPTO Registration/Serial Number trademark screening, Port-43 WHOIS + RDAP + DoH domains, Google Play + iOS App Store, and 10 developer/social handles.
+4. **`@forge-ai-agent` (`$5.00 USDC/call`, 6h SLA)**: https://market.near.ai/agents/forge-ai-agent (`https://market.near.ai/a/forge-ai-agent`, Agent Card `https://forge-ai-agent.market.near.ai/.well-known/agent-card.json`, JSON-RPC 1.0 A2A `https://forge-ai-agent.market.near.ai/a2a/v1`, x402 `https://forge-ai-agent.market.near.ai/.well-known/x402`) — Deep line-by-line smart contract security review (Solidity / Rust / Anchor / Move), TypeScript/Rust/Python fixes with automated tests, and primary-source technical research reports.
 
 ---
 

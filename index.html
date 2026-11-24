@@ -196,16 +196,12 @@
 
       <nav class="fs-nav-links" id="mainNavLinks" aria-label="Main navigation">
         <a href="#products">Products</a>
+        <a href="#agent-fleet">A2A Fleet</a>
         <a href="#pricing">Pricing</a>
-        <a href="#verify">On-Chain Verify</a>
+        <a href="#verify">Verify</a>
         <a href="cryptobill.html">CryptoBill</a>
-        <a href="tokencalc.html">TokenCost</a>
-        <a href="json2sheet.html">JSON2Sheet</a>
-        <a href="sowbuilder.html">SOW Builder</a>
-        <a href="txdecode.html">Calldata Lens</a>
         <a href="tokenaudit.html">TokenGuard</a>
         <a href="brandcheck.html">BrandGuard</a>
-        <a href="envshield.html">EnvShield</a>
         <a href="mcp.html">MCP Server</a>
       </nav>
 
@@ -222,19 +218,25 @@
     <section class="fs-hero">
       <div class="fs-container fs-hero-grid">
         <div class="fs-hero-copy">
-          <span class="fs-badge fs-badge-accent">BY YOUTHMY11-AI · ZERO-BACKEND MICRO-SAAS SUITE</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <span class="fs-badge fs-badge-accent">BY YOUTHMY11-AI · ZERO-BACKEND MICRO-SAAS SUITE</span>
+            <a href="https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite" target="_blank" rel="noopener noreferrer" class="fs-badge fs-badge-success" title="Verified on Official Anthropic / Linux Foundation MCP Registry">
+              ✓ MCP Registry: io.github.youthmy11-ai/forgesuite-mcp · v1.2.0 Active ↗
+            </a>
+          </div>
           <h1>Ship faster. Invoice globally. Pay once for life.</h1>
           <p class="fs-lead">
-            Practical, local-first creator and freelancer software with zero monthly subscriptions, zero tracking bloat, offline QR generation, and instant on-chain BSC USDT verification.
+            Practical, local-first creator, developer, and Web3 security software — featuring 8 client-side web apps, an Official Registry-verified 7-tool MCP Server, 4 autonomous A2A + x402 cloud agents, and instant on-chain BSC USDT &amp; Solana USDC verification.
           </p>
           <div class="fs-hero-ctas">
             <a href="cryptobill.html" class="fs-btn fs-btn-primary fs-btn-lg">Try CryptoBill Forge Free →</a>
+            <a href="mcp.html" class="fs-btn fs-btn-secondary fs-btn-lg">1-Click MCP Server (v1.2.0) →</a>
             <button type="button" class="fs-btn fs-btn-secondary fs-btn-lg" data-checkout-sku="BUNDLE">
               Get All-Access Bundle ($35 · Save $14)
             </button>
           </div>
           <div class="fs-kpi-strip">
-            <span><strong>11 Tools + Bundle</strong> (8 Web · 3 Pro)</span>
+            <span><strong>12 Offerings + 4 Agents</strong> (Web · MCP · A2A)</span>
             <span><strong>100% Client-Side</strong> Privacy</span>
             <span><strong>BSC &amp; Solana Auto-Unlock</strong> in Seconds</span>
           </div>
@@ -556,8 +558,8 @@
               </div>
               <ul class="fs-feature-list">
                 <li>Base, Ethereum, BSC, Arbitrum &amp; Solana Mainnet CORS-safe RPCs</li>
+                <li>Deep guides: <a href="solana-token-2022-scanner.html" style="text-decoration:underline;">Solana Token-2022</a> &amp; <a href="evm-proxy-honeypot-scanner.html" style="text-decoration:underline;">EVM Proxy/Honeypot</a></li>
                 <li>Pro Batch Watchlist (&le; 25 tokens) + JSON/CSV Risk Dossier export</li>
-                <li>Direct handoff to Forge AI Agent ($5 USDC) &amp; CryptoBill Forge</li>
               </ul>
             </div>
             <div class="fs-card-actions">
@@ -597,16 +599,16 @@
           <article class="fs-card">
             <div>
               <div class="fs-card-top">
-                <span class="fs-badge fs-badge-success">FREE MCP SERVER · V1.2.0</span>
+                <a href="https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite" target="_blank" rel="noopener noreferrer" class="fs-badge fs-badge-success">✓ REGISTRY ACTIVE · V1.2.0</a>
                 <span class="fs-badge fs-badge-muted">7 TOOLS · 0 DEPS</span>
               </div>
               <h3>ForgeSuite MCP Server</h3>
               <p class="fs-card-desc">
-                Zero-dependency Model Context Protocol (MCP) stdio server (v1.2.0) executable globally via <code>npx --yes github:youthmy11-ai/youthmy11-ai.github.io</code> with 7 DevSecOps, FinOps, Brand Launch &amp; Web3 security tools.
+                Official MCP Registry verified (<code>io.github.youthmy11-ai/forgesuite-mcp</code> · v1.2.0 Active). Run globally via <code>npx --yes github:youthmy11-ai/youthmy11-ai.github.io</code> or install in 1 click inside VS Code.
               </p>
               <div class="fs-price-row">
                 <span class="fs-price-main">$0</span>
-                <span class="fs-price-term">MIT Open Source · 1-Command npx</span>
+                <span class="fs-price-term">MIT Open Source · VS Code + Claude Code + Cursor</span>
               </div>
               <ul class="fs-feature-list">
                 <li><code>envshield_scan</code> &amp; <code>calldata_decode</code> (MaxUint256 guard)</li>
@@ -615,8 +617,88 @@
               </ul>
             </div>
             <div class="fs-card-actions">
-              <a href="mcp.html" class="fs-btn fs-btn-primary">Install MCP Server →</a>
-              <a href="mcp/forgesuite-mcp.mjs" download="forgesuite-mcp.mjs" class="fs-btn fs-btn-secondary">Download .mjs</a>
+              <a href="mcp.html" class="fs-btn fs-btn-primary">1-Click Install &amp; Docs →</a>
+              <a href="vscode:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D" class="fs-btn fs-btn-secondary">VS Code ⚡</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4-TIER LIVE AUTONOMOUS A2A + X402 AGENT FLEET -->
+    <section id="agent-fleet" class="fs-section fs-section-alt">
+      <div class="fs-container">
+        <div class="fs-section-head">
+          <div>
+            <span class="fs-badge fs-badge-accent">REMOTE HTTPS JSON-RPC · ESCROW-BACKED A2A + X402 CLOUD AGENTS</span>
+            <h2>4-Tier Live Autonomous A2A + x402 Agent Fleet ($0.15 – $5.00 USDC)</h2>
+            <p>Want instant cloud JSON-RPC execution, USPTO trademark checks, or deep Solidity/Rust source engineering instead of local stdio? Call our 4 autonomous agents live on NEAR AI Market.</p>
+          </div>
+          <a href="mcp.html#agent-fleet" class="fs-btn fs-btn-secondary">MCP vs Cloud A2A Guide →</a>
+        </div>
+
+        <div class="fs-products-grid">
+          <article class="fs-card">
+            <div>
+              <div class="fs-card-top">
+                <span class="fs-badge fs-badge-success">$0.15 USDC / CALL</span>
+                <span class="fs-badge fs-badge-muted">&lt;500MS SLA</span>
+              </div>
+              <h3><code>@forge-data-finops</code></h3>
+              <p class="fs-card-desc">
+                Ultra-fast nested JSON-to-CSV/Markdown conversion with PII redaction, 8-model multi-turn LLM budget benchmarks, and milestone SOW + Solana Pay / BEP20 / TRC20 crypto invoice generation.
+              </p>
+            </div>
+            <div class="fs-card-actions">
+              <a href="https://market.near.ai/agents/forge-data-finops" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-primary">Call @forge-data-finops ($0.15) ↗</a>
+            </div>
+          </article>
+
+          <article class="fs-card">
+            <div>
+              <div class="fs-card-top">
+                <span class="fs-badge fs-badge-warn">$0.25 USDC / CALL</span>
+                <span class="fs-badge fs-badge-muted">&lt;5S LIVE RPC</span>
+              </div>
+              <h3><code>@forge-token-guard</code></h3>
+              <p class="fs-card-desc">
+                Synchronous EVM proxy/opcode/honeypot scanner (Base, Ethereum, BSC, Arbitrum), Solana SPL &amp; Token-2022 <code>permanentDelegate</code> / holder scanner, calldata decoder, and <code>.env</code> secret auditor.
+              </p>
+            </div>
+            <div class="fs-card-actions">
+              <a href="https://market.near.ai/agents/forge-token-guard" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-primary">Call @forge-token-guard ($0.25) ↗</a>
+            </div>
+          </article>
+
+          <article class="fs-card">
+            <div>
+              <div class="fs-card-top">
+                <span class="fs-badge fs-badge-accent">$0.35 USDC / CALL</span>
+                <span class="fs-badge fs-badge-muted">&lt;12S · USPTO + 10 PLATFORMS</span>
+              </div>
+              <h3><code>@forge-brand-checker</code></h3>
+              <p class="fs-card-desc">
+                Official USPTO Registration &amp; Serial Number trademark screening, Port-43 WHOIS + RDAP + DoH domain verification, Google Play + Apple iOS App Store, and 10 developer/social handle checks.
+              </p>
+            </div>
+            <div class="fs-card-actions">
+              <a href="https://market.near.ai/agents/forge-brand-checker" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-primary">Call @forge-brand-checker ($0.35) ↗</a>
+            </div>
+          </article>
+
+          <article class="fs-card">
+            <div>
+              <div class="fs-card-top">
+                <span class="fs-badge fs-badge-warn">$5.00 USDC / CALL</span>
+                <span class="fs-badge fs-badge-muted">DEEP SMART CONTRACT &amp; CODE</span>
+              </div>
+              <h3><code>@forge-ai-agent</code></h3>
+              <p class="fs-card-desc">
+                Deep line-by-line Solidity, Rust/Anchor, and Move smart contract security audits, PR diff vulnerability reviews, full-stack TypeScript/Python/Rust fixes with tests, and primary-source research.
+              </p>
+            </div>
+            <div class="fs-card-actions">
+              <a href="https://market.near.ai/agents/forge-ai-agent" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-primary">Hire @forge-ai-agent ($5.00) ↗</a>
             </div>
           </article>
         </div>
@@ -891,6 +973,8 @@
         <a href="sowbuilder.html">ScopeGuard SOW</a>
         <a href="txdecode.html">Calldata Lens</a>
         <a href="tokenaudit.html">TokenGuard</a>
+        <a href="solana-token-2022-scanner.html">Solana Token-2022 Scanner</a>
+        <a href="evm-proxy-honeypot-scanner.html">EVM Proxy &amp; Honeypot Scanner</a>
         <a href="brandcheck.html">BrandGuard</a>
         <a href="envshield.html">EnvShield</a>
         <a href="mcp.html">MCP Server</a>

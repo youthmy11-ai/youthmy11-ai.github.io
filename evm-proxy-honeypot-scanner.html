@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVM EIP-1967 Proxy, SELFDESTRUCT &amp; Honeypot Bytecode Scanner (Base, Ethereum, BSC, Arbitrum)</title>
+  <meta name="description" content="Free client-side EVM smart contract &amp; token bytecode scanner across Base, Ethereum, BSC, and Arbitrum. Detect EIP-1967 &amp; EIP-1167 proxies, unverified DELEGATECALL traps, SELFDESTRUCT opcodes, blacklist functions, and mutable honeypot sell taxes.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/evm-proxy-honeypot-scanner.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/evm-proxy-honeypot-scanner.html">
+  <meta property="og:title" content="EVM EIP-1967 Proxy, SELFDESTRUCT &amp; Honeypot Bytecode Scanner (Base, Ethereum, BSC, Arbitrum)">
+  <meta property="og:description" content="PUSH-aware EVM bytecode disassembler &amp; storage slot scanner for EIP-1967/ZeppelinOS/EIP-1167 proxies, unrecognized DELEGATECALL traps, SELFDESTRUCT, blacklists, and honeypot tax selectors.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="EVM EIP-1967 Proxy, SELFDESTRUCT &amp; Honeypot Bytecode Scanner">
+  <meta name="twitter:description" content="Audit Base, Ethereum, BSC &amp; Arbitrum contracts for hidden proxy implementations, DELEGATECALL traps, SELFDESTRUCT opcodes, and mutable honeypot fees in browser or via MCP.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ef4444'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='19' font-weight='800'%3EEVM%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TokenGuard EVM Proxy, SELFDESTRUCT & Honeypot Bytecode Scanner",
+    "applicationCategory": "SecurityApplication",
+    "operatingSystem": "Web, Windows, macOS, Linux (Node.js 20+ MCP)",
+    "url": "https://youthmy11-ai.github.io/evm-proxy-honeypot-scanner.html",
+    "softwareVersion": "1.2.0",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free Browser & MCP Single-Contract Scanner", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Autonomous Cloud A2A Scan (@forge-token-guard)", "price": "0.25", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Pro 25-Token Batch Watchlist & CSV/JSON Dossier (All-Access Bundle)", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "Reads EIP-1967 implementation, admin, and beacon storage slots plus ZeppelinOS/FiatToken slots via eth_getStorageAt",
+      "Unwraps EIP-1167 minimal proxy clones (363d3d373d3d3d363d73...5af4...) and disassembles the underlying implementation bytecode",
+      "PUSH-aware EVM opcode disassembler stripping Solidity CBOR metadata to detect true SELFDESTRUCT (0xff), DELEGATECALL (0xf4), CALLCODE (0xf2), CREATE2 (0xf5), and ORIGIN (0x32)",
+      "Scans PUSH4 selector tables for mutable honeypot taxes (setSellTax, setFees, setMaxTxPercent), blacklists, pauses, and hidden mints across Base, Ethereum, BSC, and Arbitrum"
+    ],
+    "description": "Client-side EVM bytecode disassembler, EIP-1967/1167 proxy implementation resolver, and honeypot selector scanner across Base, Ethereum, BNB Smart Chain, and Arbitrum."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "headline": "EVM EIP-1967 Proxy, SELFDESTRUCT & Honeypot Bytecode Scanner: Detecting Unverified DELEGATECALL Traps",
+        "description": "Deep technical reference on disassembling EVM runtime bytecode, resolving EIP-1967 and EIP-1167 proxy storage slots, eliminating PUSH-operand opcode false positives, and catching mutable sell-tax honeypots across Base, Ethereum, BSC, and Arbitrum.",
+        "url": "https://youthmy11-ai.github.io/evm-proxy-honeypot-scanner.html",
+        "datePublished": "2026-11-24",
+        "dateModified": "2026-11-24",
+        "proficiencyLevel": "Expert",
+        "author": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do unverified DELEGATECALL proxy honeypots bypass block explorers?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Attackers deploy a clean, verified outer ERC-20 shell that executes DELEGATECALL (0xf4) to an address stored in a non-standard storage slot instead of EIP-1967 (0x360894...). Block explorers display the clean outer source while the unverified implementation enforces a 99% sell tax or address blacklist. TokenGuard catches this via PUSH-aware opcode disassembly and flags UNRECOGNIZED_DELEGATECALL."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why must an EVM bytecode scanner skip PUSH1..PUSH32 operands and CBOR metadata?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Naive substring searches for 'ff' or 'f4' trigger massive false positives whenever 0xff appears inside a 32-byte constant (e.g. MaxUint256) or trailing Solidity IPFS CBOR metadata. TokenGuard strips the CBOR trailer and advances the program counter across PUSH1..PUSH32 (0x60..0x7f) immediate bytes so only true executable SELFDESTRUCT and DELEGATECALL instructions are flagged."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does TokenGuard inspect EIP-1967 and EIP-1167 minimal clone proxies?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "TokenGuard queries EIP-1967 implementation (0x360894...), admin (0xb53127...), beacon (0xa3f0ad...), and ZeppelinOS/FiatToken (0x7050c9...) slots via eth_getStorageAt, plus pattern-matches 45-byte EIP-1167 minimal clones, then fetches and disassembles the target implementation bytecode automatically."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can AI coding agents run EVM proxy and honeypot scans via MCP?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Install ForgeSuite MCP Server (io.github.youthmy11-ai/forgesuite-mcp v1.2.0) in 1 click for VS Code or run npx --yes github:youthmy11-ai/youthmy11-ai.github.io to invoke evm_token_risk_scan locally, or call @forge-token-guard via HTTPS A2A + x402 ($0.25 USDC/call)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .seo-code {
+      background: rgba(9, 13, 22, 0.88);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      margin: 10px 0 0;
+    }
+    [data-theme="light"] .seo-code {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+    .seo-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .seo-launch-box {
+      padding: 22px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.11), rgba(37, 99, 235, 0.11));
+      border: 1px solid var(--border-strong);
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body data-page="evm-proxy-honeypot-scanner">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">TG</span>
+        <span>TokenGuard · EVM</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="tokenaudit.html" class="fs-btn fs-btn-sm fs-btn-secondary">Live Scanner</a>
+        <a href="solana-token-2022-scanner.html" class="fs-btn fs-btn-sm fs-btn-secondary">Solana Token-2022 Guide</a>
+        <a href="txdecode.html" class="fs-btn fs-btn-sm fs-btn-secondary">Calldata Lens</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP Server (v1.2.0)</a>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Watchlist Pro ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 64px;">
+    <!-- HERO + INTERACTIVE DEEP-LINK LAUNCHER -->
+    <section style="margin-bottom:28px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span class="fs-badge fs-badge-warn">BASE · ETHEREUM · BSC · ARBITRUM BYTECODE SECURITY</span>
+        <a href="https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite" target="_blank" rel="noopener noreferrer" class="fs-badge fs-badge-success">
+          ✓ Official MCP Registry: io.github.youthmy11-ai/forgesuite-mcp · v1.2.0 Active ↗
+        </a>
+      </div>
+
+      <h1 style="margin:12px 0 10px;font-size:clamp(1.85rem, 3.5vw, 2.6rem);line-height:1.15;letter-spacing:-0.025em;">
+        EVM EIP-1967 Proxy, SELFDESTRUCT &amp; Honeypot Bytecode Scanner (Base, Ethereum, BSC, Arbitrum)
+      </h1>
+      <p class="fs-lead" style="margin:0;max-width:80ch;color:var(--text-muted);">
+        Verified Solidity source on Etherscan or Basescan means nothing if a hidden proxy slot or raw <code>DELEGATECALL</code> routes execution into unverified logic. Disassemble live EVM bytecode in your browser to uncover <strong>EIP-1967 / ZeppelinOS / EIP-1167 proxy implementations</strong>, <strong><code>SELFDESTRUCT</code> &amp; <code>CREATE2</code> metamorphic traps</strong>, <strong>blacklist/freeze hooks</strong>, and <strong>mutable honeypot sell-tax selectors</strong>.
+      </p>
+
+      <!-- INTERACTIVE QUICK SCAN FORM + 1-CLICK DEEP LINKS -->
+      <div class="seo-launch-box" aria-label="Interactive EVM Proxy and Bytecode Scanner Launcher">
+        <form id="evmQuickScanForm" style="display:grid;gap:12px;">
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label" style="color:var(--text);">Target EVM Chain</span>
+              <select id="evmChainSelect" class="fs-select">
+                <option value="base" selected>Base Mainnet (Chain ID 8453)</option>
+                <option value="ethereum">Ethereum Mainnet (Chain ID 1)</option>
+                <option value="bsc">BNB Smart Chain (Chain ID 56)</option>
+                <option value="arbitrum">Arbitrum One (Chain ID 42161)</option>
+              </select>
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label" style="color:var(--text);">Contract / Token Address (<code>0x...</code>)</span>
+              <div class="fs-input-row">
+                <input id="evmAddrInput" type="text" class="fs-input" value="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" placeholder="0x..." spellcheck="false" autocomplete="off">
+                <button type="submit" class="fs-btn fs-btn-primary">Disassemble Live →</button>
+              </div>
+            </label>
+          </div>
+        </form>
+
+        <div style="margin-top:14px;">
+          <div class="fs-field-label" style="margin-bottom:8px;">1-Click Live Mainnet Deep-Link Presets (Unwraps Proxy Slots &amp; Implementation Bytecode):</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="tokenaudit.html?chain=base&amp;address=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" class="fs-btn fs-btn-sm fs-btn-primary">
+              🔍 Scan Base USDC (FiatToken Proxy + Implementation)
+            </a>
+            <a href="tokenaudit.html?chain=ethereum&amp;address=0xdAC17F958D2ee523a2206206994597C13D831ec7" class="fs-btn fs-btn-sm fs-btn-secondary">
+              🔍 Scan Ethereum USDT (Blacklist &amp; Pause Selectors)
+            </a>
+            <a href="tokenaudit.html?chain=bsc&amp;address=0x55d398326f99059fF775485246999027B3197955" class="fs-btn fs-btn-sm fs-btn-secondary">
+              🔍 Scan BSC USDT (Owner &amp; Mint Selectors)
+            </a>
+            <a href="tokenaudit.html?chain=arbitrum&amp;address=0xaf88d065e77c8cC2239327C5EDb3A432268e5831" class="fs-btn fs-btn-sm fs-btn-ghost">
+              Scan Arbitrum USDC Proxy
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECHNICAL BREAKDOWN OF EVM PROXY & HONEYPOT TRAPS -->
+    <section style="margin-bottom:28px;">
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-accent">STORAGE SLOTS · OPCODE WALKING · SELECTOR FORENSICS</span>
+          <h2>How EVM Proxy Rug Pulls, SELFDESTRUCT &amp; Honeypot Bytecode Traps Work</h2>
+          <p>TokenGuard combines live storage-slot inspection with a deterministic PUSH-aware EVM disassembler directly over CORS-safe PublicNode RPCs.</p>
+        </div>
+      </div>
+
+      <div class="seo-grid-2">
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">HIGH · +20 PTS</span>
+              <span class="fs-badge fs-badge-muted">UNRECOGNIZED_DELEGATECALL</span>
+            </div>
+            <h3>1. <code>DELEGATECALL</code> Unverified Implementation Traps</h3>
+            <p class="fs-card-desc">
+              Standard upgradeable contracts store their logic address in EIP-1967 slot <code>0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc</code> or ZeppelinOS slot <code>0x7050c9e0...</code>. Scam tokens hide a custom storage slot inside a harmless-looking verified contract and execute <code>DELEGATECALL</code> (<code>0xf4</code>) into an unverified contract that steals allowances or blocks selling. TokenGuard resolves all standard slots <em>and</em> flags stealth <code>UNRECOGNIZED_DELEGATECALL</code> opcodes.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="tokenaudit.html?chain=base&amp;address=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" class="fs-btn fs-btn-sm fs-btn-secondary">Inspect Live Proxy Resolution →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">45-BYTE CLONE UNWRAP</span>
+              <span class="fs-badge fs-badge-muted">EIP-1167 MINIMAL PROXY</span>
+            </div>
+            <h3>2. EIP-1167 Minimal Clone Factories</h3>
+            <p class="fs-card-desc">
+              Token factories deploy thousands of 45-byte EIP-1167 minimal clones (<code>363d3d373d3d3d363d73&lt;impl&gt;5af43d82803e903d91602b57fd5bf3</code>) whose outer bytecode contains zero ERC-20 function selectors. TokenGuard automatically extracts the embedded 20-byte master implementation address, fetches its runtime bytecode via <code>eth_getCode</code>, and merges every hidden selector into your risk score.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="tokenaudit.html?chain=arbitrum&amp;address=0xaf88d065e77c8cC2239327C5EDb3A432268e5831" class="fs-btn fs-btn-sm fs-btn-secondary">Test Proxy Unwrapper →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">CRITICAL · +35 PTS</span>
+              <span class="fs-badge fs-badge-muted">SELFDESTRUCT · CALLCODE · ORIGIN</span>
+            </div>
+            <h3>3. PUSH-Aware <code>SELFDESTRUCT</code> &amp; <code>ORIGIN</code> Disassembly</h3>
+            <p class="fs-card-desc">
+              Naive hex scanners flag <code>0xff</code> inside <code>uint256.max</code> constants or IPFS CBOR metadata. TokenGuard strips Solidity CBOR trailers and steps cleanly past <code>PUSH1..PUSH32</code> (<code>0x60..0x7f</code>) immediate operands to pinpoint real executable <code>SELFDESTRUCT</code> (<code>0xff</code>), legacy <code>CALLCODE</code> (<code>0xf2</code>), <code>CREATE2</code> (<code>0xf5</code>) metamorphic redeployers, and <code>tx.origin</code> (<code>0x32</code>) honeypot checks.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="txdecode.html" class="fs-btn fs-btn-sm fs-btn-secondary">Decode Raw Calldata in Calldata Lens →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">HIGH · +25 PTS</span>
+              <span class="fs-badge fs-badge-muted">BLACKLIST &amp; MUTABLE TAX</span>
+            </div>
+            <h3>4. Blacklist, Pause &amp; Mutable Honeypot Fee Selectors</h3>
+            <p class="fs-card-desc">
+              Even without verified ABI files, Solidity dispatchers embed 4-byte function selectors via <code>PUSH4</code> (<code>0x63</code>). TokenGuard detects supply-inflation selectors (<code>mint</code>, <code>issue</code>), address freezes (<code>blacklist</code>, <code>setBlacklist</code>, <code>freezeAccount</code>), global transfer locks (<code>pause()</code>), and honeypot fee levers (<code>setSellTax</code>, <code>setFees</code>, <code>setMaxTxPercent</code>, <code>setMaxWalletSize</code>).
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="tokenaudit.html?chain=ethereum&amp;address=0xdAC17F958D2ee523a2206206994597C13D831ec7" class="fs-btn fs-btn-sm fs-btn-secondary">See Matched Selectors on USDT →</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- MCP + A2A AUTOMATION -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-success">LOCAL STDIO MCP (FREE) + CLOUD A2A X402 ($0.25 USDC)</span>
+          <h2 style="margin-top:6px;">Run EVM Proxy &amp; Honeypot Audits Inside VS Code, Claude Code &amp; Cursor</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="vscode:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D" class="fs-btn fs-btn-sm fs-btn-primary">⚡ Install in VS Code</a>
+          <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-copy-target="evmMcpCmd">Copy npx Command</button>
+        </div>
+      </div>
+
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Execute <code>evm_token_risk_scan</code> and <code>calldata_decode</code> locally with zero npm dependencies via our Official MCP Registry server (<code>io.github.youthmy11-ai/forgesuite-mcp</code> · v1.2.0):
+      </p>
+      <pre class="seo-code"><code id="evmMcpCmd">npx --yes github:youthmy11-ai/youthmy11-ai.github.io</code></pre>
+
+      <div class="seo-grid-2">
+        <div class="fs-rail-box">
+          <h3>MCP Tool Call: <code>evm_token_risk_scan</code> (Free Local Stdio)</h3>
+          <pre class="seo-code"><code>{
+  "name": "evm_token_risk_scan",
+  "arguments": {
+    "chain": "base",
+    "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+  }
+}</code></pre>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">Full MCP Server Docs →</a>
+            <a href="https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.2.0/forgesuite-mcp.mcpb" class="fs-btn fs-btn-sm fs-btn-ghost">Download .mcpb</a>
+          </div>
+        </div>
+
+        <div class="fs-rail-box" style="display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">CLOUD A2A + X402</span>
+              <span class="fs-badge fs-badge-muted">&lt;5S · $0.25 USDC / CALL</span>
+            </div>
+            <h3 style="margin-top:10px;">Remote HTTPS Agent: <code>@forge-token-guard</code></h3>
+            <p class="inv-muted" style="margin:6px 0 12px;">
+              Need synchronous HTTPS JSON-RPC contract screening inside a DeFi backend, Discord/Telegram bot, or autonomous agent? Call <strong><code>@forge-token-guard</code></strong> for <strong>$0.25 USDC/call</strong> — or commission a line-by-line Solidity audit from <strong><code>@forge-ai-agent</code> ($5.00 USDC)</strong>.
+            </p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="https://market.near.ai/agents/forge-token-guard" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Call @forge-token-guard ($0.25 USDC) ↗</a>
+            <a href="https://market.near.ai/agents/forge-ai-agent" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-secondary">Deep Solidity Audit ($5 USDC) ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRO WATCHLIST CONVERSION BANNER -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-warn">LIFETIME ALL-ACCESS PRO BUNDLE · SAVE $14</span>
+          <h2 style="margin-top:6px;">Audit 25 Multi-Chain Contracts in One Batch + Export CSV/JSON Dossiers ($35)</h2>
+        </div>
+        <button type="button" class="fs-btn fs-btn-primary" data-checkout-sku="BUNDLE">Unlock Pro Watchlist ($35)</button>
+      </div>
+      <p class="inv-muted" style="margin:6px 0 0;">
+        One-time <strong>$35</strong> payment (instant client-side RPC auto-unlock via <strong>BSC BEP20 USDT</strong> or <strong>Solana SPL USDC</strong>) unlocks TokenGuard’s 25-Token Batch Watchlist across Base, Ethereum, BSC, Arbitrum &amp; Solana plus CryptoBill Forge Pro, BrandGuard Agency Matrix, AutoShorts Studio Pro, and WebLead Extractor Pro.
+      </p>
+    </section>
+
+    <!-- FAQ -->
+    <section>
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-muted">TECHNICAL FAQ</span>
+          <h2>EVM Proxy &amp; Bytecode Security Questions</h2>
+        </div>
+      </div>
+      <div class="fs-faq-grid">
+        <div class="fs-faq-item">
+          <h3>How do unverified DELEGATECALL proxy honeypots bypass block explorers?</h3>
+          <p>Scammers verify a clean outer ERC-20 shell that executes <code>DELEGATECALL</code> to a custom storage slot instead of EIP-1967. TokenGuard disassembles raw opcodes and flags <code>UNRECOGNIZED_DELEGATECALL</code> immediately.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Why skip PUSH1..PUSH32 operands and CBOR metadata?</h3>
+          <p>Skipping <code>0x60..0x7f</code> immediate bytes and trailing Solidity CBOR hashes ensures constants like <code>0xffff...</code> never trigger false-positive <code>SELFDESTRUCT</code> or <code>DELEGATECALL</code> alerts.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Which proxy standards are unwrapped automatically?</h3>
+          <p>EIP-1967 implementation, admin, and beacon slots, OpenZeppelin legacy <code>zeppelinos</code> / Circle <code>FiatToken</code> slots, and 45-byte EIP-1167 minimal proxy clones.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Which EVM networks are supported out of the box?</h3>
+          <p>Base Mainnet, Ethereum Mainnet, BNB Smart Chain (BSC), and Arbitrum One via CORS-safe PublicNode primaries — plus any custom HTTPS EVM RPC URL.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="evm-proxy-honeypot-scanner.html">EVM Proxy &amp; Honeypot Scanner</a>
+        <a href="solana-token-2022-scanner.html">Solana Token-2022 Scanner</a>
+        <a href="mcp.html">MCP Server</a>
+        <a href="brandcheck.html">BrandGuard</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="txdecode.html">Calldata Lens</a>
+        <a href="envshield.html">EnvShield</a>
+        <a href="llms.txt">llms.txt</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { bindCheckoutTriggers } from "./assets/checkout.js";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      bindCheckoutTriggers();
+
+      const form = document.getElementById("evmQuickScanForm");
+      const chainEl = document.getElementById("evmChainSelect");
+      const addrEl = document.getElementById("evmAddrInput");
+      if (form && chainEl && addrEl) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const chain = encodeURIComponent(chainEl.value || "base");
+          const addr = addrEl.value.trim();
+          const url = addr
+            ? `tokenaudit.html?chain=${chain}&address=${encodeURIComponent(addr)}`
+            : `tokenaudit.html?chain=${chain}`;
+          window.location.href = url;
+        });
+      }
+
+      const themeBtn = document.getElementById("themeToggleBtn");
+      if (themeBtn) {
+        const saved = window.localStorage.getItem("forgesuite_theme") || "dark";
+        document.documentElement.dataset.theme = saved;
+        themeBtn.textContent = saved === "light" ? "☀ Light" : "🌙 Dark";
+        themeBtn.addEventListener("click", () => {
+          const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+          document.documentElement.dataset.theme = next;
+          window.localStorage.setItem("forgesuite_theme", next);
+          themeBtn.textContent = next === "light" ? "☀ Light" : "🌙 Dark";
+        });
+      }
+
+      document.querySelectorAll("[data-copy-target]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-copy-target");
+          const target = id ? document.getElementById(id) : null;
+          if (!target) return;
+          const prev = btn.textContent;
+          try {
+            await navigator.clipboard.writeText(target.textContent || "");
+            btn.textContent = "Copied ✓";
+            setTimeout(() => {
+              btn.textContent = prev;
+            }, 1600);
+          } catch {}
+        });
+      });
+    });
+  </script>
+</body>
+</html>

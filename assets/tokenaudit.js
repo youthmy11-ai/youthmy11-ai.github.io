@@ -1638,6 +1638,84 @@ function badgeClassForRisk(level) {
   return "fs-badge-muted";
 }
 
+const CHAIN_QUERY_ALIASES = Object.freeze({
+  ethereum: "ethereum",
+  eth: "ethereum",
+  mainnet: "ethereum",
+  "1": "ethereum",
+  base: "base",
+  "8453": "base",
+  bsc: "bsc",
+  bnb: "bsc",
+  "56": "bsc",
+  arbitrum: "arbitrum",
+  arb: "arbitrum",
+  "42161": "arbitrum",
+  solana: "solana",
+  sol: "solana",
+});
+
+/**
+ * Parses URL query parameters (`?chain=solana&mint=...` or `?chain=base&address=...`)
+ * for deep-linking directly into TokenGuard from SEO guides, IDE docs, or dashboards.
+ */
+export function parseTokenAuditQueryParams(searchInput = "") {
+  const raw = String(searchInput || "").trim();
+  const params = new URLSearchParams(raw.startsWith("?") ? raw.slice(1) : raw);
+
+  const rawChain = String(params.get("chain") || params.get("network") || "")
+    .trim()
+    .toLowerCase();
+  const rawMint = String(params.get("mint") || "").trim();
+  const rawAddress = String(
+    rawMint ||
+      params.get("address") ||
+      params.get("token") ||
+      params.get("contract") ||
+      params.get("target") ||
+      ""
+  ).trim();
+
+  let chain = CHAIN_QUERY_ALIASES[rawChain] || null;
+  if (rawAddress) {
+    if (/^0x[0-9a-fA-F]{40}$/.test(rawAddress)) {
+      if (!chain || chain === "solana") chain = "base";
+    } else if (BASE58_REGEX.test(rawAddress) && !rawAddress.startsWith("0x")) {
+      chain = "solana";
+    }
+  }
+  if (!chain && rawMint) {
+    chain = "solana";
+  }
+
+  let rpcUrl = null;
+  const rawRpc = params.get("rpc") || params.get("rpcUrl") || "";
+  if (rawRpc.trim()) {
+    try {
+      rpcUrl = sanitizeCustomRpcUrl(rawRpc);
+    } catch {
+      rpcUrl = null;
+    }
+  }
+
+  const rawAutorun = String(params.get("autorun") || params.get("scan") || "")
+    .trim()
+    .toLowerCase();
+  const autorun =
+    Boolean(rawAddress) &&
+    rawAutorun !== "0" &&
+    rawAutorun !== "false" &&
+    rawAutorun !== "no";
+
+  return {
+    hasTarget: Boolean(rawAddress),
+    chain: chain || "base",
+    address: rawAddress,
+    rpcUrl,
+    autorun,
+  };
+}
+
 function isTokenGuardProUnlocked() {
   return (
     hasUnlockedTier("BUNDLE") ||
@@ -2066,8 +2144,21 @@ function initTokenAuditApp() {
 
   syncProUi();
 
-  // Populate initial sample address and run instant live demo scan
-  if (addrEl && !addrEl.value.trim()) {
+  // Support URL query deep-links (?chain=solana&mint=... or ?chain=base&address=...)
+  const queryTarget =
+    typeof window !== "undefined"
+      ? parseTokenAuditQueryParams(window.location.search)
+      : { hasTarget: false, chain: "base", address: "", rpcUrl: null, autorun: false };
+
+  if (addrEl && queryTarget.hasTarget) {
+    if (chainEl) chainEl.value = queryTarget.chain;
+    addrEl.value = queryTarget.address;
+    if (rpcEl && queryTarget.rpcUrl) rpcEl.value = queryTarget.rpcUrl;
+    if (queryTarget.autorun) {
+      executeSingleScan();
+    }
+  } else if (addrEl && !addrEl.value.trim()) {
+    // Populate initial sample address and run instant live demo scan
     if (chainEl) chainEl.value = TOKENGUARD_SAMPLES.base_usdc.chain;
     addrEl.value = TOKENGUARD_SAMPLES.base_usdc.address;
     executeSingleScan();
