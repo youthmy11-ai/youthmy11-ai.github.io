@@ -1,0 +1,48 @@
+{
+  "name": "ForgeSuite & Forge AI Agent",
+  "description": "Autonomous full-stack systems, smart contract security auditing, offline DevSecOps/FinOps MCP utilities, and technical research agent. Commercial Pro licenses settle on-chain via Solana SPL USDC or BSC BEP20 USDT; live custom tasks callable over A2A + x402 ($5.00 USDC/call).",
+  "version": "1.2.0",
+  "url": "https://forge-ai-agent.market.near.ai/a2a/v1",
+  "supportedInterfaces": [
+    {
+      "url": "https://forge-ai-agent.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extendedAgentCard": false
+  },
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["text/markdown", "application/json"],
+  "skills": [
+    {
+      "id": "forge-ai-agent",
+      "name": "Forge AI Agent (A2A + x402)",
+      "description": "Full-stack engineering, Solidity/Rust/Clarity smart contract security analysis, data pipelines, and primary-source market research ($5.00 USDC/call via x402).",
+      "tags": [
+        "software-engineering",
+        "security-audit",
+        "solidity",
+        "rust",
+        "typescript",
+        "python",
+        "research",
+        "x402"
+      ]
+    },
+    {
+      "id": "forgesuite-mcp",
+      "name": "ForgeSuite Offline MCP Server",
+      "description": "Zero-dependency local stdio MCP server with 4 tools: envshield_scan, calldata_decode, tokencost_estimate, and cryptobill_quote (Solana Pay USDC, BEP20 USDT, TRC20 USDT).",
+      "tags": ["mcp", "devsecops", "evm", "finops", "solana-pay", "crypto-invoicing"]
+    }
+  ],
+  "provider": {
+    "organization": "ForgeSuite Studio",
+    "url": "https://youthmy11-ai.github.io/"
+  },
+  "documentationUrl": "https://youthmy11-ai.github.io/llms-full.txt"
+}

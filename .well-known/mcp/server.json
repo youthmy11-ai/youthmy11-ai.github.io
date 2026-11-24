@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.youthmy11-ai/forgesuite-mcp",
+  "title": "ForgeSuite Offline DevSecOps & Crypto FinOps MCP Server",
+  "description": "Zero-dependency Node.js stdio MCP server: .env secret leak scanner, EVM calldata/risk decoder, LLM token cost calculator, and Solana Pay USDC / BEP20 / TRC20 invoice URI generator.",
+  "version": "1.0.0",
+  "websiteUrl": "https://youthmy11-ai.github.io/mcp.html",
+  "repository": {
+    "url": "https://github.com/youthmy11-ai/youthmy11-ai.github.io",
+    "source": "github"
+  },
+  "tools": [
+    {
+      "name": "envshield_scan",
+      "description": "Scan .env, JSON, YAML, or code snippets offline for leaked API keys, private keys, mnemonics, JWTs, and webhook secrets."
+    },
+    {
+      "name": "calldata_decode",
+      "description": "Decode raw hexadecimal EVM transaction calldata (ERC-20, Permit2, Uniswap, Multisend) and flag unlimited approvals."
+    },
+    {
+      "name": "tokencost_estimate",
+      "description": "Calculate per-call and monthly LLM/agent token spend across frontier models with prompt-caching discounts."
+    },
+    {
+      "name": "cryptobill_quote",
+      "description": "Generate deterministic self-custody crypto invoice links and Solana Pay SPL-USDC / EIP-681 BEP20 / TRON payment URIs."
+    }
+  ]
+}

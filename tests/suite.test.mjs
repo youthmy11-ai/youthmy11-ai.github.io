@@ -1321,3 +1321,18 @@ test("ForgeSuite MCP stdio server handles malformed JSON, unknown methods, unkno
   assert.equal(messages[4].id, 99);
   assert.deepEqual(messages[4].result, {});
 });
+
+test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/server.json are valid and synced", () => {
+  const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  assert.ok(fs.existsSync(path.join(rootDir, ".nojekyll")), ".nojekyll must exist so GitHub Pages serves /.well-known/*");
+  const agentCard = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "agent-card.json"), "utf8"));
+  assert.equal(agentCard.supportedInterfaces[0].url, "https://forge-ai-agent.market.near.ai/a2a/v1");
+  assert.equal(agentCard.supportedInterfaces[0].protocolBinding, "JSONRPC");
+
+  const mcpManifest = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "mcp", "server.json"), "utf8"));
+  assert.equal(mcpManifest.name, "io.github.youthmy11-ai/forgesuite-mcp");
+  assert.deepEqual(
+    mcpManifest.tools.map((t) => t.name),
+    ["envshield_scan", "calldata_decode", "tokencost_estimate", "cryptobill_quote"]
+  );
+});

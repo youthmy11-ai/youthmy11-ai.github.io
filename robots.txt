@@ -1,11 +1,15 @@
 # ForgeSuite Studio — Open indexing for search engines & AI assistants
-# Machine-readable summaries:
+# Machine-readable summaries & agent discovery:
 #   https://youthmy11-ai.github.io/llms.txt
 #   https://youthmy11-ai.github.io/llms-full.txt
+#   https://youthmy11-ai.github.io/.well-known/agent-card.json
+#   https://youthmy11-ai.github.io/.well-known/mcp/server.json
 
 User-agent: *
 Allow: /
 Allow: /llms.txt
 Allow: /llms-full.txt
+Allow: /.well-known/agent-card.json
+Allow: /.well-known/mcp/server.json
 
 Sitemap: https://youthmy11-ai.github.io/sitemap.xml
