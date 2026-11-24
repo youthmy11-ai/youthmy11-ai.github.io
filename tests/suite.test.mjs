@@ -692,6 +692,7 @@ test("encodeInvoicePayload and decodeInvoicePayload perform lossless UTF-8 round
     discountPercent: 10,
     notes: "Pay via USDT or PayPal € — thank you!",
     paymentMethods: {
+      solana: "BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx",
       bep20: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
       trc20: "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb",
       paypalEmail: "billing@eclair.dev",
@@ -769,6 +770,20 @@ test("validateInvoiceLimits enforces Free vs Pro line item limits and resolves Q
   const qr = resolvePrimaryQrPayload(threeItems, { grandTotal: 60 });
   assert.equal(qr.method, "trc20");
   assert.equal(qr.qrString, "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb");
+
+  const solanaInvoice = {
+    ...threeItems,
+    currency: "USDC",
+    paymentMethods: { solana: "BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx", bep20: "", trc20: "" },
+    qrMethod: "solana",
+  };
+  const solQr = resolvePrimaryQrPayload(solanaInvoice, { grandTotal: 125.5 });
+  assert.equal(solQr.method, "solana");
+  assert.equal(
+    solQr.qrString,
+    "solana:BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx?amount=125.50&spl-token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+  );
+  assert.ok(generateQrMatrix(solQr.qrString).length >= 21);
 });
 
 /* ============================================================================

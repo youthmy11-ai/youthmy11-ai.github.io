@@ -157,6 +157,7 @@
               <select id="cbCurrency" class="fs-select">
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
+                <option value="USDC">USDC (Solana / Multi-chain)</option>
                 <option value="USDT">USDT (₮)</option>
               </select>
             </label>
@@ -183,34 +184,41 @@
           </div>
           <div class="cb-grid-2">
             <label class="fs-field">
-              <span class="fs-field-label">Your USDT (BEP20 / BSC) Address</span>
-              <input type="text" id="cbPayBep20" class="fs-input" placeholder="0x...">
+              <span class="fs-field-label">Your USDC (Solana SPL) Address</span>
+              <input type="text" id="cbPaySolana" class="fs-input" placeholder="Solana wallet address...">
             </label>
             <label class="fs-field">
-              <span class="fs-field-label">Your USDT (TRC20 / TRON) Address</span>
-              <input type="text" id="cbPayTrc20" class="fs-input" placeholder="T...">
+              <span class="fs-field-label">Your USDT (BEP20 / BSC) Address</span>
+              <input type="text" id="cbPayBep20" class="fs-input" placeholder="0x...">
             </label>
           </div>
           <div class="cb-grid-2">
             <label class="fs-field">
+              <span class="fs-field-label">Your USDT (TRC20 / TRON) Address</span>
+              <input type="text" id="cbPayTrc20" class="fs-input" placeholder="T...">
+            </label>
+            <label class="fs-field">
               <span class="fs-field-label">Your PayPal Email</span>
               <input type="email" id="cbPayPaypal" class="fs-input" placeholder="you@paypal-email.com">
             </label>
+          </div>
+          <div class="cb-grid-2">
             <label class="fs-field">
               <span class="fs-field-label">Your Binance Pay ID</span>
               <input type="text" id="cbPayBinance" class="fs-input" placeholder="e.g. 123456789">
             </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Primary QR Code on Invoice Sheet</span>
+              <select id="cbQrMethod" class="fs-select">
+                <option value="auto">Auto (first configured payment rail)</option>
+                <option value="solana">USDC (Solana Pay QR)</option>
+                <option value="bep20">USDT (BEP20)</option>
+                <option value="trc20">USDT (TRC20)</option>
+                <option value="paypal">PayPal Checkout URL</option>
+                <option value="binance">Binance Pay ID</option>
+              </select>
+            </label>
           </div>
-          <label class="fs-field">
-            <span class="fs-field-label">Primary QR Code on Invoice Sheet</span>
-            <select id="cbQrMethod" class="fs-select">
-              <option value="auto">Auto (first configured payment rail)</option>
-              <option value="bep20">USDT (BEP20)</option>
-              <option value="trc20">USDT (TRC20)</option>
-              <option value="paypal">PayPal Checkout URL</option>
-              <option value="binance">Binance Pay ID</option>
-            </select>
-          </label>
         </div>
 
         <!-- Pro Branding -->

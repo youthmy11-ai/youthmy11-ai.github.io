@@ -14,8 +14,11 @@ export const FREE_TIER_LIMITS = Object.freeze({
 export const SUPPORTED_CURRENCIES = Object.freeze({
   USD: { code: "USD", symbol: "$", position: "prefix" },
   EUR: { code: "EUR", symbol: "€", position: "prefix" },
+  USDC: { code: "USDC", symbol: "USDC", position: "suffix" },
   USDT: { code: "USDT", symbol: "USDT", position: "suffix" },
 });
+
+export const SOLANA_USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 
 export const DEFAULT_ACCENT_COLOR = "#2563eb";
 const STORAGE_TEMPLATES_KEY = "cryptobill_templates_v1";
@@ -109,6 +112,7 @@ export function createDefaultInvoice() {
     notes:
       "Thank you for your business! Please include the Invoice # as payment reference when sending crypto or PayPal transfers.",
     paymentMethods: {
+      solana: "",
       bep20: "",
       trc20: "",
       paypalEmail: "",
@@ -213,7 +217,7 @@ export function sanitizeInvoiceData(raw) {
     unitPrice: Math.max(0, Number(it && it.unitPrice) || 0),
   }));
 
-  const allowedQrMethods = new Set(["auto", "bep20", "trc20", "paypal", "binance"]);
+  const allowedQrMethods = new Set(["auto", "solana", "bep20", "trc20", "paypal", "binance"]);
   return {
     businessName: String(raw.businessName ?? fallback.businessName).slice(0, 120),
     businessEmail: String(raw.businessEmail ?? "").slice(0, 120),
@@ -227,6 +231,7 @@ export function sanitizeInvoiceData(raw) {
     discountPercent: clamp(Number(raw.discountPercent) || 0, 0, 100),
     notes: String(raw.notes ?? "").slice(0, 1000),
     paymentMethods: {
+      solana: String(pm.solana || "").trim().slice(0, 100),
       bep20: String(pm.bep20 || "").trim().slice(0, 100),
       trc20: String(pm.trc20 || "").trim().slice(0, 100),
       paypalEmail: String(pm.paypalEmail || "").trim().slice(0, 120),
@@ -357,6 +362,16 @@ export function buildClientPaypalLink(invoiceData, grandTotal) {
   });
 }
 
+export function buildSolanaPayUsdcUri(solanaAddress, grandTotal) {
+  const addr = String(solanaAddress || "").trim();
+  if (!addr) return null;
+  const amt = Number(grandTotal);
+  if (Number.isFinite(amt) && amt > 0) {
+    return `solana:${addr}?amount=${amt.toFixed(2)}&spl-token=${SOLANA_USDC_MINT}`;
+  }
+  return `solana:${addr}?spl-token=${SOLANA_USDC_MINT}`;
+}
+
 /**
  * Resolves the active payment QR payload for the invoice preview & client payment panel.
  */
@@ -364,8 +379,12 @@ export function resolvePrimaryQrPayload(invoiceData, totals) {
   const pm = invoiceData?.paymentMethods || {};
   const grandTotal = totals?.grandTotal ?? 0;
   const paypalUrl = pm.paypalEmail ? buildClientPaypalLink(invoiceData, grandTotal) : null;
+  const solanaUri = pm.solana ? buildSolanaPayUsdcUri(pm.solana, grandTotal) : null;
 
   const candidates = {
+    solana: solanaUri
+      ? { method: "solana", label: "USDC (Solana Pay)", value: pm.solana, qrString: solanaUri }
+      : null,
     bep20: pm.bep20
       ? { method: "bep20", label: "USDT (BEP20 / BSC)", value: pm.bep20, qrString: pm.bep20 }
       : null,
@@ -389,7 +408,7 @@ export function resolvePrimaryQrPayload(invoiceData, totals) {
   if (preferred !== "auto" && candidates[preferred]) {
     return candidates[preferred];
   }
-  return candidates.bep20 || candidates.trc20 || candidates.paypal || candidates.binance || null;
+  return candidates.solana || candidates.bep20 || candidates.trc20 || candidates.paypal || candidates.binance || null;
 }
 
 /* ============================================================================
@@ -589,6 +608,7 @@ export function initCryptoBillApp() {
     bindField("cbTaxPercent", () => state.taxPercent, (v) => (state.taxPercent = clamp(Number(v) || 0, 0, 100))),
     bindField("cbDiscountPercent", () => state.discountPercent, (v) => (state.discountPercent = clamp(Number(v) || 0, 0, 100))),
     bindField("cbNotes", () => state.notes, (v) => (state.notes = v)),
+    bindField("cbPaySolana", () => state.paymentMethods.solana, (v) => (state.paymentMethods.solana = v.trim())),
     bindField("cbPayBep20", () => state.paymentMethods.bep20, (v) => (state.paymentMethods.bep20 = v.trim())),
     bindField("cbPayTrc20", () => state.paymentMethods.trc20, (v) => (state.paymentMethods.trc20 = v.trim())),
     bindField("cbPayPaypal", () => state.paymentMethods.paypalEmail, (v) => (state.paymentMethods.paypalEmail = v.trim())),
@@ -787,6 +807,15 @@ export function initCryptoBillApp() {
     const paypalUrl = buildClientPaypalLink(state, totals.grandTotal);
     const activeRails = [];
 
+    if (pm.solana) {
+      const solUri = buildSolanaPayUsdcUri(pm.solana, totals.grandTotal);
+      activeRails.push({
+        id: "solana",
+        title: "USDC (Solana Pay SPL)",
+        detail: pm.solana,
+        qrSvg: renderQrSvg(solUri || pm.solana, { size: 120, margin: 2, label: "Pay USDC Solana QR" }),
+      });
+    }
     if (pm.bep20) {
       activeRails.push({
         id: "bep20",
@@ -892,6 +921,11 @@ export function initCryptoBillApp() {
     }
 
     const pmRows = [];
+    if (state.paymentMethods.solana) {
+      pmRows.push(
+        `<div><span>USDC (Solana):</span> <code>${escapeHtml(state.paymentMethods.solana)}</code></div>`
+      );
+    }
     if (state.paymentMethods.bep20) {
       pmRows.push(
         `<div><span>USDT (BEP20):</span> <code>${escapeHtml(state.paymentMethods.bep20)}</code></div>`
@@ -1153,11 +1187,12 @@ export function initCryptoBillApp() {
         clientName: "Horizon Commerce Ltd.",
         clientEmail: "finance@horizoncommerce.example",
         invoiceNumber: "INV-2026-042",
-        currency: "USDT",
+        currency: "USDC",
         taxPercent: 0,
         discountPercent: 5,
-        notes: "5% partner discount applied. Pay via USDT BEP20/TRC20, Binance Pay, or PayPal.",
+        notes: "5% partner discount applied. Pay via USDC (Solana Pay), USDT BEP20/TRC20, Binance Pay, or PayPal.",
         paymentMethods: {
+          solana: "7EcDhSYGxXyscszYEp35KHN8vvw3svAuLKTzXwCFLtV",
           bep20: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
           trc20: "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb",
           paypalEmail: "payments@novabyte.example",
