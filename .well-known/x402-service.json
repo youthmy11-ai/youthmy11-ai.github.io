@@ -1,0 +1,26 @@
+{
+  "x402": "1.0",
+  "name": "ForgeAudit x402 Security & Risk Intelligence",
+  "description": "Live EVM token contract bytecode, EIP-1967/1167 proxy & rug-vector risk audit (Base, Ethereum, BSC, Arbitrum), Solana SPL & Token-2022 mint extension/holder audit, plus EVM calldata decoder & secret scanner. Pay per call in USDC via x402.",
+  "capabilities": [
+    "security",
+    "token-audit",
+    "smart-contract-audit",
+    "evm",
+    "solana",
+    "honeypot",
+    "calldata",
+    "onchain"
+  ],
+  "pricing": {
+    "currency": "USDC",
+    "base": "0.02",
+    "unit": "request"
+  },
+  "payment": {
+    "address": "0x0a1e9c96755a7962306cf2ca9a80113a61559852",
+    "chain": "base",
+    "facilitator": "https://facilitator.payai.network"
+  },
+  "endpoint": "https://spoke-jpg-occasion-sunglasses.trycloudflare.com/v1/evm/token-risk-audit"
+}
