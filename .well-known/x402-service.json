@@ -1,11 +1,14 @@
 {
   "x402": "1.0",
   "name": "ForgeAudit x402 Security & Risk Intelligence",
-  "description": "Live EVM token contract bytecode, EIP-1967/1167 proxy & rug-vector risk audit, Solana SPL & Token-2022 mint extension/holder audit, brand/trademark availability, clean web extraction, and 9:16 subtitle & voiceover QA. Pay per call in USDC via x402.",
+  "description": "8 live x402 USDC endpoints: EVM token bytecode/proxy risk audit, Solana SPL & Token-2022 mint audit, EVM pre-sign calldata drainer audit, 6-chain EVM + Solana wallet EIP-7702 & Gnosis Safe audit, brand/trademark availability, SSRF-safe web extraction, and 9:16 subtitle & voiceover QA.",
   "capabilities": [
     "security",
     "token-audit",
     "smart-contract-audit",
+    "calldata-audit",
+    "wallet-audit",
+    "eip-7702",
     "evm",
     "solana",
     "brand-check",
