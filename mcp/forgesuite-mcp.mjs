@@ -1,26 +1,31 @@
 #!/usr/bin/env node
 /**
- * ForgeSuite MCP Server (v1.1.0)
- * Zero-dependency Node 22+ Model Context Protocol (MCP) stdio JSON-RPC 2.0 server.
+ * ForgeSuite MCP Server (v1.2.0)
+ * Zero-dependency Node 20+ Model Context Protocol (MCP) stdio JSON-RPC 2.0 server.
  *
- * 6 Developer, FinOps & Web3 Security Tools:
- *   1. envshield_scan        — Scan .env/configs/logs offline for leaked secrets & return redacted output
- *   2. calldata_decode       — Decode EVM calldata selectors offline & flag unlimited MaxUint256 approvals
- *   3. tokencost_estimate    — Estimate LLM API & multi-turn AI agent run costs (Claude/GPT/Gemini/DeepSeek)
- *   4. cryptobill_quote      — Generate Markdown/JSON crypto invoices + live CryptoBill #inv= links
- *   5. evm_token_risk_scan   — Live EVM token/proxy/opcode risk audit across Base/Ethereum/BSC/Arbitrum
- *   6. solana_mint_risk_scan — Live Solana SPL / Token-2022 authority, extension & holder concentration audit
+ * 1-Command Global Run:
+ *   npx --yes github:youthmy11-ai/youthmy11-ai.github.io
+ *
+ * 7 Developer, FinOps, Brand Launch & Web3 Security Tools:
+ *   1. envshield_scan           — Scan .env/configs/logs offline for leaked secrets & return redacted output
+ *   2. calldata_decode          — Decode EVM calldata selectors offline & flag unlimited MaxUint256 approvals
+ *   3. tokencost_estimate       — Estimate LLM API & multi-turn AI agent run costs (Claude/GPT/Gemini/DeepSeek)
+ *   4. cryptobill_quote         — Generate Markdown/JSON crypto invoices + live CryptoBill #inv= links
+ *   5. evm_token_risk_scan      — Live EVM token/proxy/opcode risk audit across Base/Ethereum/BSC/Arbitrum
+ *   6. solana_mint_risk_scan    — Live Solana SPL / Token-2022 authority, extension & holder concentration audit
+ *   7. brand_domain_handle_scan — Live RDAP + DoH domain (.com/.io/.ai/.dev/.app/.org), npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability audit
  *
  * Docs & Pro Bundle ($35 Lifetime): https://youthmy11-ai.github.io/mcp.html
  * License: MIT (youthmy11-ai)
  */
 
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const SERVER_INFO = Object.freeze({
   name: "forgesuite-mcp",
-  version: "1.1.0",
+  version: "1.2.0",
 });
 
 export const SUPPORTED_PROTOCOL_VERSIONS = Object.freeze([
@@ -38,6 +43,8 @@ export const FORGESUITE_LINKS = Object.freeze({
   cryptobill: "https://youthmy11-ai.github.io/cryptobill.html",
   pricing: "https://youthmy11-ai.github.io/#pricing",
   forgeAgent: "https://market.near.ai/a/forge-ai-agent",
+  forgeTokenGuard: "https://market.near.ai/a/forge-token-guard",
+  forgeDataFinops: "https://market.near.ai/a/forge-data-finops",
 });
 
 /* ============================================================================
@@ -2202,7 +2209,718 @@ export async function scanSolanaMintOnChain(input = {}, options = {}) {
 }
 
 /* ============================================================================
- * 6. MCP Tool Definitions & Dispatch (6 Tools)
+ * 6. Brand, Domain & Handle Availability Scanner (v1.2.0)
+ * ========================================================================== */
+
+export const BRAND_SCAN_DEFAULT_TLDS = Object.freeze([
+  "com",
+  "io",
+  "ai",
+  "dev",
+  "app",
+  "org",
+]);
+
+export const RDAP_ENDPOINTS_BY_TLD = Object.freeze({
+  com: "https://rdap.verisign.com/com/v1/domain/",
+  net: "https://rdap.verisign.com/net/v1/domain/",
+  org: "https://rdap.publicinterestregistry.org/rdap/domain/",
+  dev: "https://pubapi.registry.google/rdap/domain/",
+  app: "https://pubapi.registry.google/rdap/domain/",
+  io: "https://rdap.identitydigital.services/rdap/domain/",
+  ai: "https://rdap.identitydigital.services/rdap/domain/",
+});
+
+export const NEAR_AGENT_FLEET = Object.freeze([
+  {
+    id: "forge-ai-agent",
+    name: "Forge AI Agent — Deep Smart Contract Audits & Full-Stack Engineering ($5.00 USDC/call)",
+    marketUrl: FORGESUITE_LINKS.forgeAgent,
+    a2aEndpoint: "https://forge-ai-agent.market.near.ai/a2a/v1",
+  },
+  {
+    id: "forge-token-guard",
+    name: "Forge TokenGuard — Instant <15s EVM & Solana Rug/Proxy Scanner ($0.25 USDC/call)",
+    marketUrl: FORGESUITE_LINKS.forgeTokenGuard,
+    a2aEndpoint: "https://forge-token-guard.market.near.ai/a2a/v1",
+  },
+  {
+    id: "forge-data-finops",
+    name: "Forge Data & FinOps — Instant <500ms JSON/CSV PII Redactor, LLM Budget & Crypto SOW ($0.15 USDC/call)",
+    marketUrl: FORGESUITE_LINKS.forgeDataFinops,
+    a2aEndpoint: "https://forge-data-finops.market.near.ai/a2a/v1",
+  },
+]);
+
+export function normalizeBrandCandidate(rawName) {
+  const display = String(rawName ?? "")
+    .trim()
+    .replace(/^@+/, "")
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/.*$/, "");
+
+  // Strip known trailing TLD if caller passed e.g. "forgesuite.io"
+  const basePart = display.replace(/\.(?:com|io|ai|dev|app|org|net|xyz|co)$/i, "").trim();
+  const domainLabel = basePart
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 63);
+
+  const compactKey = domainLabel.replace(/-/g, "");
+  if (!domainLabel || domainLabel.length < 2 || !compactKey) {
+    throw new Error(
+      `Invalid brand candidate "${rawName}". Provide at least 2 alphanumeric characters.`
+    );
+  }
+
+  return {
+    displayName: basePart || domainLabel,
+    domainLabel,
+    packageSlug: domainLabel,
+    githubHandle: domainLabel.slice(0, 39).replace(/-+$/g, ""),
+    blueskyHandle: `${domainLabel.slice(0, 50).replace(/-+$/g, "")}.bsky.social`,
+    redditHandle: basePart
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, "_")
+      .replace(/_{2,}/g, "_")
+      .replace(/^[-_]+|[-_]+$/g, "")
+      .slice(0, 20) || compactKey.slice(0, 20),
+    compactKey,
+  };
+}
+
+function mapDnsRcode(rcode) {
+  if (rcode === 0) return "NOERROR";
+  if (rcode === 2) return "SERVFAIL";
+  if (rcode === 3) return "NXDOMAIN";
+  return typeof rcode === "number" ? `RCODE_${rcode}` : null;
+}
+
+async function safeJsonFetch(url, options = {}) {
+  const fetchImpl = options.fetchImpl ?? globalThis.fetch;
+  const timeoutMs = options.timeoutMs ?? 6500;
+  const headers = {
+    "User-Agent": "ForgeSuite-MCP/1.2.0 (+https://youthmy11-ai.github.io)",
+    Accept: options.accept || "application/json",
+    ...(options.headers || {}),
+  };
+  const res = await fetchImpl(url, {
+    method: options.method || "GET",
+    headers,
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+  const text = await res.text();
+  let json = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    json = null;
+  }
+  return { ok: res.ok, status: res.status, text, json };
+}
+
+async function checkSingleDomainAvailability(domainLabel, rawTld, options = {}) {
+  const tld = String(rawTld || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^\.+/, "");
+  const domain = `${domainLabel}.${tld}`;
+  const rdapPrimary = RDAP_ENDPOINTS_BY_TLD[tld]
+    ? `${RDAP_ENDPOINTS_BY_TLD[tld]}${encodeURIComponent(domain)}`
+    : `https://rdap.org/domain/${encodeURIComponent(domain)}`;
+  const dohUrl = `https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=NS`;
+
+  const [rdapOutcome, dohOutcome] = await Promise.allSettled([
+    safeJsonFetch(rdapPrimary, {
+      ...options,
+      accept: "application/rdap+json, application/json",
+    }),
+    safeJsonFetch(dohUrl, options),
+  ]);
+
+  let rdapRes = rdapOutcome.status === "fulfilled" ? rdapOutcome.value : null;
+  if (
+    (!rdapRes || (rdapRes.status !== 200 && rdapRes.status !== 404)) &&
+    RDAP_ENDPOINTS_BY_TLD[tld]
+  ) {
+    try {
+      rdapRes = await safeJsonFetch(`https://rdap.org/domain/${encodeURIComponent(domain)}`, {
+        ...options,
+        accept: "application/rdap+json, application/json",
+      });
+    } catch {
+      // keep existing rdapRes
+    }
+  }
+
+  const dohRes = dohOutcome.status === "fulfilled" ? dohOutcome.value : null;
+  const checkedAt = new Date().toISOString();
+
+  const rdapStatus = rdapRes ? rdapRes.status : null;
+  const dnsRcode = dohRes?.json && typeof dohRes.json.Status === "number" ? dohRes.json.Status : null;
+  const dnsStatus = mapDnsRcode(dnsRcode);
+  const hasDnsDelegation = Boolean(
+    dnsRcode === 0 && Array.isArray(dohRes?.json?.Answer) && dohRes.json.Answer.length > 0
+  );
+
+  let expirationDate = null;
+  if (rdapStatus === 200 && Array.isArray(rdapRes?.json?.events)) {
+    const expEvt = rdapRes.json.events.find((e) => e?.eventAction === "expiration");
+    if (expEvt?.eventDate) expirationDate = String(expEvt.eventDate);
+  }
+
+  let available = null;
+  let status = "unknown";
+  let source = "unverified";
+
+  if (rdapStatus === 200) {
+    available = false;
+    status = "taken";
+    source = dohRes?.ok ? "rdap+doh" : "rdap";
+  } else if (hasDnsDelegation) {
+    available = false;
+    status = "taken";
+    source = rdapStatus ? "rdap+doh" : "doh";
+  } else if (rdapStatus === 404) {
+    available = true;
+    status = "available";
+    source = dohRes?.ok ? "rdap+doh" : "rdap";
+  } else if (dnsRcode === 3) {
+    available = true;
+    status = "likely_available";
+    source = "doh";
+  }
+
+  return {
+    domain,
+    tld,
+    available,
+    status,
+    rdapStatus,
+    dnsStatus,
+    hasDnsDelegation,
+    expirationDate,
+    source,
+    checkedAt,
+  };
+}
+
+async function checkNpmPackageAvailability(packageSlug, options = {}) {
+  const url = `https://registry.npmjs.org/${encodeURIComponent(packageSlug)}`;
+  const publicUrl = `https://www.npmjs.com/package/${packageSlug}`;
+  try {
+    const res = await safeJsonFetch(url, options);
+    const checkedAt = new Date().toISOString();
+    if (res.status === 404) {
+      return {
+        registry: "npm",
+        name: packageSlug,
+        available: true,
+        status: "available",
+        latestVersion: null,
+        url: publicUrl,
+        checkedAt,
+      };
+    }
+    if (res.status === 200) {
+      return {
+        registry: "npm",
+        name: packageSlug,
+        available: false,
+        status: "taken",
+        latestVersion: res.json?.["dist-tags"]?.latest || null,
+        url: publicUrl,
+        checkedAt,
+      };
+    }
+    return {
+      registry: "npm",
+      name: packageSlug,
+      available: null,
+      status: `http_${res.status}`,
+      latestVersion: null,
+      url: publicUrl,
+      checkedAt,
+    };
+  } catch (err) {
+    return {
+      registry: "npm",
+      name: packageSlug,
+      available: null,
+      status: "error",
+      error: err instanceof Error ? err.message : String(err),
+      url: publicUrl,
+      checkedAt: new Date().toISOString(),
+    };
+  }
+}
+
+async function checkPypiPackageAvailability(packageSlug, options = {}) {
+  const url = `https://pypi.org/pypi/${encodeURIComponent(packageSlug)}/json`;
+  const publicUrl = `https://pypi.org/project/${packageSlug}/`;
+  try {
+    const res = await safeJsonFetch(url, options);
+    const checkedAt = new Date().toISOString();
+    if (res.status === 404) {
+      return {
+        registry: "pypi",
+        name: packageSlug,
+        available: true,
+        status: "available",
+        latestVersion: null,
+        url: publicUrl,
+        checkedAt,
+      };
+    }
+    if (res.status === 200) {
+      return {
+        registry: "pypi",
+        name: packageSlug,
+        available: false,
+        status: "taken",
+        latestVersion: res.json?.info?.version || null,
+        url: publicUrl,
+        checkedAt,
+      };
+    }
+    return {
+      registry: "pypi",
+      name: packageSlug,
+      available: null,
+      status: `http_${res.status}`,
+      latestVersion: null,
+      url: publicUrl,
+      checkedAt,
+    };
+  } catch (err) {
+    return {
+      registry: "pypi",
+      name: packageSlug,
+      available: null,
+      status: "error",
+      error: err instanceof Error ? err.message : String(err),
+      url: publicUrl,
+      checkedAt: new Date().toISOString(),
+    };
+  }
+}
+
+async function checkGithubNamespaceAvailability(githubHandle, options = {}) {
+  const apiUrl = `https://api.github.com/users/${encodeURIComponent(githubHandle)}`;
+  const profileUrl = `https://github.com/${githubHandle}`;
+  try {
+    const res = await safeJsonFetch(apiUrl, {
+      ...options,
+      accept: "application/vnd.github+json",
+    });
+    const checkedAt = new Date().toISOString();
+    if (res.status === 404) {
+      return {
+        registry: "github",
+        handle: githubHandle,
+        available: true,
+        status: "available",
+        accountType: null,
+        url: profileUrl,
+        checkedAt,
+      };
+    }
+    if (res.status === 200) {
+      return {
+        registry: "github",
+        handle: githubHandle,
+        available: false,
+        status: "taken",
+        accountType: res.json?.type || "Account",
+        url: profileUrl,
+        checkedAt,
+      };
+    }
+    if (res.status === 403 || res.status === 429) {
+      const webRes = await safeJsonFetch(profileUrl, {
+        ...options,
+        accept: "text/html",
+      });
+      const fallbackAt = new Date().toISOString();
+      if (webRes.status === 404) {
+        return {
+          registry: "github",
+          handle: githubHandle,
+          available: true,
+          status: "available",
+          accountType: null,
+          url: profileUrl,
+          checkedAt: fallbackAt,
+        };
+      }
+      if (webRes.status === 200) {
+        return {
+          registry: "github",
+          handle: githubHandle,
+          available: false,
+          status: "taken",
+          accountType: "WebProfile",
+          url: profileUrl,
+          checkedAt: fallbackAt,
+        };
+      }
+    }
+    return {
+      registry: "github",
+      handle: githubHandle,
+      available: null,
+      status: `http_${res.status}`,
+      accountType: null,
+      url: profileUrl,
+      checkedAt,
+    };
+  } catch (err) {
+    return {
+      registry: "github",
+      handle: githubHandle,
+      available: null,
+      status: "error",
+      error: err instanceof Error ? err.message : String(err),
+      url: profileUrl,
+      checkedAt: new Date().toISOString(),
+    };
+  }
+}
+
+async function checkBlueskyHandleAvailability(blueskyHandle, options = {}) {
+  const apiUrl = `https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?handle=${encodeURIComponent(blueskyHandle)}`;
+  const profileUrl = `https://bsky.app/profile/${blueskyHandle}`;
+  try {
+    const res = await safeJsonFetch(apiUrl, options);
+    const checkedAt = new Date().toISOString();
+    if (res.status === 200 && res.json?.did) {
+      return {
+        platform: "bluesky",
+        handle: blueskyHandle,
+        available: false,
+        status: "taken",
+        did: res.json.did,
+        url: profileUrl,
+        checkedAt,
+      };
+    }
+    if (
+      res.status === 404 ||
+      (res.status === 400 && /unable to resolve handle/i.test(String(res.json?.message || res.text)))
+    ) {
+      return {
+        platform: "bluesky",
+        handle: blueskyHandle,
+        available: true,
+        status: "available",
+        did: null,
+        url: profileUrl,
+        checkedAt,
+      };
+    }
+    return {
+      platform: "bluesky",
+      handle: blueskyHandle,
+      available: null,
+      status: `http_${res.status}`,
+      did: null,
+      url: profileUrl,
+      checkedAt,
+    };
+  } catch (err) {
+    return {
+      platform: "bluesky",
+      handle: blueskyHandle,
+      available: null,
+      status: "error",
+      error: err instanceof Error ? err.message : String(err),
+      url: profileUrl,
+      checkedAt: new Date().toISOString(),
+    };
+  }
+}
+
+async function checkRedditHandleAvailability(redditHandle, options = {}) {
+  const availUrl = `https://www.reddit.com/api/username_available.json?user=${encodeURIComponent(redditHandle)}`;
+  const profileUrl = `https://www.reddit.com/user/${redditHandle}/`;
+  try {
+    const res = await safeJsonFetch(availUrl, options);
+    const checkedAt = new Date().toISOString();
+    if (res.status === 200 && typeof res.json === "boolean") {
+      return {
+        platform: "reddit",
+        handle: redditHandle,
+        available: res.json,
+        status: res.json ? "available" : "taken",
+        url: profileUrl,
+        checkedAt,
+      };
+    }
+    if (res.status === 404) {
+      return {
+        platform: "reddit",
+        handle: redditHandle,
+        available: true,
+        status: "available",
+        url: profileUrl,
+        checkedAt,
+      };
+    }
+    return {
+      platform: "reddit",
+      handle: redditHandle,
+      available: null,
+      status: res.status === 403 || res.status === 429 ? "restricted" : `http_${res.status}`,
+      httpStatus: res.status,
+      url: profileUrl,
+      checkedAt,
+    };
+  } catch (err) {
+    return {
+      platform: "reddit",
+      handle: redditHandle,
+      available: null,
+      status: "error",
+      error: err instanceof Error ? err.message : String(err),
+      url: profileUrl,
+      checkedAt: new Date().toISOString(),
+    };
+  }
+}
+
+async function checkIosAppStoreCollision(candidateSpec, options = {}) {
+  const searchUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(candidateSpec.displayName)}&entity=software&country=us&limit=5`;
+  try {
+    const res = await safeJsonFetch(searchUrl, options);
+    const checkedAt = new Date().toISOString();
+    if (!res.ok || !res.json || !Array.isArray(res.json.results)) {
+      return {
+        store: "apple_ios_app_store",
+        query: candidateSpec.displayName,
+        available: null,
+        status: `http_${res.status}`,
+        exactMatchFound: false,
+        totalSearchHits: 0,
+        topMatches: [],
+        checkedAt,
+      };
+    }
+
+    const results = res.json.results;
+    const targetLower = candidateSpec.displayName.toLowerCase();
+    const exactMatchFound = results.some((item) => {
+      const trackName = String(item?.trackName || "").trim();
+      if (!trackName) return false;
+      const trackLower = trackName.toLowerCase();
+      const trackCompact = trackLower.replace(/[^a-z0-9]+/g, "");
+      const leadingBrand = trackLower.split(/[:\-–—|]/)[0].trim().replace(/[^a-z0-9]+/g, "");
+      return (
+        trackLower === targetLower ||
+        trackCompact === candidateSpec.compactKey ||
+        leadingBrand === candidateSpec.compactKey
+      );
+    });
+
+    return {
+      store: "apple_ios_app_store",
+      query: candidateSpec.displayName,
+      available: !exactMatchFound,
+      status: exactMatchFound ? "collision_detected" : "clear",
+      exactMatchFound,
+      totalSearchHits: Number(res.json.resultCount ?? results.length) || 0,
+      topMatches: results.slice(0, 3).map((r) => ({
+        trackName: r.trackName || null,
+        sellerName: r.sellerName || null,
+        bundleId: r.bundleId || null,
+        trackViewUrl: r.trackViewUrl || null,
+      })),
+      checkedAt,
+    };
+  } catch (err) {
+    return {
+      store: "apple_ios_app_store",
+      query: candidateSpec.displayName,
+      available: null,
+      status: "error",
+      exactMatchFound: false,
+      totalSearchHits: 0,
+      topMatches: [],
+      error: err instanceof Error ? err.message : String(err),
+      checkedAt: new Date().toISOString(),
+    };
+  }
+}
+
+function scoreBrandCandidateReadiness(domains, registries, social, appStore) {
+  let earned = 0;
+  let possible = 0;
+  const addWeight = (avail, weight) => {
+    if (typeof avail !== "boolean") return;
+    possible += weight;
+    if (avail) earned += weight;
+  };
+
+  const domainMap = new Map(domains.map((d) => [d.tld, d.available]));
+  addWeight(domainMap.get("com") ?? null, 25);
+  addWeight(domainMap.get("ai") ?? null, 10);
+  addWeight(domainMap.get("io") ?? null, 10);
+  addWeight(domainMap.get("dev") ?? null, 8);
+  addWeight(domainMap.get("app") ?? null, 6);
+  addWeight(domainMap.get("org") ?? null, 6);
+
+  // Include any extra custom TLDs
+  for (const d of domains) {
+    if (!["com", "ai", "io", "dev", "app", "org"].includes(d.tld)) {
+      addWeight(d.available, 5);
+    }
+  }
+
+  addWeight(registries.npm.available, 10);
+  addWeight(registries.pypi.available, 8);
+  addWeight(registries.github.available, 12);
+  addWeight(social.bluesky.available, 6);
+  addWeight(social.reddit.available, 4);
+  addWeight(appStore.available, 10);
+
+  const readinessScore = possible > 0 ? Math.round((earned / possible) * 100) : 0;
+  const allChecks = [
+    ...domains.map((d) => d.available),
+    registries.npm.available,
+    registries.pypi.available,
+    registries.github.available,
+    social.bluesky.available,
+    social.reddit.available,
+    appStore.available,
+  ];
+
+  return {
+    readinessScore,
+    verdict:
+      readinessScore >= 80
+        ? "STRONG_GREENLIGHT"
+        : readinessScore >= 55
+          ? "VIABLE_WITH_TRADEOFFS"
+          : "HIGH_COLLISION",
+    availableCount: allChecks.filter((v) => v === true).length,
+    takenCount: allChecks.filter((v) => v === false).length,
+    unknownCount: allChecks.filter((v) => v === null).length,
+    comAvailable: domainMap.get("com") ?? null,
+    allDeveloperRegistriesAvailable:
+      registries.npm.available === true &&
+      registries.pypi.available === true &&
+      registries.github.available === true,
+  };
+}
+
+export async function scanBrandDomainAndHandles(input = {}, options = {}) {
+  const rawCandidates = [];
+  if (Array.isArray(input?.candidates)) {
+    for (const item of input.candidates) {
+      if (typeof item === "string" && item.trim()) rawCandidates.push(item.trim());
+    }
+  }
+  if (typeof input?.name === "string" && input.name.trim()) {
+    for (const part of input.name.split(",")) {
+      if (part.trim()) rawCandidates.push(part.trim());
+    }
+  }
+
+  const dedupedRaw = Array.from(new Set(rawCandidates)).slice(0, 5);
+  if (dedupedRaw.length === 0) {
+    throw new Error(
+      "Missing brand name: provide 'name' (e.g. 'forgesuite') or 'candidates' (up to 5 names)."
+    );
+  }
+
+  const requestedTlds =
+    Array.isArray(input?.tlds) && input.tlds.length > 0
+      ? Array.from(
+          new Set(
+            input.tlds
+              .map((t) =>
+                String(t || "")
+                  .trim()
+                  .toLowerCase()
+                  .replace(/^\.+/, "")
+              )
+              .filter((t) => /^[a-z0-9-]{2,24}$/.test(t))
+          )
+        ).slice(0, 10)
+      : [...BRAND_SCAN_DEFAULT_TLDS];
+
+  if (requestedTlds.length === 0) {
+    throw new Error("At least one valid TLD is required.");
+  }
+
+  const normalizedCandidates = dedupedRaw.map((c) => normalizeBrandCandidate(c));
+
+  const results = await Promise.all(
+    normalizedCandidates.map(async (spec) => {
+      const [domains, npmRes, pypiRes, githubRes, blueskyRes, redditRes, appStoreRes] =
+        await Promise.all([
+          Promise.all(
+            requestedTlds.map((tld) =>
+              checkSingleDomainAvailability(spec.domainLabel, tld, options)
+            )
+          ),
+          checkNpmPackageAvailability(spec.packageSlug, options),
+          checkPypiPackageAvailability(spec.packageSlug, options),
+          checkGithubNamespaceAvailability(spec.githubHandle, options),
+          checkBlueskyHandleAvailability(spec.blueskyHandle, options),
+          checkRedditHandleAvailability(spec.redditHandle, options),
+          checkIosAppStoreCollision(spec, options),
+        ]);
+
+      const registries = {
+        npm: npmRes,
+        pypi: pypiRes,
+        github: githubRes,
+      };
+      const social = {
+        bluesky: blueskyRes,
+        reddit: redditRes,
+      };
+      const summary = scoreBrandCandidateReadiness(domains, registries, social, appStoreRes);
+
+      return {
+        candidate: spec.displayName,
+        normalizedSlug: spec.domainLabel,
+        checkedAt: new Date().toISOString(),
+        summary,
+        domains,
+        registries,
+        social,
+        iosAppStore: appStoreRes,
+      };
+    })
+  );
+
+  const ranked = [...results].sort(
+    (a, b) => b.summary.readinessScore - a.summary.readinessScore
+  );
+
+  return {
+    ok: true,
+    checkedAt: new Date().toISOString(),
+    tldsChecked: requestedTlds,
+    candidateCount: results.length,
+    recommendedCandidate: ranked[0]?.candidate || null,
+    results,
+    upgradeLinks: {
+      proBundleUrl: FORGESUITE_LINKS.pricing,
+      proBundlePriceUsd: 35,
+      proBundleOffer:
+        "Unlock ForgeSuite All-Access Lifetime Pro Bundle ($35, save $14 — CryptoBill Pro, TokenGuard 25-Token Batch Watchlist, AutoShorts Pro & WebLead Pro)",
+      mcpDocsUrl: FORGESUITE_LINKS.mcp,
+      nearAgentFleet: NEAR_AGENT_FLEET,
+    },
+  };
+}
+
+/* ============================================================================
+ * 7. MCP Tool Definitions & Dispatch (7 Tools)
  * ========================================================================== */
 
 export const TOOLS = Object.freeze([
@@ -2396,6 +3114,33 @@ export const TOOLS = Object.freeze([
         },
       },
       required: ["mint"],
+    },
+  },
+  {
+    name: "brand_domain_handle_scan",
+    description:
+      "Check candidate brand or project names live across authoritative RDAP + Google DoH domains (.com, .io, .ai, .dev, .app, .org), developer registries (npm, PyPI, GitHub), social handles (Bluesky, Reddit), and the Apple iOS App Store (itunes.apple.com). Returns structured availability, launch readiness score, and UTC check timestamps.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          description:
+            "Candidate brand/project name (e.g. 'forgesuite' or comma-separated list of up to 5 candidates).",
+        },
+        candidates: {
+          type: "array",
+          items: { type: "string" },
+          description: "Optional array of up to 5 candidate brand names to compare in parallel.",
+        },
+        tlds: {
+          type: "array",
+          items: { type: "string" },
+          description:
+            "Optional list of domain TLDs to verify (default: ['com', 'io', 'ai', 'dev', 'app', 'org']).",
+        },
+      },
+      required: ["name"],
     },
   },
 ]);
@@ -2634,13 +3379,74 @@ function executeTool(name, args = {}, options = {}) {
         }));
     }
 
+    case "brand_domain_handle_scan": {
+      const hasName = typeof safeArgs.name === "string" && safeArgs.name.trim().length > 0;
+      const hasCandidates =
+        Array.isArray(safeArgs.candidates) && safeArgs.candidates.some((c) => typeof c === "string" && c.trim());
+      if (!hasName && !hasCandidates) {
+        return {
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: "Invalid argument: provide 'name' (string) or 'candidates' (non-empty string array).",
+            },
+          ],
+        };
+      }
+      return scanBrandDomainAndHandles(safeArgs, options)
+        .then((res) => {
+          const fmtStatus = (avail, labelStatus) => {
+            if (avail === true) return `AVAILABLE (${labelStatus || "available"})`;
+            if (avail === false) return `TAKEN (${labelStatus || "taken"})`;
+            return `UNVERIFIED (${labelStatus || "unknown"})`;
+          };
+          const lines = [
+            `Brand, Domain & Handle Scan (Checked UTC: ${res.checkedAt})`,
+            `Recommended Candidate: ${res.recommendedCandidate || "n/a"}`,
+          ];
+          for (const item of res.results) {
+            lines.push(
+              "",
+              `## ${item.candidate} (slug: \`${item.normalizedSlug}\` — Readiness: ${item.summary.readinessScore}/100 · ${item.summary.verdict})`,
+              `- Domains: ${item.domains.map((d) => `\`${d.domain}\`=${d.available === true ? "FREE" : d.available === false ? "TAKEN" : "?"}`).join(", ")}`,
+              `- Registries: npm=${fmtStatus(item.registries.npm.available, item.registries.npm.status)} | PyPI=${fmtStatus(item.registries.pypi.available, item.registries.pypi.status)} | GitHub=${fmtStatus(item.registries.github.available, item.registries.github.status)}`,
+              `- Social: Bluesky (\`${item.social.bluesky.handle}\`)=${fmtStatus(item.social.bluesky.available, item.social.bluesky.status)} | Reddit (\`u/${item.social.reddit.handle}\`)=${fmtStatus(item.social.reddit.available, item.social.reddit.status)}`,
+              `- Apple iOS App Store: ${item.iosAppStore.available === true ? "CLEAR (no exact title collision)" : item.iosAppStore.available === false ? "COLLISION DETECTED" : "UNVERIFIED"} (${item.iosAppStore.totalSearchHits} search hits)`
+            );
+          }
+          lines.push(
+            "",
+            `Upgrade to ForgeSuite All-Access Pro Bundle ($35 Lifetime, Save $14): ${FORGESUITE_LINKS.pricing}`,
+            `NEAR AI Agent Market Fleet (A2A + x402):`,
+            `- Forge AI Agent ($5.00 USDC/call): ${FORGESUITE_LINKS.forgeAgent}`,
+            `- Forge TokenGuard ($0.25 USDC/call): ${FORGESUITE_LINKS.forgeTokenGuard}`,
+            `- Forge Data & FinOps ($0.15 USDC/call): ${FORGESUITE_LINKS.forgeDataFinops}`
+          );
+          return {
+            isError: false,
+            content: [{ type: "text", text: lines.join("\n") }],
+            structuredContent: res,
+          };
+        })
+        .catch((err) => ({
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: `Brand Domain & Handle Scan Error: ${err instanceof Error ? err.message : String(err)}`,
+            },
+          ],
+        }));
+    }
+
     default:
       return null;
   }
 }
 
 /* ============================================================================
- * 7. JSON-RPC 2.0 MCP Protocol Router
+ * 8. JSON-RPC 2.0 MCP Protocol Router
  * ========================================================================== */
 
 function rpcResult(id, result) {
@@ -2690,7 +3496,7 @@ export function handleJsonRpcMessage(msg, options = {}) {
         },
         serverInfo: SERVER_INFO,
         instructions:
-          "ForgeSuite MCP Server (v1.1.0) provides 6 zero-dependency developer, FinOps & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), and solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner). Docs: https://youthmy11-ai.github.io/mcp.html",
+          "ForgeSuite MCP Server (v1.2.0) provides 7 zero-dependency developer, FinOps, brand launch & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner), and brand_domain_handle_scan (authoritative RDAP + Google DoH .com/.io/.ai/.dev/.app/.org domains, npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability scanner). Global run: npx --yes github:youthmy11-ai/youthmy11-ai.github.io | Docs: https://youthmy11-ai.github.io/mcp.html",
       });
     }
 
@@ -2843,9 +3649,15 @@ function startStdioServer() {
 const isMainModule = (() => {
   if (!process.argv[1]) return false;
   try {
-    return path.resolve(fileURLToPath(import.meta.url)) === path.resolve(process.argv[1]);
+    const selfReal = fs.realpathSync(fileURLToPath(import.meta.url));
+    const entryReal = fs.realpathSync(path.resolve(process.argv[1]));
+    return selfReal === entryReal;
   } catch {
-    return false;
+    try {
+      return path.resolve(fileURLToPath(import.meta.url)) === path.resolve(process.argv[1]);
+    } catch {
+      return false;
+    }
   }
 })();
 

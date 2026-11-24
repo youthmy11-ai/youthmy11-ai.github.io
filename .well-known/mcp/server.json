@@ -1,14 +1,24 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.youthmy11-ai/forgesuite-mcp",
-  "title": "ForgeSuite DevSecOps, Web3 Risk & Crypto FinOps MCP Server",
-  "description": "Zero-dependency Node.js 22+ stdio MCP server (v1.1.0, 6 tools): .env secret leak scanner, EVM calldata/risk decoder, LLM token cost calculator, crypto invoice URI generator, live EVM token/proxy/opcode risk scanner, and live Solana SPL/Token-2022 mint risk scanner.",
-  "version": "1.1.0",
+  "title": "ForgeSuite DevSecOps, Web3 Risk, Brand Launch & Crypto FinOps MCP Server",
+  "description": "Zero-dependency Node.js 20+ stdio MCP server (v1.2.0, 7 tools — run instantly via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`): .env secret leak scanner, EVM calldata/risk decoder, LLM token cost calculator, crypto invoice URI generator, live EVM token/proxy/opcode risk scanner, live Solana SPL/Token-2022 mint risk scanner, and live RDAP+DoH domain & developer/social handle availability scanner.",
+  "version": "1.2.0",
   "websiteUrl": "https://youthmy11-ai.github.io/mcp.html",
   "repository": {
     "url": "https://github.com/youthmy11-ai/youthmy11-ai.github.io",
     "source": "github"
   },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "github:youthmy11-ai/youthmy11-ai.github.io",
+      "version": "1.2.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ],
   "tools": [
     {
       "name": "envshield_scan",
@@ -33,6 +43,10 @@
     {
       "name": "solana_mint_risk_scan",
       "description": "Live Solana Mainnet SPL Token and Token-2022 mintAuthority, freezeAuthority, permanentDelegate, transferFeeConfig, transferHook, and Top-10 holder concentration risk audit."
+    },
+    {
+      "name": "brand_domain_handle_scan",
+      "description": "Check candidate brand/project names across authoritative RDAP + Google DoH domains (.com, .io, .ai, .dev, .app, .org), npm/PyPI/GitHub registries, Bluesky/Reddit handles, and Apple iOS App Store."
     }
   ]
 }

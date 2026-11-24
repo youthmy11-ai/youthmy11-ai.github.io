@@ -1,0 +1,36 @@
+{
+  "name": "forgesuite-mcp",
+  "version": "1.2.0",
+  "description": "Zero-dependency MCP server (7 tools) for Web3 EVM/Solana token risk scanning, calldata decoding, .env secret auditing, LLM FinOps cost estimation, crypto invoicing, and brand domain/handle availability.",
+  "type": "module",
+  "bin": {
+    "forgesuite-mcp": "./mcp/forgesuite-mcp.mjs"
+  },
+  "main": "./mcp/forgesuite-mcp.mjs",
+  "scripts": {
+    "start": "node ./mcp/forgesuite-mcp.mjs",
+    "test": "node --test tests/suite.test.mjs"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "web3-security",
+    "evm",
+    "solana",
+    "token-audit",
+    "calldata",
+    "secret-scanner",
+    "finops",
+    "domain-availability"
+  ],
+  "homepage": "https://youthmy11-ai.github.io/mcp.html",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/youthmy11-ai/youthmy11-ai.github.io.git"
+  },
+  "author": "ForgeSuite Studio (youthmy11-ai)",
+  "license": "MIT"
+}

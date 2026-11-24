@@ -26,13 +26,14 @@ All web tools execute **100% inside local browser memory** with zero ForgeSuite 
 7. **[EnvShield Secret Scanner](https://youthmy11-ai.github.io/envshield.html)** (`envshield.html`) — **Free**
    - Instant client-side `.env`, JSON, and transcript secret scanner & safe redactor covering OpenAI, Anthropic, GitHub, AWS, Google, Telegram, EVM private keys, JWTs, DB URIs, and high-entropy credentials.
 
-## ForgeSuite MCP Server (`mcp/forgesuite-mcp.mjs` · v1.1.0 · 6 Tools · Zero Dependencies)
+## ForgeSuite MCP Server (`mcp/forgesuite-mcp.mjs` · v1.2.0 · 7 Tools · Zero Dependencies)
 
-Connect Claude Code, Cursor, Antigravity, or Windsurf to **6 developer, FinOps & Web3 security tools** (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`) — docs at **[mcp.html](https://youthmy11-ai.github.io/mcp.html)**:
+Connect Claude Code, Cursor, Antigravity, or Windsurf in **one command** (`< 2s`, zero npm dependencies) to **7 developer, FinOps, brand launch & Web3 security tools** (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, `brand_domain_handle_scan`) — docs at **[mcp.html](https://youthmy11-ai.github.io/mcp.html)**:
 
 ```bash
-mkdir -p ~/.forgesuite-mcp && curl -fsSL https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs -o ~/.forgesuite-mcp/forgesuite-mcp.mjs
-claude mcp add forgesuite -- node "$HOME/.forgesuite-mcp/forgesuite-mcp.mjs"
+# Run directly or register with Claude Code in 1 command:
+npx --yes github:youthmy11-ai/youthmy11-ai.github.io
+claude mcp add forgesuite -- npx --yes github:youthmy11-ai/youthmy11-ai.github.io
 ```
 
 ## Packaged Pro Editions & Bundle (`Save $14`)

@@ -57,9 +57,9 @@
     },
     {
       "id": "forgesuite-mcp",
-      "name": "ForgeSuite MCP Server (v1.1.0)",
-      "description": "Zero-dependency Node 22+ stdio MCP server with 6 tools: envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote, evm_token_risk_scan (Base/Ethereum/BSC/Arbitrum), and solana_mint_risk_scan (SPL & Token-2022).",
-      "tags": ["mcp", "devsecops", "evm", "solana", "token-audit", "finops", "solana-pay", "crypto-invoicing"]
+      "name": "ForgeSuite MCP Server (v1.2.0)",
+      "description": "Zero-dependency Node 20+ stdio MCP server (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io`) with 7 tools: envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote, evm_token_risk_scan (Base/Ethereum/BSC/Arbitrum), solana_mint_risk_scan (SPL & Token-2022), and brand_domain_handle_scan (RDAP+DoH domains, npm/PyPI/GitHub, Bluesky/Reddit, iOS App Store).",
+      "tags": ["mcp", "devsecops", "evm", "solana", "token-audit", "finops", "domain-availability", "solana-pay", "crypto-invoicing"]
     }
   ],
   "provider": {

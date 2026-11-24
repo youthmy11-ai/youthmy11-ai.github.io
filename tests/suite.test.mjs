@@ -81,7 +81,12 @@ import {
   TOKEN_2022_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
 } from "../assets/tokenaudit.js";
-import { SERVER_INFO as MCP_SERVER_INFO } from "../mcp/forgesuite-mcp.mjs";
+import {
+  SERVER_INFO as MCP_SERVER_INFO,
+  handleJsonRpcMessage,
+  normalizeBrandCandidate,
+  scanBrandDomainAndHandles,
+} from "../mcp/forgesuite-mcp.mjs";
 
 test("verifySolanaUsdcTx and verifySolanaUsdcTxOnChain validate SPL USDC transfers and issue keys", async () => {
   const sampleTx = {
@@ -1160,17 +1165,18 @@ test("ForgeSuite MCP stdio server handles initialize, notifications/initialized,
   assert.equal(messages[0].id, 1);
   assert.equal(messages[0].result.protocolVersion, "2024-11-05");
   assert.equal(messages[0].result.serverInfo.name, "forgesuite-mcp");
-  assert.equal(messages[0].result.serverInfo.version, "1.1.0");
-  assert.equal(MCP_SERVER_INFO.version, "1.1.0");
+  assert.equal(messages[0].result.serverInfo.version, "1.2.0");
+  assert.equal(MCP_SERVER_INFO.version, "1.2.0");
   assert.ok(messages[0].result.capabilities.tools);
 
   assert.equal(messages[1].id, 2);
   assert.deepEqual(messages[1].result, {});
 
   assert.equal(messages[2].id, 3);
-  assert.equal(messages[2].result.tools.length, 6);
+  assert.equal(messages[2].result.tools.length, 7);
   const toolNames = messages[2].result.tools.map((t) => t.name).sort();
   assert.deepEqual(toolNames, [
+    "brand_domain_handle_scan",
     "calldata_decode",
     "cryptobill_quote",
     "envshield_scan",
@@ -1360,7 +1366,7 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
 
   const mcpManifest = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "mcp", "server.json"), "utf8"));
   assert.equal(mcpManifest.name, "io.github.youthmy11-ai/forgesuite-mcp");
-  assert.equal(mcpManifest.version, "1.1.0");
+  assert.equal(mcpManifest.version, "1.2.0");
   assert.deepEqual(
     mcpManifest.tools.map((t) => t.name),
     [
@@ -1370,6 +1376,7 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
       "cryptobill_quote",
       "evm_token_risk_scan",
       "solana_mint_risk_scan",
+      "brand_domain_handle_scan",
     ]
   );
 });
@@ -1776,4 +1783,236 @@ test("ForgeSuite MCP v1.1.0 executes evm_token_risk_scan and solana_mint_risk_sc
   } finally {
     await new Promise((resolve) => mockRpcServer.close(resolve));
   }
+});
+
+/* ============================================================================
+ * 14. ForgeSuite MCP v1.2.0 Packaging, LF Line-Endings & Tool #7 Brand Scanner
+ * ========================================================================== */
+
+test("root package.json, .gitattributes, shebang LF line-endings, and v1.2.0 npx discovery docs are valid", () => {
+  const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const pkgPath = path.join(rootDir, "package.json");
+  const gitAttrPath = path.join(rootDir, ".gitattributes");
+  const mcpBinPath = path.join(rootDir, "mcp", "forgesuite-mcp.mjs");
+
+  assert.ok(fs.existsSync(pkgPath), "root package.json must exist for npx github:... execution");
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+  assert.equal(pkg.name, "forgesuite-mcp");
+  assert.equal(pkg.version, "1.2.0");
+  assert.equal(pkg.type, "module");
+  assert.deepEqual(pkg.bin, { "forgesuite-mcp": "./mcp/forgesuite-mcp.mjs" });
+  assert.equal(pkg.engines?.node, ">=20.0.0");
+  assert.equal(pkg.dependencies, undefined, "root package.json must have zero dependencies");
+  assert.equal(pkg.devDependencies, undefined, "root package.json must have zero devDependencies");
+
+  assert.ok(fs.existsSync(gitAttrPath), ".gitattributes must exist");
+  const gitAttr = fs.readFileSync(gitAttrPath, "utf8");
+  assert.match(gitAttr, /\*\.mjs\s+text\s+eol=lf/);
+
+  const rawMcpBytes = fs.readFileSync(mcpBinPath);
+  const firstLineBytes = rawMcpBytes.subarray(0, 20).toString("ascii");
+  assert.equal(
+    firstLineBytes,
+    "#!/usr/bin/env node\n",
+    "mcp/forgesuite-mcp.mjs must start with exact LF shebang #!/usr/bin/env node\\n"
+  );
+  assert.equal(
+    rawMcpBytes.includes(0x0d),
+    false,
+    "mcp/forgesuite-mcp.mjs must use strict LF (\\n) with zero CR (\\r) bytes"
+  );
+
+  // Check v1.2.0 and 1-command npx across discovery & storefront files
+  const npxCmd = "npx --yes github:youthmy11-ai/youthmy11-ai.github.io";
+  for (const rel of [
+    ".well-known/mcp/server.json",
+    ".well-known/agent-card.json",
+    "mcp.html",
+    "index.html",
+    "llms.txt",
+    "llms-full.txt",
+    "README.md",
+  ]) {
+    const content = fs.readFileSync(path.join(rootDir, rel), "utf8");
+    assert.ok(content.includes(npxCmd), `${rel} must showcase ${npxCmd}`);
+    assert.ok(content.includes("brand_domain_handle_scan"), `${rel} must list brand_domain_handle_scan`);
+    assert.ok(content.includes("1.2.0"), `${rel} must reference v1.2.0`);
+  }
+});
+
+test("brand_domain_handle_scan (Tool #7) audits RDAP+DoH domains, npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store", async () => {
+  const norm = normalizeBrandCandidate("@ForgeSuite.io");
+  assert.equal(norm.domainLabel, "forgesuite");
+  assert.equal(norm.blueskyHandle, "forgesuite.bsky.social");
+  assert.throws(() => normalizeBrandCandidate("x"), /at least 2 alphanumeric/i);
+
+  const mockFetch = async (rawUrl) => {
+    const u = String(rawUrl);
+    const jsonResp = (status, obj) => ({
+      ok: status >= 200 && status < 300,
+      status,
+      text: async () => (obj === null ? "" : JSON.stringify(obj)),
+    });
+
+    // Candidate 1 ("novaforgex") -> mostly available; Candidate 2 ("takenhub") -> mostly taken
+    const isTakenBrand = u.toLowerCase().includes("takenhub");
+
+    // Authoritative RDAP checks
+    if (
+      u.includes("rdap.verisign.com") ||
+      u.includes("rdap.identitydigital.services") ||
+      u.includes("pubapi.registry.google") ||
+      u.includes("rdap.publicinterestregistry.org") ||
+      u.includes("rdap.org/domain/")
+    ) {
+      if (isTakenBrand || u.endsWith("novaforgex.org")) {
+        return jsonResp(200, {
+          objectClassName: "domain",
+          ldhName: isTakenBrand ? "TAKENHUB.COM" : "NOVAFORGEX.ORG",
+          events: [{ eventAction: "expiration", eventDate: "2028-05-01T00:00:00Z" }],
+        });
+      }
+      return jsonResp(404, { errorCode: 404, title: "Not Found" });
+    }
+
+    // Google DoH checks
+    if (u.includes("dns.google/resolve")) {
+      if (isTakenBrand || u.includes("name=novaforgex.org")) {
+        return jsonResp(200, { Status: 0, Answer: [{ name: "example.", type: 2, data: "ns1.dns.com." }] });
+      }
+      return jsonResp(200, { Status: 3 });
+    }
+
+    // npm
+    if (u.includes("registry.npmjs.org/")) {
+      return isTakenBrand
+        ? jsonResp(200, { name: "takenhub", "dist-tags": { latest: "4.2.0" } })
+        : jsonResp(404, { error: "Not found" });
+    }
+
+    // PyPI
+    if (u.includes("pypi.org/pypi/")) {
+      return isTakenBrand
+        ? jsonResp(200, { info: { version: "1.9.3" } })
+        : jsonResp(404, { message: "Not Found" });
+    }
+
+    // GitHub API (test 403 fallback on novaforgex -> github.com web 404)
+    if (u.includes("api.github.com/users/")) {
+      if (isTakenBrand) return jsonResp(200, { login: "takenhub", type: "Organization" });
+      return jsonResp(403, { message: "API rate limit exceeded" });
+    }
+    if (u.startsWith("https://github.com/")) {
+      return isTakenBrand ? jsonResp(200, {}) : jsonResp(404, {});
+    }
+
+    // Bluesky
+    if (u.includes("public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle")) {
+      return isTakenBrand
+        ? jsonResp(200, { did: "did:plc:takenhub12345" })
+        : jsonResp(400, { error: "InvalidRequest", message: "Unable to resolve handle" });
+    }
+
+    // Reddit
+    if (u.includes("reddit.com/api/username_available.json")) {
+      return jsonResp(200, !isTakenBrand);
+    }
+
+    // Apple iOS App Store
+    if (u.includes("itunes.apple.com/search")) {
+      if (isTakenBrand) {
+        return jsonResp(200, {
+          resultCount: 2,
+          results: [
+            {
+              trackName: "TakenHub: Team Chat",
+              sellerName: "TakenHub Inc.",
+              bundleId: "com.takenhub.ios",
+              trackViewUrl: "https://apps.apple.com/us/app/takenhub/id123456",
+            },
+          ],
+        });
+      }
+      return jsonResp(200, {
+        resultCount: 1,
+        results: [
+          {
+            trackName: "Unrelated Utility App",
+            sellerName: "Other Studio",
+            bundleId: "com.other.app",
+            trackViewUrl: "https://apps.apple.com/us/app/other/id999999",
+          },
+        ],
+      });
+    }
+
+    throw new Error(`Unexpected URL in brand scanner test: ${u}`);
+  };
+
+  const direct = await scanBrandDomainAndHandles(
+    { name: "NovaForgeX, TakenHub" },
+    { fetchImpl: mockFetch }
+  );
+  assert.equal(direct.ok, true);
+  assert.equal(direct.candidateCount, 2);
+  assert.equal(direct.recommendedCandidate, "NovaForgeX");
+  assert.match(direct.checkedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+  assert.deepEqual(direct.tldsChecked, ["com", "io", "ai", "dev", "app", "org"]);
+  assert.equal(direct.upgradeLinks.proBundlePriceUsd, 35);
+  assert.equal(direct.upgradeLinks.nearAgentFleet.length, 3);
+
+  const nova = direct.results[0];
+  assert.equal(nova.normalizedSlug, "novaforgex");
+  assert.equal(nova.summary.comAvailable, true);
+  assert.equal(nova.summary.allDeveloperRegistriesAvailable, true);
+  assert.equal(nova.summary.verdict, "STRONG_GREENLIGHT");
+  assert.ok(nova.summary.readinessScore >= 90);
+  assert.equal(nova.domains.find((d) => d.tld === "com").available, true);
+  assert.equal(nova.domains.find((d) => d.tld === "org").available, false);
+  assert.equal(nova.registries.npm.available, true);
+  assert.equal(nova.registries.pypi.available, true);
+  assert.equal(nova.registries.github.available, true);
+  assert.equal(nova.social.bluesky.available, true);
+  assert.equal(nova.social.reddit.available, true);
+  assert.equal(nova.iosAppStore.available, true);
+  assert.equal(nova.iosAppStore.exactMatchFound, false);
+
+  const taken = direct.results[1];
+  assert.equal(taken.summary.readinessScore, 0);
+  assert.equal(taken.summary.verdict, "HIGH_COLLISION");
+  assert.equal(taken.registries.npm.latestVersion, "4.2.0");
+  assert.equal(taken.registries.github.accountType, "Organization");
+  assert.equal(taken.iosAppStore.available, false);
+  assert.equal(taken.iosAppStore.exactMatchFound, true);
+
+  // Full JSON-RPC tools/call dispatch test + stdio error validation
+  const rpcResp = await handleJsonRpcMessage(
+    {
+      jsonrpc: "2.0",
+      id: "brand-rpc-1",
+      method: "tools/call",
+      params: {
+        name: "brand_domain_handle_scan",
+        arguments: { name: "NovaForgeX" },
+      },
+    },
+    { fetchImpl: mockFetch }
+  );
+  assert.equal(rpcResp.id, "brand-rpc-1");
+  assert.equal(rpcResp.result.isError, false);
+  assert.match(rpcResp.result.content[0].text, /STRONG_GREENLIGHT/);
+  assert.match(rpcResp.result.content[0].text, /\$35/);
+  assert.match(rpcResp.result.content[0].text, /market\.near\.ai\/a\/forge-ai-agent/);
+  assert.equal(rpcResp.result.structuredContent.recommendedCandidate, "NovaForgeX");
+
+  const stdioErr = await runMcpStdioSession([
+    JSON.stringify({
+      jsonrpc: "2.0",
+      id: "brand-bad",
+      method: "tools/call",
+      params: { name: "brand_domain_handle_scan", arguments: { name: "   " } },
+    }) + "\n",
+  ]);
+  assert.equal(stdioErr.code, 0);
+  assert.equal(stdioErr.messages[0].result.isError, true);
 });

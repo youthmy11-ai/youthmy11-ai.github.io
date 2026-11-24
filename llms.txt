@@ -1,6 +1,6 @@
 # ForgeSuite Studio
 
-> Zero-backend, privacy-first micro-SaaS, DevSecOps, and Web3 security tool portfolio by youthmy11-ai. Offers 7 client-side browser applications (including TokenGuard live EVM & Solana contract risk scanner), 2 open-core desktop/browser tools (AutoShorts Studio and WebLead & Table Extractor), a zero-dependency Node 22+ MCP Server (v1.1.0, 6 tools), and an All-Access Lifetime Pro Bundle ($15–$49 pricing, zero subscriptions, zero server uploads) with instant client-side on-chain BSC USDT (BEP20) and Solana SPL USDC auto-unlock plus TRC20, Binance Pay, and PayPal checkout.
+> Zero-backend, privacy-first micro-SaaS, DevSecOps, and Web3 security tool portfolio by youthmy11-ai. Offers 7 client-side browser applications (including TokenGuard live EVM & Solana contract risk scanner), 2 open-core desktop/browser tools (AutoShorts Studio and WebLead & Table Extractor), a zero-dependency Node 20+ MCP Server (v1.2.0, 7 tools — 1-command run: `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`), and an All-Access Lifetime Pro Bundle ($15–$49 pricing, zero subscriptions, zero server uploads) with instant client-side on-chain BSC USDT (BEP20) and Solana SPL USDC auto-unlock plus TRC20, Binance Pay, and PayPal checkout.
 
 ForgeSuite Studio is designed for solo founders, independent freelancers, AI engineers, content creators, and Web3 builders who want fast local-first software without recurring subscriptions or cloud tracking.
 
@@ -18,7 +18,7 @@ ForgeSuite Studio is designed for solo founders, independent freelancers, AI eng
 - [ScopeGuard SOW Builder](https://youthmy11-ai.github.io/sowbuilder.html): Free ($0) offline freelance, AI engineering, and Web3 audit Statement of Work generator with 100%-balanced milestone splits and 1-click CryptoBill USDT invoicing.
 - [Calldata Lens](https://youthmy11-ai.github.io/txdecode.html): Free ($0) offline Ethereum & BSC EVM hex calldata decoder for ERC-20 transfers, infinite `MAX_UINT256` approval risk alerts, EIP-2612 permits, ERC-4626 vaults, and Safe multisig payloads.
 - [EnvShield Secret Scanner](https://youthmy11-ai.github.io/envshield.html): Free ($0) offline `.env`, JSON, and AI transcript secret scanner & redactor detecting OpenAI, Anthropic, GitHub, AWS, Telegram, JWT, DB URI passwords, EVM private keys, and high-entropy credentials.
-- [ForgeSuite MCP Server (v1.1.0)](https://youthmy11-ai.github.io/mcp.html): Free ($0) zero-dependency single-file Node 22+ JSON-RPC 2.0 stdio MCP server (`https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs`) for Claude Code, Cursor, Antigravity, and Windsurf exposing 6 tools: `envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, and `solana_mint_risk_scan`.
+- [ForgeSuite MCP Server (v1.2.0)](https://youthmy11-ai.github.io/mcp.html): Free ($0) zero-dependency Node 20+ JSON-RPC 2.0 stdio MCP server (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io` or `https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs`) for Claude Code, Cursor, Antigravity, and Windsurf exposing 7 tools: `envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, and `brand_domain_handle_scan`.
 
 ## Open-Core Packaged Tools & Lifetime Bundle
 

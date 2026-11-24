@@ -1,6 +1,6 @@
 # ForgeSuite Studio — Full Portfolio Reference (`llms-full.txt`)
 
-> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 10 catalog offerings (7 live client-side web apps including TokenGuard EVM & Solana Risk Scanner, 2 open-core packaged GitHub tools, 1 zero-dependency Node 22+ MCP Server v1.1.0 with 6 tools, and 1 All-Access Lifetime Bundle), transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict client-side privacy guarantees, and zero-backend crypto + PayPal checkout.
+> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 10 catalog offerings (7 live client-side web apps including TokenGuard EVM & Solana Risk Scanner, 2 open-core packaged GitHub tools, 1 zero-dependency Node 20+ MCP Server v1.2.0 with 7 tools executable via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`, and 1 All-Access Lifetime Bundle), transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict client-side privacy guarantees, and zero-backend crypto + PayPal checkout.
 
 ---
 
@@ -29,7 +29,7 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 | 8 | **ScopeGuard SOW Builder** | Live Web App (`sowbuilder.html`) | 100% Free ($0) — AI/Web3/Chrome SOW templates, milestone splits, CryptoBill export | **$0** | Free |
 | 9 | **Calldata Lens** | Live Web App (`txdecode.html`) | 100% Free ($0) — offline EVM ABI decoder & `MAX_UINT256` approval risk alerts | **$0** | Free |
 | 10 | **EnvShield Secret Scanner** | Live Web App (`envshield.html`) | 100% Free ($0) — 13 secret detectors + Shannon entropy scanner & 1-click redactor | **$0** | Free |
-| 11 | **ForgeSuite MCP Server (v1.1.0)** | Node 22+ Stdio MCP (`mcp.html` / `mcp/forgesuite-mcp.mjs`) | 100% Free ($0, MIT) — zero-dep MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`) | **$0** | Free |
+| 11 | **ForgeSuite MCP Server (v1.2.0)** | Node 20+ Stdio MCP (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io` / `mcp.html`) | 100% Free ($0, MIT) — zero-dep MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, `brand_domain_handle_scan`) | **$0** | Free |
 
 ---
 
@@ -106,18 +106,20 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
   - **Solana SPL & Token-2022 Mint Rug Audit**: Queries CORS-safe Solana Mainnet RPCs (`solana-rpc.publicnode.com`, `api.zan.top/solana-mainnet`) to inspect active `mintAuthority`, `freezeAuthority`, dangerous Token-2022 extensions (`permanentDelegate`, `transferFeeConfig`, `mintCloseAuthority`, `transferHook`, `defaultAccountState`, `nonTransferable`), supply, and Top-10 holder concentration.
   - **Pro Watchlist & Deep Source Audit Funnel**: Unlocks multi-chain **Batch Watchlist Multi-Token Audit (`<= 25` addresses at once + JSON/CSV Risk Dossier export)** with any ForgeSuite Pro / All-Access Bundle (`$35` lifetime), and links directly to **Forge AI Agent** (`$5.00 USDC` via A2A + x402 at `https://market.near.ai/a/forge-ai-agent`) for line-by-line Solidity/Rust source audits.
 
-### 3.11 ForgeSuite MCP Server v1.1.0 (`https://youthmy11-ai.github.io/mcp.html`)
-- **Category**: DeveloperApplication (Windows, macOS, Linux — Node.js 22+, 0 npm dependencies, MIT Free)
-- **Download URL**: `https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs`
+### 3.11 ForgeSuite MCP Server v1.2.0 (`https://youthmy11-ai.github.io/mcp.html`)
+- **Category**: DeveloperApplication (Windows, macOS, Linux — Node.js 20+, 0 npm dependencies, MIT Free)
+- **1-Command Global Install**: `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`
+- **Direct Single-File URL**: `https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs`
 - **Capabilities**:
-  - Single-file zero-dependency JSON-RPC 2.0 Model Context Protocol (MCP) stdio server (`v1.1.0`) compatible with Claude Code, Cursor, Antigravity, and Windsurf.
-  - Exposes **6 tools**:
+  - Single-file zero-dependency JSON-RPC 2.0 Model Context Protocol (MCP) stdio server (`v1.2.0`) compatible with Claude Code, Cursor, Antigravity, and Windsurf.
+  - Exposes **7 tools**:
     1. `envshield_scan` — offline secret leak detection & redaction
     2. `calldata_decode` — offline EVM ABI decoding + `MaxUint256` unlimited approval warnings
     3. `tokencost_estimate` — multi-turn LLM cost & retainer estimation across Claude/GPT-5/Gemini/DeepSeek
     4. `cryptobill_quote` — Markdown/JSON crypto invoice + live serverless `cryptobill.html#inv=` URL
     5. `evm_token_risk_scan` — live EVM token/proxy/opcode risk audit across Base/Ethereum/BSC/Arbitrum
     6. `solana_mint_risk_scan` — live Solana SPL / Token-2022 authority, extension & holder concentration risk audit
+    7. `brand_domain_handle_scan` — live authoritative RDAP + Google DoH domain (`.com`, `.io`, `.ai`, `.dev`, `.app`, `.org`), developer registry (`npm`, `PyPI`, `GitHub`), social (`Bluesky`, `Reddit`), and Apple iOS App Store availability scanner
 
 ---
 
@@ -157,7 +159,7 @@ ForgeSuite operates a live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 
 
 - **Storefront**: https://youthmy11-ai.github.io/
 - **TokenGuard Scanner**: https://youthmy11-ai.github.io/tokenaudit.html
-- **MCP Server v1.1.0**: https://youthmy11-ai.github.io/mcp.html
+- **MCP Server v1.2.0**: https://youthmy11-ai.github.io/mcp.html
 - **Concise LLM Index**: https://youthmy11-ai.github.io/llms.txt
 - **Live A2A + x402 Agent**: https://market.near.ai/a/forge-ai-agent
 - **GitHub Organization / Developer**: https://github.com/youthmy11-ai
