@@ -85,11 +85,31 @@ import {
 } from "../assets/tokenaudit.js";
 import {
   SERVER_INFO as MCP_SERVER_INFO,
+  classifyWalletEvmBytecode,
+  deriveSolanaAssociatedTokenAddress,
   handleJsonRpcMessage,
   normalizeBrandCandidate,
   scanBrandDomainAndHandles,
+  scanMultiChainWallets,
 } from "../mcp/forgesuite-mcp.mjs";
 import { createForgeSuiteMcpbBuffer } from "../mcp/pack-mcpb.mjs";
+import {
+  MAX_WATCHLIST_WALLETS,
+  NEAR_WALLET_SCANNER_URL,
+  WALLETLENS_EVM_CHAINS,
+  WALLETLENS_SOLANA_CONFIG,
+  buildWalletAuditInvoicePayload,
+  buildWalletSowState,
+  classifyEvmCodeStatic as walletLensClassifyCode,
+  deriveSolanaAta,
+  exportWalletWatchlistCsv,
+  inspectSingleWallet,
+  isValidEvmAddress as walletLensValidEvm,
+  isValidSolanaAddress as walletLensValidSol,
+  parseWalletCheckQueryParams,
+  parseWalletWatchlistEntries,
+  runBatchWalletWatchlist,
+} from "../assets/walletcheck.js";
 import {
   BRANDGUARD_DEFAULT_TLDS,
   CORS_RDAP_BY_TLD,
@@ -1199,15 +1219,15 @@ test("ForgeSuite MCP stdio server handles initialize, notifications/initialized,
   assert.equal(messages[0].id, 1);
   assert.equal(messages[0].result.protocolVersion, "2024-11-05");
   assert.equal(messages[0].result.serverInfo.name, "forgesuite-mcp");
-  assert.equal(messages[0].result.serverInfo.version, "1.2.0");
-  assert.equal(MCP_SERVER_INFO.version, "1.2.0");
+  assert.equal(messages[0].result.serverInfo.version, "1.3.0");
+  assert.equal(MCP_SERVER_INFO.version, "1.3.0");
   assert.ok(messages[0].result.capabilities.tools);
 
   assert.equal(messages[1].id, 2);
   assert.deepEqual(messages[1].result, {});
 
   assert.equal(messages[2].id, 3);
-  assert.equal(messages[2].result.tools.length, 7);
+  assert.equal(messages[2].result.tools.length, 8);
   const toolNames = messages[2].result.tools.map((t) => t.name).sort();
   assert.deepEqual(toolNames, [
     "brand_domain_handle_scan",
@@ -1215,6 +1235,7 @@ test("ForgeSuite MCP stdio server handles initialize, notifications/initialized,
     "cryptobill_quote",
     "envshield_scan",
     "evm_token_risk_scan",
+    "multi_chain_wallet_scan",
     "solana_mint_risk_scan",
     "tokencost_estimate",
   ]);
@@ -1395,12 +1416,18 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
   const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   assert.ok(fs.existsSync(path.join(rootDir, ".nojekyll")), ".nojekyll must exist so GitHub Pages serves /.well-known/*");
   const agentCard = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "agent-card.json"), "utf8"));
+  assert.equal(agentCard.supportedInterfaces.length, 5);
   assert.equal(agentCard.supportedInterfaces[0].url, "https://forge-ai-agent.market.near.ai/a2a/v1");
   assert.equal(agentCard.supportedInterfaces[0].protocolBinding, "JSONRPC");
+  assert.ok(
+    agentCard.supportedInterfaces.some(
+      (i) => i.url === "https://wallet-activity-scanner.market.near.ai/a2a/v1"
+    )
+  );
 
   const mcpManifest = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "mcp", "server.json"), "utf8"));
   assert.equal(mcpManifest.name, "io.github.youthmy11-ai/forgesuite-mcp");
-  assert.equal(mcpManifest.version, "1.2.0");
+  assert.equal(mcpManifest.version, "1.3.0");
   assert.deepEqual(
     mcpManifest.tools.map((t) => t.name),
     [
@@ -1411,6 +1438,7 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
       "evm_token_risk_scan",
       "solana_mint_risk_scan",
       "brand_domain_handle_scan",
+      "multi_chain_wallet_scan",
     ]
   );
 });
@@ -1823,7 +1851,7 @@ test("ForgeSuite MCP v1.1.0 executes evm_token_risk_scan and solana_mint_risk_sc
  * 14. ForgeSuite MCP v1.2.0 Packaging, LF Line-Endings & Tool #7 Brand Scanner
  * ========================================================================== */
 
-test("root package.json, .gitattributes, shebang LF line-endings, and v1.2.0 npx discovery docs are valid", () => {
+test("root package.json, .gitattributes, shebang LF line-endings, and v1.3.0 npx discovery docs are valid", () => {
   const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const pkgPath = path.join(rootDir, "package.json");
   const gitAttrPath = path.join(rootDir, ".gitattributes");
@@ -1832,7 +1860,7 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.2.0 npx
   assert.ok(fs.existsSync(pkgPath), "root package.json must exist for npx github:... execution");
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
   assert.equal(pkg.name, "forgesuite-mcp");
-  assert.equal(pkg.version, "1.2.0");
+  assert.equal(pkg.version, "1.3.0");
   assert.equal(pkg.type, "module");
   assert.deepEqual(pkg.bin, { "forgesuite-mcp": "./mcp/forgesuite-mcp.mjs" });
   assert.equal(pkg.engines?.node, ">=20.0.0");
@@ -1856,7 +1884,7 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.2.0 npx
     "mcp/forgesuite-mcp.mjs must use strict LF (\\n) with zero CR (\\r) bytes"
   );
 
-  // Check v1.2.0 and 1-command npx across discovery & storefront files
+  // Check v1.3.0 and 1-command npx across discovery & storefront files
   const npxCmd = "npx --yes github:youthmy11-ai/youthmy11-ai.github.io";
   for (const rel of [
     ".well-known/mcp/server.json",
@@ -1870,7 +1898,8 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.2.0 npx
     const content = fs.readFileSync(path.join(rootDir, rel), "utf8");
     assert.ok(content.includes(npxCmd), `${rel} must showcase ${npxCmd}`);
     assert.ok(content.includes("brand_domain_handle_scan"), `${rel} must list brand_domain_handle_scan`);
-    assert.ok(content.includes("1.2.0"), `${rel} must reference v1.2.0`);
+    assert.ok(content.includes("multi_chain_wallet_scan"), `${rel} must list multi_chain_wallet_scan`);
+    assert.ok(content.includes("1.3.0"), `${rel} must reference v1.3.0`);
   }
 });
 
@@ -1993,7 +2022,7 @@ test("brand_domain_handle_scan (Tool #7) audits RDAP+DoH domains, npm/PyPI/GitHu
   assert.match(direct.checkedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
   assert.deepEqual(direct.tldsChecked, ["com", "io", "ai", "dev", "app", "org"]);
   assert.equal(direct.upgradeLinks.proBundlePriceUsd, 35);
-  assert.equal(direct.upgradeLinks.nearAgentFleet.length, 3);
+  assert.equal(direct.upgradeLinks.nearAgentFleet.length, 5);
 
   const nova = direct.results[0];
   assert.equal(nova.normalizedSlug, "novaforgex");
@@ -2379,7 +2408,7 @@ test("parseTokenAuditQueryParams supports ?chain=solana&mint=..., EVM aliases, a
   assert.equal(badRpc.rpcUrl, null);
 });
 
-test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified badge, 1-click VS Code deep-links, .mcpb bundle, and 4-tier A2A + x402 fleet", () => {
+test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified badge, 1-click VS Code deep-links, .mcpb bundle, and 5-agent A2A + x402 fleet", () => {
   const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const registryUrl = "https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite";
   const vscodeLink =
@@ -2387,7 +2416,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   const vscodeInsidersLink =
     "vscode-insiders:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D";
   const mcpbAssetUrl =
-    "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.2.0/forgesuite-mcp.mcpb";
+    "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.3.0/forgesuite-mcp.mcpb";
 
   // Verify encoded VS Code deep-link payload decodes cleanly to valid JSON
   const decodedPayload = JSON.parse(decodeURIComponent(vscodeLink.split("?")[1]));
@@ -2398,6 +2427,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   });
 
   const fleetAgents = [
+    "https://market.near.ai/agents/wallet-activity-scanner",
     "https://market.near.ai/agents/forge-data-finops",
     "https://market.near.ai/agents/forge-token-guard",
     "https://market.near.ai/agents/forge-brand-checker",
@@ -2414,7 +2444,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   ]) {
     assert.ok(doc.includes(registryUrl), `${label} missing Official MCP Registry URL`);
     assert.ok(doc.includes("io.github.youthmy11-ai/forgesuite-mcp"), `${label} missing registry name`);
-    assert.ok(doc.includes("v1.2.0 Active"), `${label} missing v1.2.0 Active badge`);
+    assert.ok(doc.includes("v1.3.0 Active"), `${label} missing v1.3.0 Active badge`);
     assert.ok(doc.includes(vscodeLink), `${label} missing 1-click VS Code MCP install link`);
     assert.ok(doc.includes(vscodeInsidersLink), `${label} missing 1-click VS Code Insiders MCP install link`);
     assert.ok(doc.includes(mcpbAssetUrl), `${label} missing .mcpb release bundle download link`);
@@ -2424,7 +2454,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   }
 
   assert.ok(indexHtml.includes(registryUrl), "index.html missing Official MCP Registry URL");
-  assert.ok(indexHtml.includes("v1.2.0 Active"), "index.html missing v1.2.0 Active badge");
+  assert.ok(indexHtml.includes("v1.3.0 Active"), "index.html missing v1.3.0 Active badge");
   for (const agentUrl of fleetAgents) {
     assert.ok(indexHtml.includes(agentUrl), `index.html missing A2A fleet agent ${agentUrl}`);
   }
@@ -2538,4 +2568,393 @@ test("evm-proxy-honeypot-scanner.html ships valid SoftwareApplication + TechArti
     ["arbitrum", "base", "bsc", "ethereum"],
     "EVM deep-links should cover Base, Ethereum, BSC, and Arbitrum"
   );
+});
+
+
+/* ============================================================================
+ * 17. ForgeSuite MCP v1.3.0 Tool #8 (`multi_chain_wallet_scan`) & Web App #9 (`WalletLens`)
+ * ========================================================================== */
+
+test("WalletLens pure-JS SHA-256 + Ed25519 deriveSolanaAta, 32-byte Base58 validation, and CORS RPC endpoints match mainnet vectors", () => {
+  const solWallet = "BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx";
+  const usdcMint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+  const pyusdMint = "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo";
+  const tronAddress = "TGVUMYRwTqrCGzrPNW5V2bhrBNtsKgFcn7";
+
+  assert.equal(walletLensValidSol(solWallet), true);
+  assert.equal(walletLensValidSol(tronAddress), false, "25-byte TRON address must be rejected as Solana key");
+  assert.equal(walletLensValidEvm("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"), true);
+  assert.equal(walletLensValidEvm("0x1234"), false);
+
+  const browserAta = deriveSolanaAta(solWallet, TOKEN_PROGRAM_ID, usdcMint);
+  const nodeMcpAta = deriveSolanaAssociatedTokenAddress(solWallet, TOKEN_PROGRAM_ID, usdcMint);
+  assert.equal(browserAta, "BNPJru7RVMw39jiGyCFcfBLhgoyhJ7DwycZ3m5PxqRE8");
+  assert.equal(browserAta, nodeMcpAta);
+
+  const pyusdAta = deriveSolanaAta(solWallet, TOKEN_2022_PROGRAM_ID, pyusdMint);
+  assert.equal(pyusdAta, deriveSolanaAssociatedTokenAddress(solWallet, TOKEN_2022_PROGRAM_ID, pyusdMint));
+  assert.equal(walletLensValidSol(pyusdAta), true);
+
+  for (const ck of ["ethereum", "base", "arbitrum", "bsc", "polygon"]) {
+    assert.match(WALLETLENS_EVM_CHAINS[ck].rpcs[0], /publicnode\.com/);
+  }
+  assert.equal(WALLETLENS_SOLANA_CONFIG.rpcs[0], "https://solana-rpc.publicnode.com");
+});
+
+test("parseWalletCheckQueryParams supports ?address=..., Etherscan/Solscan URLs, chain aliases, HTTPS RPC sanitization, and autorun", () => {
+  const empty = parseWalletCheckQueryParams("");
+  assert.equal(empty.hasTarget, false);
+  assert.equal(empty.autorun, false);
+
+  const evm = parseWalletCheckQueryParams(
+    "?address=https://etherscan.io/address/0xfeB016d0D14AC0fa6d69199608B0776d007203B2&chains=eth,base,arb,pol&rpc=https://ethereum-rpc.publicnode.com"
+  );
+  assert.equal(evm.hasTarget, true);
+  assert.equal(evm.address, "0xfeB016d0D14AC0fa6d69199608B0776d007203B2");
+  assert.equal(evm.family, "evm");
+  assert.deepEqual(evm.chains, ["ethereum", "base", "arbitrum", "polygon"]);
+  assert.equal(evm.rpcUrl, "https://ethereum-rpc.publicnode.com/");
+  assert.equal(evm.autorun, true);
+
+  const sol = parseWalletCheckQueryParams(
+    "?wallet=BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx&rpc=ftp://evil.example&autorun=0"
+  );
+  assert.equal(sol.hasTarget, true);
+  assert.equal(sol.family, "solana");
+  assert.equal(sol.rpcUrl, null);
+  assert.equal(sol.autorun, false);
+});
+
+test("multi_chain_wallet_scan (Tool #8) inspects EVM EIP-7702, Gnosis Safe M-of-N, ERC-4337 & Solana SPL/Token-2022 over MCP JSON-RPC and stdio", async () => {
+  const eip7702Addr = "0x874ebd03bee4ac1950796598d10f78be2ab3db3f";
+  const delegateImpl = "0xae0fa4ff1b0e2fd4cd32fddc0f56b0e0c0bd1933";
+  const safeAddr = "0xfeb016d0d14ac0fa6d69199608b0776d007203b2";
+  const erc4337Addr = "0x3333333333333333333333333333333333333333";
+  const entryPoint = "0x0000000071727de22e5e9d8baf0edac6f37da032";
+  const solAddr = "BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx";
+
+  assert.equal(classifyWalletEvmBytecode(`0xef0100${delegateImpl.slice(2)}`).accountType, "eip7702_delegated");
+  assert.equal(walletLensClassifyCode(`0xef0100${delegateImpl.slice(2)}`).delegatedTo, delegateImpl);
+
+  const ownerA = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const ownerB = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+  const ownerC = "0xcccccccccccccccccccccccccccccccccccccccc";
+  const abiOwners =
+    "0x" +
+    "20".padStart(64, "0") +
+    "03".padStart(64, "0") +
+    ownerA.slice(2).padStart(64, "0") +
+    ownerB.slice(2).padStart(64, "0") +
+    ownerC.slice(2).padStart(64, "0");
+
+  const mockWalletFetch = async (rawUrl, init = {}) => {
+    const u = String(rawUrl);
+    const body = JSON.parse(init.body);
+    const jsonResp = (obj) => ({
+      ok: true,
+      status: 200,
+      json: async () => obj,
+    });
+
+    if (u.includes("solana")) {
+      const req = Array.isArray(body) ? body[0] : body;
+      if (req.method === "getAccountInfo") {
+        return jsonResp({
+          jsonrpc: "2.0",
+          id: req.id,
+          result: {
+            context: { slot: 473305000 },
+            value: { lamports: 2_500_000_000, owner: "11111111111111111111111111111111", executable: false },
+          },
+        });
+      }
+      if (req.method === "getTokenAccountsByOwner") {
+        // Simulate HTTP 403 on indexed method to verify automatic O(1) ATA getMultipleAccounts fallback
+        return { ok: false, status: 403, json: async () => ({ error: { message: "Indexed blocked" } }) };
+      }
+      if (req.method === "getMultipleAccounts") {
+        const atas = req.params[0];
+        const values = atas.map((_, idx) => {
+          if (idx === 0) {
+            return {
+              data: {
+                parsed: {
+                  info: {
+                    mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                    state: "initialized",
+                    tokenAmount: { amount: "750500000", decimals: 6 }, // 750.50 USDC-SPL
+                  },
+                },
+              },
+            };
+          }
+          if (idx === 2) {
+            return {
+              data: {
+                parsed: {
+                  info: {
+                    mint: "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+                    state: "initialized",
+                    tokenAmount: { amount: "120000000", decimals: 6 }, // 120.00 PYUSD (Token-2022)
+                  },
+                },
+              },
+            };
+          }
+          return null;
+        });
+        return jsonResp({ jsonrpc: "2.0", id: req.id, result: { context: { slot: 473305000 }, value: values } });
+      }
+      if (req.method === "getSignaturesForAddress") {
+        return jsonResp({
+          jsonrpc: "2.0",
+          id: req.id,
+          result: [
+            {
+              signature: "5h6xK9mN2pQ4rS7tU8vW1xY3zA5bC7dE9fG2hJ4kL6mN8pQ1rS3tU5vW7xY9zA1bC3dE5fG7hJ9kL2mN4pQ6rS8t",
+              slot: 473304990,
+              blockTime: 1763971200,
+              err: null,
+              memo: "ForgeSuite Pro Settlement",
+              confirmationStatus: "confirmed",
+            },
+          ],
+        });
+      }
+      return jsonResp({ jsonrpc: "2.0", id: req.id, result: null });
+    }
+
+    const reqs = Array.isArray(body) ? body : [body];
+    const replies = reqs.map((r) => {
+      const target = String(r.params?.[0]?.to || r.params?.[0] || "").toLowerCase();
+      if (r.id === "block") {
+        return { jsonrpc: "2.0", id: "block", result: { number: "0x1400000", timestamp: "0x67430000" } };
+      }
+      if (r.id === "balance") {
+        return { jsonrpc: "2.0", id: "balance", result: "0xde0b6b3a7640000" }; // 1.0 native
+      }
+      if (r.id === "nonce") {
+        return { jsonrpc: "2.0", id: "nonce", result: "0x19" }; // 25
+      }
+      if (r.id === "code") {
+        if (target === eip7702Addr) return { jsonrpc: "2.0", id: "code", result: `0xef0100${delegateImpl.slice(2)}` };
+        if (target === safeAddr || target === erc4337Addr) return { jsonrpc: "2.0", id: "code", result: "0x6080604052" };
+        return { jsonrpc: "2.0", id: "code", result: "0x" };
+      }
+      if (r.id === "tok_0") {
+        // USDC: 18dp on BSC, 6dp on Ethereum/Base/Arbitrum/Polygon
+        const isBsc = u.includes("bsc");
+        const amt = isBsc ? 500n * 10n ** 18n : 500n * 10n ** 6n;
+        return { jsonrpc: "2.0", id: "tok_0", result: "0x" + amt.toString(16).padStart(64, "0") };
+      }
+      if (String(r.id).startsWith("tok_")) {
+        return { jsonrpc: "2.0", id: r.id, result: "0x" + "0".repeat(64) };
+      }
+      if (r.id === "safe_threshold") {
+        if (target === safeAddr) return { jsonrpc: "2.0", id: "safe_threshold", result: "0x" + "2".padStart(64, "0") };
+        return { jsonrpc: "2.0", id: "safe_threshold", error: { code: -32000, message: "reverted" } };
+      }
+      if (r.id === "safe_owners") {
+        if (target === safeAddr) return { jsonrpc: "2.0", id: "safe_owners", result: abiOwners };
+        return { jsonrpc: "2.0", id: "safe_owners", error: { code: -32000, message: "reverted" } };
+      }
+      if (r.id === "erc4337_ep") {
+        if (target === erc4337Addr) {
+          return { jsonrpc: "2.0", id: "erc4337_ep", result: "0x" + entryPoint.slice(2).padStart(64, "0") };
+        }
+        return { jsonrpc: "2.0", id: "erc4337_ep", error: { code: -32000, message: "reverted" } };
+      }
+      return { jsonrpc: "2.0", id: r.id, result: "0x" };
+    });
+    return jsonResp(replies);
+  };
+
+  const scanRes = await scanMultiChainWallets(
+    {
+      wallets: [eip7702Addr, safeAddr, erc4337Addr, solAddr],
+      chains: ["ethereum", "base", "solana"],
+    },
+    { fetchImpl: mockWalletFetch }
+  );
+  assert.equal(scanRes.ok, true);
+  assert.equal(scanRes.walletCount, 4);
+  assert.equal(scanRes.wallets[0].chains[0].account.accountType, "eip7702_delegated");
+  assert.equal(scanRes.wallets[0].chains[0].account.delegatedTo, delegateImpl);
+  assert.equal(scanRes.wallets[1].chains[0].account.accountType, "gnosis_safe");
+  assert.equal(scanRes.wallets[1].chains[0].account.safeThreshold, 2);
+  assert.equal(scanRes.wallets[1].chains[0].account.safeOwnersCount, 3);
+  assert.equal(scanRes.wallets[2].chains[0].account.accountType, "erc4337");
+  assert.equal(scanRes.wallets[2].chains[0].account.entryPoint, entryPoint);
+  assert.equal(scanRes.wallets[3].family, "solana");
+  assert.equal(scanRes.wallets[3].totalStablecoinUsd, 870.5); // 750.50 USDC + 120.00 PYUSD
+  assert.equal(scanRes.upgradeLinks.proBundlePriceUsd, 35);
+  assert.equal(scanRes.upgradeLinks.nearWalletScannerPriceUsdc, 0.15);
+
+  const rpcMsg = await handleJsonRpcMessage(
+    {
+      jsonrpc: "2.0",
+      id: "wallet-mcp-1",
+      method: "tools/call",
+      params: {
+        name: "multi_chain_wallet_scan",
+        arguments: { address: `${eip7702Addr}, ${solAddr}`, chains: ["ethereum", "solana"] },
+      },
+    },
+    { fetchImpl: mockWalletFetch }
+  );
+  assert.equal(rpcMsg.id, "wallet-mcp-1");
+  assert.equal(rpcMsg.result.isError, false);
+  assert.match(rpcMsg.result.content[0].text, /EIP-7702 Delegated Account/);
+  assert.match(rpcMsg.result.content[0].text, /walletcheck\.html/);
+  assert.match(rpcMsg.result.content[0].text, /wallet-activity-scanner/);
+
+  const badStdio = await runMcpStdioSession([
+    JSON.stringify({
+      jsonrpc: "2.0",
+      id: "wallet-bad",
+      method: "tools/call",
+      params: { name: "multi_chain_wallet_scan", arguments: { address: "" } },
+    }) + "\n",
+  ]);
+  assert.equal(badStdio.code, 0);
+  assert.equal(badStdio.messages[0].result.isError, true);
+});
+
+test("WalletLens inspectSingleWallet, Pro 25-Wallet Watchlist, CSV formula guard, and CryptoBill/ScopeGuard handoffs work end-to-end", async () => {
+  const safeAddr = "0xfeB016d0D14AC0fa6d69199608B0776d007203B2";
+  const solAddr = "BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx";
+
+  const mockBrowserFetch = async (rawUrl, init = {}) => {
+    const u = String(rawUrl);
+    const body = JSON.parse(init.body);
+    if (u.includes("solana")) {
+      if (body.method === "getAccountInfo") {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            jsonrpc: "2.0",
+            id: body.id,
+            result: {
+              context: { slot: 473305100 },
+              value: { lamports: 1_000_000_000, owner: "SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf", executable: false },
+            },
+          }),
+        };
+      }
+      if (body.method === "getMultipleAccounts") {
+        const vals = body.params[0].map((_, idx) =>
+          idx === 0
+            ? {
+                data: {
+                  parsed: {
+                    info: {
+                      mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                      tokenAmount: { amount: "250000000", decimals: 6 }, // 250 USDC
+                    },
+                  },
+                },
+              }
+            : null
+        );
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ jsonrpc: "2.0", id: body.id, result: { context: { slot: 473305100 }, value: vals } }),
+        };
+      }
+      return { ok: true, status: 200, json: async () => ({ jsonrpc: "2.0", id: body.id, result: [] }) };
+    }
+
+    const reqs = Array.isArray(body) ? body : [body];
+    return {
+      ok: true,
+      status: 200,
+      json: async () =>
+        reqs.map((r) => {
+          if (r.id === "block") return { jsonrpc: "2.0", id: "block", result: { number: "0x100", timestamp: "0x67430000" } };
+          if (r.id === "balance") return { jsonrpc: "2.0", id: "balance", result: "0xde0b6b3a7640000" };
+          if (r.id === "nonce") return { jsonrpc: "2.0", id: "nonce", result: "0x5" };
+          if (r.id === "code") return { jsonrpc: "2.0", id: "code", result: "0x" };
+          if (r.id === "tok_0") return { jsonrpc: "2.0", id: "tok_0", result: "0x" + (100n * 10n ** 6n).toString(16).padStart(64, "0") };
+          return { jsonrpc: "2.0", id: r.id, result: "0x" + "0".repeat(64) };
+        }),
+    };
+  };
+
+  const entries = parseWalletWatchlistEntries(
+    `=EvilFormulaLabel | ${safeAddr}\nSolana Squads Vault | https://solscan.io/account/${solAddr}`
+  );
+  assert.equal(entries.length, 2);
+  assert.equal(entries[0].label, "=EvilFormulaLabel");
+  assert.equal(entries[1].address, solAddr);
+
+  const batch = await runBatchWalletWatchlist(entries, {
+    chains: ["ethereum", "base", "solana"],
+    fetchImpl: mockBrowserFetch,
+  });
+  assert.equal(batch.ok, true);
+  assert.equal(batch.totalWallets, 2);
+  assert.equal(batch.combinedStablecoinUsd, 450); // 100 ETH + 100 Base + 250 Solana
+  assert.equal(batch.smartAccountsCount, 1); // Squads multisig
+
+  const csv = exportWalletWatchlistCsv(batch);
+  assert.match(csv, /label,address,family,primary_account_type,verdict/);
+  assert.match(csv, /'=EvilFormulaLabel/, "CSV export must neutralize formula injection");
+  assert.match(csv, /squads_multisig/);
+
+  const tooMany = Array.from({ length: MAX_WATCHLIST_WALLETS + 1 }, (_, i) => ({
+    label: `W${i}`,
+    address: `0x${(i + 1).toString(16).padStart(40, "0")}`,
+    family: "evm",
+  }));
+  await assert.rejects(
+    () => runBatchWalletWatchlist(tooMany, { fetchImpl: mockBrowserFetch }),
+    /up to 25/i
+  );
+
+  // CryptoBill & ScopeGuard SOW 1-click handoff roundtrips
+  const singleReport = await inspectSingleWallet(safeAddr, {
+    chains: ["ethereum"],
+    fetchImpl: mockBrowserFetch,
+  });
+  const singleInv = buildWalletAuditInvoicePayload(singleReport);
+  assert.equal(decodeInvoicePayload(encodeInvoicePayload(singleInv)).items[0].unitPrice, 165);
+
+  const batchInv = buildWalletAuditInvoicePayload(batch);
+  assert.equal(decodeInvoicePayload(encodeInvoicePayload(batchInv)).items[0].unitPrice, 245);
+
+  const sow = buildWalletSowState(batch);
+  const decodedSow = decodeSowHandoffPayload(`#sow=${encodeSowHandoffPayload(sow)}`);
+  assert.equal(decodedSow.totalBudget, 750);
+  assert.equal(computeSowTotals(decodedSow).isBalanced, true);
+});
+
+test("walletcheck.html and sitemap.xml ship valid SoftwareApplication + FAQPage JSON-LD, 1-click mainnet presets, Pro controls, and @wallet-activity-scanner $0.15 USDC CTA", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const html = fs.readFileSync(path.join(repoRoot, "walletcheck.html"), "utf8");
+  const sitemap = fs.readFileSync(path.join(repoRoot, "sitemap.xml"), "utf8");
+
+  assert.ok(sitemap.includes("https://youthmy11-ai.github.io/walletcheck.html"));
+
+  const { types } = extractAllJsonLdObjects(html);
+  assert.ok(types.has("SoftwareApplication"), "walletcheck.html missing SoftwareApplication JSON-LD");
+  assert.ok(types.has("FAQPage"), "walletcheck.html missing FAQPage JSON-LD");
+
+  for (const term of [
+    NEAR_WALLET_SCANNER_URL,
+    "$0.15 USDC",
+    "EIP-7702",
+    "0xef0100",
+    "Gnosis Safe",
+    "multi_chain_wallet_scan",
+    'data-checkout-sku="BUNDLE"',
+    'data-checkout-sku="CB"',
+    'data-wl-sample="ens_safe"',
+    'data-wl-sample="eip7702_eoa"',
+    'data-wl-sample="vitalik_eoa"',
+    'data-wl-sample="solana_treasury"',
+  ]) {
+    assert.ok(html.includes(term), `walletcheck.html missing "${term}"`);
+  }
 });

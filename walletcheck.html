@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WalletLens — Multi-Chain Wallet Portfolio, EIP-7702 Delegation &amp; Gnosis Safe Multisig Inspector</title>
+  <meta name="description" content="Free client-side 6-chain EVM &amp; Solana wallet inspector (Ethereum, Base, Arbitrum, BSC, Polygon, Solana Mainnet). Check native &amp; stablecoin balances, nonces, EIP-7702 0xef0100 delegations, Gnosis Safe M-of-N signers, SPL/Token-2022 holdings &amp; recent signatures.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/walletcheck.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/walletcheck.html">
+  <meta property="og:title" content="WalletLens — Browser 6-Chain Wallet Portfolio, EIP-7702 &amp; Gnosis Safe Inspector">
+  <meta property="og:description" content="Inspect EVM (Ethereum, Base, Arbitrum, BSC, Polygon) &amp; Solana wallets live via CORS-clean RPCs: USDC/USDT/DAI balances, nonces, EIP-7702 delegations, Gnosis Safe M-of-N owners, and Pro 25-Wallet Watchlist CSV/JSON export.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="WalletLens — Multi-Chain EVM &amp; Solana Portfolio, EIP-7702 &amp; Safe Multisig Scanner">
+  <meta name="twitter:description" content="Zero-backend 6-chain wallet balance, EIP-7702 delegation, Gnosis Safe multisig, and Solana SPL/Token-2022 inspector with 25-wallet treasury CSV/JSON export.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310b981'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='21' font-weight='800'%3EWL%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "WalletLens",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web",
+        "url": "https://youthmy11-ai.github.io/walletcheck.html",
+        "isAccessibleForFree": true,
+        "author": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        },
+        "offers": [
+          { "@type": "Offer", "name": "Free Instant 6-Chain Single-Wallet Scanner", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+          { "@type": "Offer", "name": "Pro Single-Tool Unlock (25-Wallet Treasury Watchlist + CSV/JSON)", "price": "15", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+          { "@type": "Offer", "name": "All-Access Pro Bundle (Batch 25-Wallet Watchlist + All Pro Tools)", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+        ],
+        "featureList": [
+          "Parallel live JSON-RPC portfolio inspection across Ethereum, Base, Arbitrum, BNB Smart Chain, Polygon, and Solana Mainnet",
+          "Exact native gas (ETH, BNB, POL, SOL) and stablecoin/wrapped token balances (USDC, USDT, DAI, WETH, USDC-SPL, USDT-SPL, PYUSD)",
+          "EIP-7702 delegation designator (0xef0100...) detection, Gnosis Safe M-of-N signer & owner extraction, ERC-4337 EntryPoint, and Squads multisig classification",
+          "Pure-JS Ed25519 Associated Token Address (ATA) derivation + Solana SPL/Token-2022 balances & latest 10 transaction signatures with zero CORS errors",
+          "Pro 25-Wallet Treasury & Counterparty Watchlist with formula-safe CSV/JSON export, CryptoBill/ScopeGuard handoffs, and $0.15 USDC @wallet-activity-scanner A2A escalation"
+        ],
+        "description": "100% client-side multi-chain EVM and Solana wallet portfolio, nonce, EIP-7702 delegation, and Gnosis Safe multisig inspector."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does WalletLens detect EIP-7702 delegated EOAs and Gnosis Safe multisigs?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "WalletLens queries eth_getCode across Ethereum, Base, Arbitrum, BSC, and Polygon. If the code begins with the EIP-7702 designator prefix 0xef0100, it extracts the 20-byte delegated implementation contract. For deployed smart contracts, it probes getThreshold() (0xe75235b8), getOwners() (0xa0e67e2b), and ERC-4337 entryPoint() (0xb0d691fe)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does WalletLens upload wallet addresses or require RPC API keys?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. WalletLens runs 100% inside your browser using CORS-clean PublicNode JSON-RPC endpoints and pure-JS Ed25519 Associated Token Address (ATA) derivation on Solana Mainnet, with zero ForgeSuite backend servers or telemetry."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="walletcheck">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">WL</span>
+        <span>WalletLens</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="tokenaudit.html" class="fs-btn fs-btn-sm fs-btn-secondary">TokenGuard</a>
+        <a href="txdecode.html" class="fs-btn fs-btn-sm fs-btn-secondary">Calldata Lens</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP Server (v1.3.0)</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill</a>
+        <button type="button" id="wlBundleBtn" class="fs-btn fs-btn-sm fs-btn-primary">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 60px;">
+    <div class="fs-section-head" style="margin-bottom:20px;">
+      <div>
+        <span class="fs-badge fs-badge-accent">6-CHAIN EVM + SOLANA RPC · EIP-7702 DELEGATION · GNOSIS SAFE M-OF-N · SPL &amp; TOKEN-2022</span>
+        <h1 style="margin-top:10px;">Multi-Chain Wallet Portfolio, EIP-7702 &amp; Gnosis Safe Inspector</h1>
+        <p class="fs-lead" style="margin-top:6px;">
+          Inspect any EVM (<code>0x...</code>) or Solana (Base58) address live across <strong>Ethereum</strong>, <strong>Base</strong>, <strong>Arbitrum</strong>, <strong>BSC</strong>, <strong>Polygon</strong>, and <strong>Solana Mainnet</strong> — native gas, <code>USDC</code> / <code>USDT</code> / <code>DAI</code> / <code>PYUSD</code> holdings, tx nonces, <strong>EIP-7702 (<code>0xef0100...</code>)</strong> delegations, and <strong>Gnosis Safe <code>M-of-N</code></strong> signers 100% client-side.
+        </p>
+      </div>
+    </div>
+
+    <div class="cb-workspace">
+      <!-- LEFT COLUMN: SINGLE 6-CHAIN SCANNER, CLOUD A2A CTA & PRO 25-WALLET WATCHLIST -->
+      <section class="cb-editor-pane" aria-label="Wallet Target & Treasury Watchlist Controls">
+        <!-- 1. FREE SINGLE-WALLET 6-CHAIN SCANNER -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Instant 6-Chain Wallet Scan (Free)</h2>
+            <span class="fs-badge fs-badge-success">FREE · ZERO API KEYS</span>
+          </div>
+
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-wl-sample="ens_safe">ENS DAO Safe (2-of-4 Multisig)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-wl-sample="eip7702_eoa">Live EIP-7702 Delegated EOA</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-wl-sample="vitalik_eoa">Vitalik.eth (5-Chain EOA)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-wl-sample="solana_treasury">Solana Treasury (SPL + Sigs)</button>
+          </div>
+
+          <label class="fs-field">
+            <span class="fs-field-label">EVM Address (<code>0x...</code>), Solana Address (Base58), or Etherscan / Solscan URL</span>
+            <div class="fs-input-row">
+              <input id="wlAddressInput" type="text" class="fs-input" placeholder="0xfeB016d0D14AC0fa6d69199608B0776d007203B2 or BSdWMAHHsygetguA..." spellcheck="false" autocomplete="off">
+              <button type="button" id="wlScanBtn" class="fs-btn fs-btn-primary">Inspect Wallet</button>
+            </div>
+          </label>
+
+          <div class="cb-grid-2">
+            <div class="fs-field">
+              <span class="fs-field-label">Active Chains to Query in Parallel</span>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;padding-top:4px;font-size:0.84rem;">
+                <label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" data-wl-chain="ethereum" checked> Ethereum</label>
+                <label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" data-wl-chain="base" checked> Base</label>
+                <label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" data-wl-chain="arbitrum" checked> Arbitrum</label>
+                <label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" data-wl-chain="bsc" checked> BSC</label>
+                <label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" data-wl-chain="polygon" checked> Polygon</label>
+                <label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" data-wl-chain="solana" checked> Solana</label>
+              </div>
+            </div>
+            <label class="fs-field">
+              <span class="fs-field-label">Optional Custom HTTPS RPC</span>
+              <input id="wlCustomRpcInput" type="url" class="fs-input" placeholder="Default: PublicNode CORS RPCs" spellcheck="false" autocomplete="off">
+            </label>
+          </div>
+
+          <div id="wlStatusMsg" class="fs-status-msg" aria-live="polite"></div>
+        </div>
+
+        <!-- 2. AUTONOMOUS CLOUD A2A AGENT (@wallet-activity-scanner · $0.15 USDC) & WORKFLOW HANDOFFS -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h3>Automate Multi-Wallet Scans via Cloud A2A or Local MCP</h3>
+            <span class="fs-badge fs-badge-accent">A2A + X402 · $0.15 USDC</span>
+          </div>
+          <p class="inv-muted" style="margin:4px 0 12px;">
+            Need programmatic HTTPS JSON-RPC wallet telemetry for AI agents, trading bots, or DAO treasury monitors? Call our live autonomous agent <strong><code>@wallet-activity-scanner</code></strong> on NEAR AI Market (<strong>$0.15 USDC/call</strong>, &lt;4s SLA across 6 chains) or run Tool #8 <code>multi_chain_wallet_scan</code> free in <strong>ForgeSuite MCP v1.3.0</strong> (<code>npx --yes github:youthmy11-ai/youthmy11-ai.github.io</code>).
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="https://market.near.ai/agents/wallet-activity-scanner" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-primary">Call @wallet-activity-scanner ($0.15 USDC) ↗</a>
+            <button type="button" id="wlSendInvoiceBtn" class="fs-btn fs-btn-secondary">Invoice Treasury Audit ($165) →</button>
+            <button type="button" id="wlSendSowBtn" class="fs-btn fs-btn-ghost">1-Click ScopeGuard SOW →</button>
+          </div>
+        </div>
+
+        <!-- 3. PRO TIER: BATCH 25-WALLET TREASURY & COUNTERPARTY WATCHLIST -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Batch 25-Wallet Treasury &amp; Counterparty Watchlist</h2>
+            <span id="wlProStatusBadge" class="fs-badge fs-badge-warn">PRO FEATURE · $15 PRO / $35 BUNDLE</span>
+          </div>
+
+          <div id="wlProLockBanner" class="cb-pro-lock">
+            <strong>DAO Treasury &amp; Counterparty Ops Mode:</strong> Audit up to <strong>25 EVM &amp; Solana wallets</strong> simultaneously, verify EIP-7702 delegations &amp; Gnosis Safe signers across your entire treasury cohort, and export formula-safe <strong>CSV &amp; JSON Reconciliation Reports</strong> with <strong>Single Tool Pro ($15)</strong> or the <strong>All-Access Bundle ($35 lifetime)</strong>.
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Unlock All-Access Bundle ($35)</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="CB">Single Tool Pro ($15)</button>
+              <button type="button" id="wlActivateKeyBtn" class="fs-btn fs-btn-sm fs-btn-ghost">Activate Existing Pro Key</button>
+            </div>
+          </div>
+
+          <label class="fs-field">
+            <span class="fs-field-label">Treasury / Counterparty Wallets (<code>Label | 0x...</code> or raw EVM / Solana addresses — max 25)</span>
+            <textarea id="wlBatchInput" class="fs-textarea" rows="5" spellcheck="false" placeholder="Treasury Safe | 0xfeB016d0D14AC0fa6d69199608B0776d007203B2&#10;Solana Vault | BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx"></textarea>
+          </label>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="wlBatchRunBtn" class="fs-btn fs-btn-primary">Unlock 25-Wallet Watchlist — Bundle ($35)</button>
+            <button type="button" id="wlExportCsvBtn" class="fs-btn fs-btn-secondary" disabled>Export Treasury CSV</button>
+            <button type="button" id="wlExportJsonBtn" class="fs-btn fs-btn-secondary" disabled>Export JSON Dossier</button>
+          </div>
+          <div id="wlBatchStatusMsg" class="fs-status-msg" aria-live="polite"></div>
+
+          <div style="overflow-x:auto;">
+            <table class="fs-table">
+              <thead>
+                <tr>
+                  <th>Wallet</th>
+                  <th>Type</th>
+                  <th>Stablecoins</th>
+                  <th>Activity</th>
+                  <th>View</th>
+                </tr>
+              </thead>
+              <tbody id="wlBatchBody">
+                <tr>
+                  <td colspan="5" class="inv-muted">Run a Pro 25-Wallet Watchlist scan to aggregate multi-chain stablecoins, Safe signers &amp; EIP-7702 status.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: LIVE MULTI-CHAIN PORTFOLIO & SMART ACCOUNT DOSSIER -->
+      <section class="cb-preview-pane" aria-label="Live Multi-Chain Wallet Portfolio Dossier">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <div>
+              <h2>Live Multi-Chain Portfolio &amp; Smart Account Dossier</h2>
+              <div id="wlSummaryHeader" style="margin-top:4px;font-size:0.88rem;" class="inv-muted">Select a live mainnet preset or paste any EVM / Solana address to inspect.</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span id="wlVerdictBadge" class="fs-badge fs-badge-muted">READY</span>
+              <button type="button" id="wlCopyMdBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Copy Markdown Dossier</button>
+            </div>
+          </div>
+
+          <div id="wlMetaGrid" class="cb-grid-2"></div>
+
+          <div id="wlSmartAccountBox" class="fs-rail-box" style="margin-top:4px;" hidden>
+            <h3 style="margin:0 0 6px;font-size:0.93rem;">Smart Account, EIP-7702 Delegation &amp; Multisig Governance</h3>
+            <ul id="wlSmartAccountList" class="fs-feature-list" style="margin:0;"></ul>
+          </div>
+
+          <div>
+            <h3 id="wlChainsSectionTitle" style="margin:6px 0 10px;font-size:0.95rem;">Multi-Chain Balance, Nonce &amp; Account Classification Matrix</h3>
+            <div style="overflow-x:auto;">
+              <table class="fs-table">
+                <thead>
+                  <tr>
+                    <th>Chain</th>
+                    <th>Account Type</th>
+                    <th>Nonce / Sigs</th>
+                    <th>Native Gas</th>
+                    <th>Stablecoins &amp; Wrapped</th>
+                  </tr>
+                </thead>
+                <tbody id="wlChainsBody">
+                  <tr>
+                    <td colspan="5" class="inv-muted">Waiting for live 6-chain JSON-RPC inspection...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="wlSolanaExtraWrap" hidden>
+            <div style="margin-top:14px;">
+              <h3 style="margin:6px 0 10px;font-size:0.95rem;">Solana SPL &amp; Token-2022 Holdings (Pure-JS Ed25519 ATA Verified)</h3>
+              <div style="overflow-x:auto;">
+                <table class="fs-table">
+                  <thead>
+                    <tr>
+                      <th>Token</th>
+                      <th>Program</th>
+                      <th>Balance</th>
+                      <th>Mint &amp; Security Audit</th>
+                    </tr>
+                  </thead>
+                  <tbody id="wlSolTokensBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;">
+              <h3 style="margin:6px 0 10px;font-size:0.95rem;">Latest Confirmed Solana Signatures</h3>
+              <div style="overflow-x:auto;">
+                <table class="fs-table">
+                  <thead>
+                    <tr>
+                      <th>UTC Timestamp</th>
+                      <th>Status</th>
+                      <th>Signature</th>
+                      <th>Memo / Error</th>
+                    </tr>
+                  </thead>
+                  <tbody id="wlSolSigsBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="mcp.html">MCP Server (v1.3.0)</a>
+        <a href="walletcheck.html">WalletLens</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="brandcheck.html">BrandGuard</a>
+        <a href="txdecode.html">Calldata Lens</a>
+        <a href="envshield.html">EnvShield</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="json2sheet.html">JSON2Sheet Lab</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="https://market.near.ai/agents/wallet-activity-scanner" target="_blank" rel="noopener noreferrer">@wallet-activity-scanner ($0.15 USDC)</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/walletcheck.js"></script>
+</body>
+</html>

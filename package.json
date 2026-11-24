@@ -1,7 +1,7 @@
 {
   "name": "forgesuite-mcp",
-  "version": "1.2.0",
-  "description": "Zero-dependency MCP server (7 tools) for Web3 EVM/Solana token risk scanning, calldata decoding, .env secret auditing, LLM FinOps cost estimation, crypto invoicing, and brand domain/handle availability.",
+  "version": "1.3.0",
+  "description": "Zero-dependency MCP server (8 tools) for multi-chain EVM/Solana wallet & portfolio inspection, token risk scanning, calldata decoding, .env secret auditing, LLM FinOps cost estimation, crypto invoicing, and brand domain/handle availability.",
   "type": "module",
   "bin": {
     "forgesuite-mcp": "./mcp/forgesuite-mcp.mjs"
@@ -18,6 +18,9 @@
     "mcp",
     "model-context-protocol",
     "web3-security",
+    "wallet-scanner",
+    "eip-7702",
+    "gnosis-safe",
     "evm",
     "solana",
     "token-audit",

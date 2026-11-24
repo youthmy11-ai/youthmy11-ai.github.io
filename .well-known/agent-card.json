@@ -79,9 +79,9 @@
     },
     {
       "id": "forgesuite-mcp",
-      "name": "ForgeSuite MCP Server (v1.2.0)",
-      "description": "Zero-dependency Node 20+ stdio MCP server (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io`) with 7 tools: envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote, evm_token_risk_scan (Base/Ethereum/BSC/Arbitrum), solana_mint_risk_scan (SPL & Token-2022), and brand_domain_handle_scan (RDAP+DoH domains, npm/PyPI/GitHub, Bluesky/Reddit, iOS App Store).",
-      "tags": ["mcp", "devsecops", "evm", "solana", "token-audit", "finops", "domain-availability", "solana-pay", "crypto-invoicing"]
+      "name": "ForgeSuite MCP Server (v1.3.0)",
+      "description": "Zero-dependency Node 20+ stdio MCP server (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io`) with 8 tools: envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote, evm_token_risk_scan (Base/Ethereum/BSC/Arbitrum), solana_mint_risk_scan (SPL & Token-2022), brand_domain_handle_scan (RDAP+DoH domains, npm/PyPI/GitHub, Bluesky/Reddit, iOS App Store), and multi_chain_wallet_scan (Ethereum/Base/Arbitrum/BSC/Polygon/Solana portfolio, EIP-7702 & Gnosis Safe multisig inspector).",
+      "tags": ["mcp", "devsecops", "evm", "solana", "wallet-scanner", "eip-7702", "gnosis-safe", "token-audit", "finops", "domain-availability", "solana-pay", "crypto-invoicing"]
     }
   ],
   "provider": {

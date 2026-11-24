@@ -1,6 +1,6 @@
 # ForgeSuite Studio — Full Portfolio Reference (`llms-full.txt`)
 
-> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 11 catalog offerings (8 live client-side web apps including TokenGuard EVM & Solana Risk Scanner and BrandGuard 8-TLD Domain & Handle Checker, 2 open-core packaged GitHub tools, 1 zero-dependency Node 20+ MCP Server v1.2.0 with 7 tools executable via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`, and 1 All-Access Lifetime Bundle), transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict client-side privacy guarantees, and zero-backend crypto + PayPal checkout.
+> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 13 catalog offerings (9 live client-side web apps including WalletLens 6-Chain Portfolio & EIP-7702/Safe Inspector, TokenGuard EVM & Solana Risk Scanner, and BrandGuard 8-TLD Domain & Handle Checker, 2 open-core packaged GitHub tools, 1 zero-dependency Node 20+ MCP Server v1.3.0 with 8 tools executable via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`, and 1 All-Access Lifetime Bundle), 5 autonomous A2A + x402 cloud agents, transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict client-side privacy guarantees, and zero-backend crypto + PayPal checkout.
 
 ---
 
@@ -25,12 +25,13 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 | 4 | **All-Access Creator & Freelancer Bundle** | Universal Lifetime Key (`CB + AS + WL + TokenGuard Batch`) | Access all Free & Community releases | **$35** *(Compare at $49 · Save $14)* | `BUNDLE` |
 | 5 | **TokenGuard Risk Scanner** | Live Web App (`tokenaudit.html`) | Free unlimited single-token EVM & Solana live scans + Markdown copy | **Included in $35 Bundle** *(<= 25 Batch Watchlist + JSON/CSV Dossier)* | `BUNDLE` |
 | 6 | **BrandGuard Launch Scanner** | Live Web App (`brandcheck.html`) | Free instant single-brand + 4 Smart Variations across 8 TLDs & 5 registries | **Included in $15 Pro / $35 Bundle** *(<= 25-Brand Agency Matrix + CSV/JSON)* | `CB` / `BUNDLE` |
-| 7 | **TokenCost Lab** | Live Web App (`tokencalc.html`) | 100% Free ($0) — frontier models, prompt-cache math, CryptoBill quote handoff | **$0** | Free |
-| 8 | **JSON2Sheet & PII Masker** | Live Web App (`json2sheet.html`) | 100% Free ($0) — nested JSON to CSV/TSV/Markdown, formula guard, PII redaction | **$0** | Free |
-| 9 | **ScopeGuard SOW Builder** | Live Web App (`sowbuilder.html`) | 100% Free ($0) — AI/Web3/Chrome SOW templates, milestone splits, CryptoBill export | **$0** | Free |
-| 10 | **Calldata Lens** | Live Web App (`txdecode.html`) | 100% Free ($0) — offline EVM ABI decoder & `MAX_UINT256` approval risk alerts | **$0** | Free |
-| 11 | **EnvShield Secret Scanner** | Live Web App (`envshield.html`) | 100% Free ($0) — 13 secret detectors + Shannon entropy scanner & 1-click redactor | **$0** | Free |
-| 12 | **ForgeSuite MCP Server (v1.2.0)** | Node 20+ Stdio MCP (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io` / `mcp.html`) | 100% Free ($0, MIT) — zero-dep MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, `brand_domain_handle_scan`) | **$0** | Free |
+| 7 | **WalletLens Portfolio Inspector** | Live Web App (`walletcheck.html`) | Free instant 6-chain EVM & Solana portfolio, EIP-7702 & Safe multisig scan | **Included in $15 Pro / $35 Bundle** *(<= 25-Wallet Watchlist + CSV/JSON)* | `CB` / `BUNDLE` |
+| 8 | **TokenCost Lab** | Live Web App (`tokencalc.html`) | 100% Free ($0) — frontier models, prompt-cache math, CryptoBill quote handoff | **$0** | Free |
+| 9 | **JSON2Sheet & PII Masker** | Live Web App (`json2sheet.html`) | 100% Free ($0) — nested JSON to CSV/TSV/Markdown, formula guard, PII redaction | **$0** | Free |
+| 10 | **ScopeGuard SOW Builder** | Live Web App (`sowbuilder.html`) | 100% Free ($0) — AI/Web3/Chrome SOW templates, milestone splits, CryptoBill export | **$0** | Free |
+| 11 | **Calldata Lens** | Live Web App (`txdecode.html`) | 100% Free ($0) — offline EVM ABI decoder & `MAX_UINT256` approval risk alerts | **$0** | Free |
+| 12 | **EnvShield Secret Scanner** | Live Web App (`envshield.html`) | 100% Free ($0) — 13 secret detectors + Shannon entropy scanner & 1-click redactor | **$0** | Free |
+| 13 | **ForgeSuite MCP Server (v1.3.0)** | Node 20+ Stdio MCP (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io` / `mcp.html`) | 100% Free ($0, MIT) — zero-dep MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, `brand_domain_handle_scan`, `multi_chain_wallet_scan`) | **$0** | Free |
 
 ---
 
@@ -111,15 +112,15 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
   - **Solana SPL & Token-2022 Mint Rug Audit**: Queries CORS-safe Solana Mainnet RPCs (`solana-rpc.publicnode.com`, `api.zan.top/solana-mainnet`) to inspect active `mintAuthority`, `freezeAuthority`, dangerous Token-2022 extensions (`permanentDelegate`, `transferFeeConfig`, `mintCloseAuthority`, `transferHook`, `defaultAccountState`, `nonTransferable`), supply, and Top-10 holder concentration.
   - **Pro Watchlist & Deep Source Audit Funnel**: Unlocks multi-chain **Batch Watchlist Multi-Token Audit (`<= 25` addresses at once + JSON/CSV Risk Dossier export)** with any ForgeSuite Pro / All-Access Bundle (`$35` lifetime), and links directly to **Forge AI Agent** (`$5.00 USDC` via A2A + x402 at `https://market.near.ai/a/forge-ai-agent`) for line-by-line Solidity/Rust source audits.
 
-### 3.11 ForgeSuite MCP Server v1.2.0 (`https://youthmy11-ai.github.io/mcp.html`)
+### 3.11 ForgeSuite MCP Server v1.3.0 (`https://youthmy11-ai.github.io/mcp.html`)
 - **Category**: DeveloperApplication (Windows, macOS, Linux — Node.js 20+, 0 npm dependencies, MIT Free)
-- **Official MCP Registry Listing**: `io.github.youthmy11-ai/forgesuite-mcp` (`v1.2.0` Active — `https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite`)
+- **Official MCP Registry Listing**: `io.github.youthmy11-ai/forgesuite-mcp` (`v1.3.0` Active — `https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite`)
 - **1-Command Global Install**: `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`
-- **Verified `.mcpb` Release Bundle**: `https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.2.0/forgesuite-mcp.mcpb`
+- **Verified `.mcpb` Release Bundle**: `https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.3.0/forgesuite-mcp.mcpb`
 - **Direct Single-File URL**: `https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs`
 - **Capabilities**:
-  - Single-file zero-dependency JSON-RPC 2.0 Model Context Protocol (MCP) stdio server (`v1.2.0`) compatible with Claude Code, Cursor, Antigravity, and Windsurf.
-  - Exposes **7 tools**:
+  - Single-file zero-dependency JSON-RPC 2.0 Model Context Protocol (MCP) stdio server (`v1.3.0`) compatible with Claude Code, Cursor, Antigravity, and Windsurf.
+  - Exposes **8 tools**:
     1. `envshield_scan` — offline secret leak detection & redaction
     2. `calldata_decode` — offline EVM ABI decoding + `MaxUint256` unlimited approval warnings
     3. `tokencost_estimate` — multi-turn LLM cost & retainer estimation across Claude/GPT-5/Gemini/DeepSeek
@@ -127,6 +128,7 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
     5. `evm_token_risk_scan` — live EVM token/proxy/opcode risk audit across Base/Ethereum/BSC/Arbitrum
     6. `solana_mint_risk_scan` — live Solana SPL / Token-2022 authority, extension & holder concentration risk audit
     7. `brand_domain_handle_scan` — live authoritative RDAP + Google DoH domain (`.com`, `.io`, `.ai`, `.dev`, `.app`, `.org`), developer registry (`npm`, `PyPI`, `GitHub`), social (`Bluesky`, `Reddit`), and Apple iOS App Store availability scanner
+    8. `multi_chain_wallet_scan` — live 6-chain EVM (`Ethereum`, `Base`, `Arbitrum`, `BSC`, `Polygon`) & `Solana Mainnet` wallet portfolio, nonce, EIP-7702 (`0xef0100...`) delegation, Gnosis Safe `M-of-N` multisig, SPL/Token-2022 holdings, and Solana signature inspector
 
 ### 3.12 BrandGuard — 8-TLD Domain, Developer Registry & App Store Scanner (`https://youthmy11-ai.github.io/brandcheck.html`)
 - **Category**: BusinessApplication (Web — Free Single + 4 Variations + Pro 25-Brand Agency Matrix in `$15` Pro / `$35` Bundle)
@@ -135,6 +137,16 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
   - **100% CORS-Clean 8-TLD Domain Verification**: Queries Google DNS-over-HTTPS (`NS` + `A` records at `dns.google/resolve`) and CORS-enabled authoritative RDAP endpoints across `.com`, `.io`, `.ai`, `.dev`, `.app`, `.org`, `.net`, and `.xyz` (with automatic clean fallback to DoH if `rdap.org` redirects to a non-CORS registry), distinguishing `Likely Available (NXDOMAIN)` from `Registered (Active DNS/RDAP)`.
   - **5 Developer, Social & App Store Registries**: Live browser checks across `npm` (`registry.npmjs.org`), `PyPI` (`pypi.org/pypi/<name>/json`), `GitHub` (`api.github.com/users/<name>`), `Bluesky` (`public.api.bsky.app` ATProto handle resolution), and the US **Apple iOS App Store** (`itunes.apple.com/search`).
   - **Readiness Scoring, Variations & Agency Matrix**: Computes a deterministic `0–100` Brand Launch Readiness Score with UTC timestamps, generates 6 Smart Name Variations (`get`, `use`, `hq`, `labs`, `ai`, `try` — 4 parallel checks free, all 6 + `<= 25` Batch Agency Matrix + CSV/JSON exports in Pro), provides 1-click **ScopeGuard SOW** (`sowbuilder.html#sow=...`) and **CryptoBill** (`cryptobill.html#inv=...`) handoffs, and links directly to our `$0.35 USDC` autonomous agent **Brand Name Availability Checker** (`https://market.near.ai/agents/forge-brand-checker`) for official USPTO Registration/Serial Number trademark screening + Google Play + Reddit/YouTube/Telegram/TikTok/Instagram/X verification.
+
+### 3.13 WalletLens — Multi-Chain Wallet Portfolio, EIP-7702 & Gnosis Safe Inspector (`https://youthmy11-ai.github.io/walletcheck.html`)
+- **Category**: FinanceApplication (Web — Free Single 6-Chain Scan + Pro 25-Wallet Treasury Watchlist in `$15` Pro / `$35` Bundle)
+- **URL Deep-Link Parameters**: Pre-fills and auto-runs via `?address=<0x...|base58>` (plus optional `&chains=ethereum,base,...` and `&rpc=https://...`).
+- **Reusable Engine**: `https://youthmy11-ai.github.io/assets/walletcheck.js` (Pure ES Module compatible with Browser & Node.js 20+)
+- **Capabilities**:
+  - **Parallel 6-Chain JSON-RPC Portfolio Inspection**: Queries CORS-clean `PublicNode` endpoints across **Ethereum**, **Base**, **Arbitrum**, **BSC**, **Polygon**, and **Solana Mainnet** for native gas (`ETH`, `BNB`, `POL`, `SOL`), stablecoin/wrapped token balances (`USDC`, `USDT`, `DAI`, `WETH`, `USDC-SPL`, `USDT-SPL`, `PYUSD`), and exact outgoing nonces.
+  - **Smart Account & Delegation Forensics**: Detects **EIP-7702 (`0xef0100...`)** delegated EOAs, **Gnosis Safe `M-of-N`** multisigs (`getThreshold()` + `getOwners()`), **ERC-4337** EntryPoints, **EIP-1167** minimal clones, and **Squads** Solana multisigs, with 1-click handoff to **TokenGuard** for implementation bytecode audits.
+  - **Zero-CORS Solana Ed25519 ATA Derivation**: Derives Associated Token Addresses synchronously in pure JS (`SHA-256` + Ed25519 curve check) and queries `getMultipleAccounts` + `getSignaturesForAddress` so Solana SPL & Token-2022 balances and latest 10 signatures resolve cleanly in every browser.
+  - **Pro 25-Wallet Watchlist & Cloud A2A Funnel**: Unlocks up to **25 multi-chain treasury/counterparty wallets** with formula-safe CSV/JSON export, 1-click **CryptoBill** (`cryptobill.html#inv=...`) and **ScopeGuard SOW** (`sowbuilder.html#sow=...`) handoffs, and direct escalation to **`@wallet-activity-scanner`** (`$0.15 USDC/call` at `https://market.near.ai/agents/wallet-activity-scanner`).
 
 ---
 
@@ -158,22 +170,24 @@ ForgeSuite Studio supports **two automatic client-side on-chain auto-unlock rail
 
 ---
 
-## 5. 4-Tier Autonomous Paid A2A + x402 Cloud Agent Fleet
+## 5. 5 Live Autonomous Paid A2A + x402 Cloud Agents
 
-ForgeSuite operates 4 live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 pay-per-call autonomous cloud agents on NEAR AI Agent Market:
-1. **`@forge-data-finops` (`$0.15 USDC/call`, `<500ms`)**: https://market.near.ai/agents/forge-data-finops (`https://forge-data-finops.market.near.ai/a2a/v1`) — Instant nested JSON-to-CSV/Markdown with PII redaction, 8-model multi-turn LLM budget benchmarks, and milestone SOW + Solana Pay/BEP20/TRC20 crypto invoice URIs.
-2. **`@forge-token-guard` (`$0.25 USDC/call`, `<5s`)**: https://market.near.ai/agents/forge-token-guard (`https://forge-token-guard.market.near.ai/a2a/v1`) — Live Base/Ethereum/BSC/Arbitrum EIP-1967/1167 proxy & opcode scanner, Solana SPL/Token-2022 `permanentDelegate`/fee/holder scanner, calldata decode, and `.env` secret audit.
-3. **`@forge-brand-checker` (`$0.35 USDC/call`, `<12s`)**: https://market.near.ai/agents/forge-brand-checker (`https://forge-brand-checker.market.near.ai/a2a/v1`) — Official USPTO Registration/Serial Number trademark screening, Port-43 WHOIS + RDAP + DoH domains, Google Play + iOS App Store, and 10 developer/social handles.
-4. **`@forge-ai-agent` (`$5.00 USDC/call`, 6h SLA)**: https://market.near.ai/agents/forge-ai-agent (`https://market.near.ai/a/forge-ai-agent`, Agent Card `https://forge-ai-agent.market.near.ai/.well-known/agent-card.json`, JSON-RPC 1.0 A2A `https://forge-ai-agent.market.near.ai/a2a/v1`, x402 `https://forge-ai-agent.market.near.ai/.well-known/x402`) — Deep line-by-line smart contract security review (Solidity / Rust / Anchor / Move), TypeScript/Rust/Python fixes with automated tests, and primary-source technical research reports.
+ForgeSuite operates 5 live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 pay-per-call autonomous cloud agents on NEAR AI Agent Market:
+1. **`@wallet-activity-scanner` (`$0.15 USDC/call`, `<4s`)**: https://market.near.ai/agents/wallet-activity-scanner (`https://wallet-activity-scanner.market.near.ai/a2a/v1`) — Parallel 6-chain EVM (Ethereum, Base, Arbitrum, BSC, Polygon) & Solana Mainnet wallet portfolio, USDC/USDT/DAI/PYUSD balances, EIP-7702 delegation, Gnosis Safe M-of-N signers, SPL/Token-2022 holdings, and latest 10 Solana signatures.
+2. **`@forge-data-finops` (`$0.15 USDC/call`, `<500ms`)**: https://market.near.ai/agents/forge-data-finops (`https://forge-data-finops.market.near.ai/a2a/v1`) — Instant nested JSON-to-CSV/Markdown with PII redaction, 8-model multi-turn LLM budget benchmarks, and milestone SOW + Solana Pay/BEP20/TRC20 crypto invoice URIs.
+3. **`@forge-token-guard` (`$0.25 USDC/call`, `<5s`)**: https://market.near.ai/agents/forge-token-guard (`https://forge-token-guard.market.near.ai/a2a/v1`) — Live Base/Ethereum/BSC/Arbitrum EIP-1967/1167 proxy & opcode scanner, Solana SPL/Token-2022 `permanentDelegate`/fee/holder scanner, calldata decode, and `.env` secret audit.
+4. **`@forge-brand-checker` (`$0.35 USDC/call`, `<12s`)**: https://market.near.ai/agents/forge-brand-checker (`https://forge-brand-checker.market.near.ai/a2a/v1`) — Official USPTO Registration/Serial Number trademark screening, Port-43 WHOIS + RDAP + DoH domains, Google Play + iOS App Store, and 10 developer/social handles.
+5. **`@forge-ai-agent` (`$5.00 USDC/call`, 6h SLA)**: https://market.near.ai/agents/forge-ai-agent (`https://market.near.ai/a/forge-ai-agent`, Agent Card `https://forge-ai-agent.market.near.ai/.well-known/agent-card.json`, JSON-RPC 1.0 A2A `https://forge-ai-agent.market.near.ai/a2a/v1`, x402 `https://forge-ai-agent.market.near.ai/.well-known/x402`) — Deep line-by-line smart contract security review (Solidity / Rust / Anchor / Move), TypeScript/Rust/Python fixes with automated tests, and primary-source technical research reports.
 
 ---
 
 ## 6. Contact & Official Links
 
 - **Storefront**: https://youthmy11-ai.github.io/
+- **WalletLens Inspector**: https://youthmy11-ai.github.io/walletcheck.html
 - **TokenGuard Scanner**: https://youthmy11-ai.github.io/tokenaudit.html
 - **BrandGuard Scanner**: https://youthmy11-ai.github.io/brandcheck.html
-- **MCP Server v1.2.0**: https://youthmy11-ai.github.io/mcp.html
+- **MCP Server v1.3.0**: https://youthmy11-ai.github.io/mcp.html
 - **Concise LLM Index**: https://youthmy11-ai.github.io/llms.txt
 - **Live A2A + x402 Agent**: https://market.near.ai/a/forge-ai-agent
 - **GitHub Organization / Developer**: https://github.com/youthmy11-ai

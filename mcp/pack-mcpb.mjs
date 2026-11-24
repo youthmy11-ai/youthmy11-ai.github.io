@@ -114,7 +114,7 @@ export function buildMcpbManifest(version) {
     display_name: "ForgeSuite Web3, FinOps & Brand Security MCP",
     version,
     description:
-      "Zero-dependency Node 20+ MCP server with 7 tools for EVM/Solana token risk scanning, calldata decoding, .env secret redaction, LLM cost estimation, crypto invoicing, and brand availability.",
+      "Zero-dependency Node 20+ MCP server with 8 tools for multi-chain EVM/Solana wallet & portfolio inspection, token risk scanning, calldata decoding, .env secret redaction, LLM cost estimation, crypto invoicing, and brand availability.",
     author: {
       name: "ForgeSuite Studio (youthmy11-ai)",
       email: "youthmy11@gmail.com",
@@ -163,6 +163,10 @@ export function buildMcpbManifest(version) {
       {
         name: "brand_domain_handle_scan",
         description: "Check live domain RDAP/DoH, npm, PyPI, GitHub, Bluesky, and iOS App Store availability.",
+      },
+      {
+        name: "multi_chain_wallet_scan",
+        description: "Inspect 1-5 EVM & Solana wallets across 6 chains for balances, EIP-7702, Gnosis Safe, SPL/Token-2022 & tx activity.",
       },
     ],
   };

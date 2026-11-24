@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * ForgeSuite MCP Server (v1.2.0)
+ * ForgeSuite MCP Server (v1.3.0)
  * Zero-dependency Node 20+ Model Context Protocol (MCP) stdio JSON-RPC 2.0 server.
  *
  * 1-Command Global Run:
  *   npx --yes github:youthmy11-ai/youthmy11-ai.github.io
  *
- * 7 Developer, FinOps, Brand Launch & Web3 Security Tools:
+ * 8 Developer, FinOps, Brand Launch & Web3 Security Tools:
  *   1. envshield_scan           — Scan .env/configs/logs offline for leaked secrets & return redacted output
  *   2. calldata_decode          — Decode EVM calldata selectors offline & flag unlimited MaxUint256 approvals
  *   3. tokencost_estimate       — Estimate LLM API & multi-turn AI agent run costs (Claude/GPT/Gemini/DeepSeek)
@@ -14,18 +14,21 @@
  *   5. evm_token_risk_scan      — Live EVM token/proxy/opcode risk audit across Base/Ethereum/BSC/Arbitrum
  *   6. solana_mint_risk_scan    — Live Solana SPL / Token-2022 authority, extension & holder concentration audit
  *   7. brand_domain_handle_scan — Live RDAP + DoH domain (.com/.io/.ai/.dev/.app/.org), npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability audit
+ *   8. multi_chain_wallet_scan  — Live 6-chain EVM & Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector
  *
  * Docs & Pro Bundle ($35 Lifetime): https://youthmy11-ai.github.io/mcp.html
  * License: MIT (youthmy11-ai)
  */
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 
 export const SERVER_INFO = Object.freeze({
   name: "forgesuite-mcp",
-  version: "1.2.0",
+  version: "1.3.0",
 });
 
 export const SUPPORTED_PROTOCOL_VERSIONS = Object.freeze([
@@ -39,12 +42,16 @@ export const FORGESUITE_LINKS = Object.freeze({
   envshield: "https://youthmy11-ai.github.io/envshield.html",
   txdecode: "https://youthmy11-ai.github.io/txdecode.html",
   tokenaudit: "https://youthmy11-ai.github.io/tokenaudit.html",
+  brandcheck: "https://youthmy11-ai.github.io/brandcheck.html",
+  walletcheck: "https://youthmy11-ai.github.io/walletcheck.html",
   tokencalc: "https://youthmy11-ai.github.io/tokencalc.html",
   cryptobill: "https://youthmy11-ai.github.io/cryptobill.html",
   pricing: "https://youthmy11-ai.github.io/#pricing",
   forgeAgent: "https://market.near.ai/a/forge-ai-agent",
   forgeTokenGuard: "https://market.near.ai/a/forge-token-guard",
+  forgeBrandChecker: "https://market.near.ai/agents/forge-brand-checker",
   forgeDataFinops: "https://market.near.ai/a/forge-data-finops",
+  walletActivityScanner: "https://market.near.ai/agents/wallet-activity-scanner",
 });
 
 /* ============================================================================
@@ -2239,6 +2246,12 @@ export const NEAR_AGENT_FLEET = Object.freeze([
     a2aEndpoint: "https://forge-ai-agent.market.near.ai/a2a/v1",
   },
   {
+    id: "forge-brand-checker",
+    name: "Brand Name Availability Checker — USPTO Trademark, WHOIS/RDAP & 10-Platform Handle Scanner ($0.35 USDC/call)",
+    marketUrl: FORGESUITE_LINKS.forgeBrandChecker,
+    a2aEndpoint: "https://forge-brand-checker.market.near.ai/a2a/v1",
+  },
+  {
     id: "forge-token-guard",
     name: "Forge TokenGuard — Instant <15s EVM & Solana Rug/Proxy Scanner ($0.25 USDC/call)",
     marketUrl: FORGESUITE_LINKS.forgeTokenGuard,
@@ -2249,6 +2262,12 @@ export const NEAR_AGENT_FLEET = Object.freeze([
     name: "Forge Data & FinOps — Instant <500ms JSON/CSV PII Redactor, LLM Budget & Crypto SOW ($0.15 USDC/call)",
     marketUrl: FORGESUITE_LINKS.forgeDataFinops,
     a2aEndpoint: "https://forge-data-finops.market.near.ai/a2a/v1",
+  },
+  {
+    id: "wallet-activity-scanner",
+    name: "Multi-Chain Wallet Activity & Portfolio Scanner — 6-Chain EVM + Solana, EIP-7702 & Safe Multisig ($0.15 USDC/call)",
+    marketUrl: FORGESUITE_LINKS.walletActivityScanner,
+    a2aEndpoint: "https://wallet-activity-scanner.market.near.ai/a2a/v1",
   },
 ]);
 
@@ -2302,7 +2321,7 @@ async function safeJsonFetch(url, options = {}) {
   const fetchImpl = options.fetchImpl ?? globalThis.fetch;
   const timeoutMs = options.timeoutMs ?? 6500;
   const headers = {
-    "User-Agent": "ForgeSuite-MCP/1.2.0 (+https://youthmy11-ai.github.io)",
+    "User-Agent": "ForgeSuite-MCP/1.3.0 (+https://youthmy11-ai.github.io)",
     Accept: options.accept || "application/json",
     ...(options.headers || {}),
   };
@@ -2912,7 +2931,7 @@ export async function scanBrandDomainAndHandles(input = {}, options = {}) {
       proBundleUrl: FORGESUITE_LINKS.pricing,
       proBundlePriceUsd: 35,
       proBundleOffer:
-        "Unlock ForgeSuite All-Access Lifetime Pro Bundle ($35, save $14 — CryptoBill Pro, TokenGuard 25-Token Batch Watchlist, AutoShorts Pro & WebLead Pro)",
+        "Unlock ForgeSuite All-Access Lifetime Pro Bundle ($35, save $14 — CryptoBill Pro, TokenGuard 25-Token Watchlist, BrandGuard 25-Brand Matrix, WalletLens 25-Wallet Watchlist, AutoShorts Pro & WebLead Pro)",
       mcpDocsUrl: FORGESUITE_LINKS.mcp,
       nearAgentFleet: NEAR_AGENT_FLEET,
     },
@@ -2920,7 +2939,1287 @@ export async function scanBrandDomainAndHandles(input = {}, options = {}) {
 }
 
 /* ============================================================================
- * 7. MCP Tool Definitions & Dispatch (7 Tools)
+ * 7. WalletLens Multi-Chain EVM & Solana Wallet Portfolio / Smart Account Scanner
+ * ========================================================================== */
+
+const WALLET_MAX_COUNT = 5;
+const WALLET_DEFAULT_SIG_LIMIT = 10;
+const WALLET_MAX_SIG_LIMIT = 25;
+const WALLET_DEFAULT_TIMEOUT_MS = 4500;
+
+export const WALLET_EVM_CHAINS = Object.freeze({
+  ethereum: {
+    key: "ethereum",
+    name: "Ethereum",
+    chainId: 1,
+    nativeSymbol: "ETH",
+    nativeDecimals: 18,
+    explorerUrl: "https://etherscan.io",
+    rpcs: Object.freeze([
+      "https://ethereum-rpc.publicnode.com",
+      "https://1rpc.io/eth",
+      "https://eth.llamarpc.com",
+    ]),
+    tokens: Object.freeze([
+      { symbol: "USDC", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", decimals: 6, isStablecoin: true },
+      { symbol: "USDT", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", decimals: 6, isStablecoin: true },
+      { symbol: "DAI", address: "0x6B175474E89094C44Da98b954EedeAC495271d0F", decimals: 18, isStablecoin: true },
+      { symbol: "WETH", address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", decimals: 18, isStablecoin: false },
+    ]),
+  },
+  base: {
+    key: "base",
+    name: "Base",
+    chainId: 8453,
+    nativeSymbol: "ETH",
+    nativeDecimals: 18,
+    explorerUrl: "https://basescan.org",
+    rpcs: Object.freeze([
+      "https://base-rpc.publicnode.com",
+      "https://mainnet.base.org",
+      "https://1rpc.io/base",
+    ]),
+    tokens: Object.freeze([
+      { symbol: "USDC", address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", decimals: 6, isStablecoin: true },
+      { symbol: "USDT", address: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2", decimals: 6, isStablecoin: true },
+      { symbol: "DAI", address: "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb", decimals: 18, isStablecoin: true },
+      { symbol: "WETH", address: "0x4200000000000000000000000000000000000006", decimals: 18, isStablecoin: false },
+    ]),
+  },
+  arbitrum: {
+    key: "arbitrum",
+    name: "Arbitrum",
+    chainId: 42161,
+    nativeSymbol: "ETH",
+    nativeDecimals: 18,
+    explorerUrl: "https://arbiscan.io",
+    rpcs: Object.freeze([
+      "https://arbitrum-one-rpc.publicnode.com",
+      "https://arb1.arbitrum.io/rpc",
+      "https://1rpc.io/arb",
+    ]),
+    tokens: Object.freeze([
+      { symbol: "USDC", address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", decimals: 6, isStablecoin: true },
+      { symbol: "USDT", address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", decimals: 6, isStablecoin: true },
+      { symbol: "DAI", address: "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", decimals: 18, isStablecoin: true },
+      { symbol: "WETH", address: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", decimals: 18, isStablecoin: false },
+    ]),
+  },
+  bsc: {
+    key: "bsc",
+    name: "BSC",
+    chainId: 56,
+    nativeSymbol: "BNB",
+    nativeDecimals: 18,
+    explorerUrl: "https://bscscan.com",
+    rpcs: Object.freeze([
+      "https://bsc-rpc.publicnode.com",
+      "https://bsc-dataseed.binance.org",
+      "https://1rpc.io/bnb",
+    ]),
+    tokens: Object.freeze([
+      { symbol: "USDC", address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", decimals: 18, isStablecoin: true },
+      { symbol: "USDT", address: "0x55d398326f99059fF775485246999027B3197955", decimals: 18, isStablecoin: true },
+      { symbol: "DAI", address: "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3", decimals: 18, isStablecoin: true },
+      { symbol: "WETH", address: "0x2170Ed0880ac9A755fd29B2688956BD959F933F8", decimals: 18, isStablecoin: false },
+    ]),
+  },
+  polygon: {
+    key: "polygon",
+    name: "Polygon",
+    chainId: 137,
+    nativeSymbol: "POL",
+    nativeDecimals: 18,
+    explorerUrl: "https://polygonscan.com",
+    rpcs: Object.freeze([
+      "https://polygon-bor-rpc.publicnode.com",
+      "https://polygon-rpc.com",
+      "https://1rpc.io/matic",
+    ]),
+    tokens: Object.freeze([
+      { symbol: "USDC", address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", decimals: 6, isStablecoin: true },
+      { symbol: "USDC.e", address: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", decimals: 6, isStablecoin: true },
+      { symbol: "USDT", address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", decimals: 6, isStablecoin: true },
+      { symbol: "DAI", address: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", decimals: 18, isStablecoin: true },
+      { symbol: "WETH", address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", decimals: 18, isStablecoin: false },
+    ]),
+  },
+});
+
+export const WALLET_SOLANA_CONFIG = Object.freeze({
+  key: "solana",
+  name: "Solana Mainnet",
+  nativeSymbol: "SOL",
+  nativeDecimals: 9,
+  explorerUrl: "https://solscan.io",
+  rpcs: Object.freeze([
+    "https://solana-rpc.publicnode.com",
+    "https://api.mainnet-beta.solana.com",
+    "https://api.zan.top/solana-mainnet",
+  ]),
+  indexedRpcs: Object.freeze([
+    "https://api.mainnet-beta.solana.com",
+    "https://solana-rpc.publicnode.com",
+  ]),
+  associatedTokenProgram: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  splTokenProgram: TOKEN_PROGRAM_ID,
+  token2022Program: TOKEN_2022_PROGRAM_ID,
+  systemProgram: "11111111111111111111111111111111",
+  knownMints: Object.freeze({
+    EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: {
+      symbol: "USDC-SPL",
+      decimals: 6,
+      isStablecoin: true,
+      programId: TOKEN_PROGRAM_ID,
+    },
+    Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: {
+      symbol: "USDT-SPL",
+      decimals: 6,
+      isStablecoin: true,
+      programId: TOKEN_PROGRAM_ID,
+    },
+    "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo": {
+      symbol: "PYUSD",
+      decimals: 6,
+      isStablecoin: true,
+      programId: TOKEN_2022_PROGRAM_ID,
+    },
+    USDSwr9ApdHk5bvJKMjzff41FfuX8bSxdKcR81vTwcA: {
+      symbol: "USDS",
+      decimals: 6,
+      isStablecoin: true,
+      programId: TOKEN_PROGRAM_ID,
+    },
+    So11111111111111111111111111111111111111112: {
+      symbol: "wSOL",
+      decimals: 9,
+      isStablecoin: false,
+      programId: TOKEN_PROGRAM_ID,
+    },
+    JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN: {
+      symbol: "JUP",
+      decimals: 6,
+      isStablecoin: false,
+      programId: TOKEN_PROGRAM_ID,
+    },
+    mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So: {
+      symbol: "mSOL",
+      decimals: 9,
+      isStablecoin: false,
+      programId: TOKEN_PROGRAM_ID,
+    },
+    J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn: {
+      symbol: "jitoSOL",
+      decimals: 9,
+      isStablecoin: false,
+      programId: TOKEN_PROGRAM_ID,
+    },
+  }),
+});
+
+const WALLET_CHAIN_ALIASES = Object.freeze({
+  eth: "ethereum",
+  ethereum: "ethereum",
+  mainnet: "ethereum",
+  "1": "ethereum",
+  "eip155:1": "ethereum",
+  base: "base",
+  "8453": "base",
+  "eip155:8453": "base",
+  arb: "arbitrum",
+  arbitrum: "arbitrum",
+  "arbitrum-one": "arbitrum",
+  "42161": "arbitrum",
+  "eip155:42161": "arbitrum",
+  bsc: "bsc",
+  bnb: "bsc",
+  "bnb-chain": "bsc",
+  binance: "bsc",
+  "56": "bsc",
+  "eip155:56": "bsc",
+  pol: "polygon",
+  polygon: "polygon",
+  matic: "polygon",
+  "137": "polygon",
+  "eip155:137": "polygon",
+  sol: "solana",
+  solana: "solana",
+  "solana-mainnet": "solana",
+});
+
+const B58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+const B58_CHAR_MAP = new Map([...B58_ALPHABET].map((ch, idx) => [ch, idx]));
+const ED25519_P = (1n << 255n) - 19n;
+const ED25519_D =
+  37095705934669439343138083508754565189542113879843219016388785533085940283555n;
+
+function decodeBase58Bytes(str) {
+  const s = String(str || "").trim();
+  if (!s) return null;
+  let leadingZeros = 0;
+  while (leadingZeros < s.length && s[leadingZeros] === "1") leadingZeros += 1;
+  const revBytes = [];
+  for (let i = 0; i < s.length; i += 1) {
+    const val = B58_CHAR_MAP.get(s[i]);
+    if (val === undefined) return null;
+    let carry = val;
+    for (let j = 0; j < revBytes.length; j += 1) {
+      carry += revBytes[j] * 58;
+      revBytes[j] = carry & 0xff;
+      carry >>= 8;
+    }
+    while (carry > 0) {
+      revBytes.push(carry & 0xff);
+      carry >>= 8;
+    }
+  }
+  const out = new Uint8Array(leadingZeros + revBytes.length);
+  for (let i = 0; i < revBytes.length; i += 1) {
+    out[out.length - 1 - i] = revBytes[i];
+  }
+  return out;
+}
+
+function encodeBase58Bytes(bytes) {
+  let zeros = 0;
+  while (zeros < bytes.length && bytes[zeros] === 0) zeros += 1;
+  const digits = [];
+  for (let i = zeros; i < bytes.length; i += 1) {
+    let carry = bytes[i];
+    for (let j = 0; j < digits.length; j += 1) {
+      carry += digits[j] << 8;
+      digits[j] = carry % 58;
+      carry = Math.floor(carry / 58);
+    }
+    while (carry > 0) {
+      digits.push(carry % 58);
+      carry = Math.floor(carry / 58);
+    }
+  }
+  return "1".repeat(zeros) + digits.reverse().map((d) => B58_ALPHABET[d]).join("");
+}
+
+function modPowBig(base, exp, mod) {
+  let result = 1n;
+  let b = ((base % mod) + mod) % mod;
+  let e = exp;
+  while (e > 0n) {
+    if (e & 1n) result = (result * b) % mod;
+    b = (b * b) % mod;
+    e >>= 1n;
+  }
+  return result;
+}
+
+function isPointOnEd25519Curve(bytes32) {
+  if (!bytes32 || bytes32.length !== 32) return false;
+  let y = 0n;
+  for (let i = 0; i < 32; i += 1) {
+    y |= BigInt(bytes32[i]) << BigInt(8 * i);
+  }
+  const sign = Number((y >> 255n) & 1n);
+  y &= (1n << 255n) - 1n;
+  if (y >= ED25519_P) return false;
+  const y2 = (y * y) % ED25519_P;
+  const u = (y2 - 1n + ED25519_P) % ED25519_P;
+  const v = (ED25519_D * y2 + 1n) % ED25519_P;
+  const v3 = (((v * v) % ED25519_P) * v) % ED25519_P;
+  const v7 = (((v3 * v3) % ED25519_P) * v) % ED25519_P;
+  const uv7 = (u * v7) % ED25519_P;
+  let x = (((u * v3) % ED25519_P) * modPowBig(uv7, (ED25519_P - 5n) / 8n, ED25519_P)) % ED25519_P;
+  const vx2 = (v * ((x * x) % ED25519_P)) % ED25519_P;
+  if (vx2 !== u) {
+    const negU = (ED25519_P - u) % ED25519_P;
+    if (vx2 === negU) {
+      const sqrtM1 = modPowBig(2n, (ED25519_P - 1n) / 4n, ED25519_P);
+      x = (x * sqrtM1) % ED25519_P;
+    } else {
+      return false;
+    }
+  }
+  if (x === 0n && sign === 1) return false;
+  return true;
+}
+
+export function deriveSolanaAssociatedTokenAddress(ownerB58, tokenProgramB58, mintB58) {
+  const owner = decodeBase58Bytes(ownerB58);
+  const prog = decodeBase58Bytes(tokenProgramB58);
+  const mint = decodeBase58Bytes(mintB58);
+  const ataProg = decodeBase58Bytes(WALLET_SOLANA_CONFIG.associatedTokenProgram);
+  if (!owner || owner.length !== 32 || !prog || prog.length !== 32 || !mint || mint.length !== 32 || !ataProg) {
+    return null;
+  }
+  const pdaMarker = Buffer.from("ProgramDerivedAddress", "utf8");
+  for (let bump = 255; bump >= 0; bump -= 1) {
+    const hash = crypto
+      .createHash("sha256")
+      .update(owner)
+      .update(prog)
+      .update(mint)
+      .update(Buffer.from([bump]))
+      .update(ataProg)
+      .update(pdaMarker)
+      .digest();
+    if (!isPointOnEd25519Curve(hash)) {
+      return encodeBase58Bytes(hash);
+    }
+  }
+  return null;
+}
+
+export function isValidSolanaWalletAddress(candidate) {
+  const s = String(candidate || "").trim();
+  if (s.length < 32 || s.length > 44) return false;
+  const decoded = decodeBase58Bytes(s);
+  return Boolean(decoded && decoded.length === 32);
+}
+
+export function isValidEvmWalletAddress(candidate) {
+  return /^0x[a-fA-F0-9]{40}$/.test(String(candidate || "").trim());
+}
+
+function formatWalletUnitsExact(rawBigInt, decimals, maxFractionDigits = 6) {
+  const neg = rawBigInt < 0n;
+  const v = neg ? -rawBigInt : rawBigInt;
+  const base = 10n ** BigInt(decimals);
+  const whole = v / base;
+  const fracRaw = (v % base).toString().padStart(decimals, "0");
+  const trimmedFull = fracRaw.replace(/0+$/, "");
+  const exactStr = trimmedFull
+    ? `${neg ? "-" : ""}${whole.toString()}.${trimmedFull}`
+    : `${neg ? "-" : ""}${whole.toString()}`;
+
+  const displayFrac = fracRaw.slice(0, maxFractionDigits).replace(/0+$/, "");
+  const displayStr = displayFrac
+    ? `${neg ? "-" : ""}${whole.toLocaleString("en-US")}.${displayFrac}`
+    : `${neg ? "-" : ""}${whole.toLocaleString("en-US")}`;
+
+  return {
+    atomic: (neg ? -v : v).toString(),
+    exact: exactStr,
+    display: displayStr,
+    numeric: Number(exactStr),
+  };
+}
+
+function normalizeWalletChainFilter(rawChains) {
+  if (!rawChains) return null;
+  const items = Array.isArray(rawChains)
+    ? rawChains
+    : String(rawChains)
+        .split(/[\s,|/]+/)
+        .filter(Boolean);
+  const resolved = [];
+  for (const item of items) {
+    const mapped = WALLET_CHAIN_ALIASES[String(item).trim().toLowerCase()];
+    if (mapped && !resolved.includes(mapped)) resolved.push(mapped);
+  }
+  return resolved.length > 0 ? resolved : null;
+}
+
+function extractWalletCandidatesFromText(text) {
+  const src = String(text || "");
+  const stripped = src
+    .replace(/https?:\/\/[^\s)"'`<>]+\/(?:address|account|tx|token)\/([A-Za-z0-9]+)/gi, " $1 ")
+    .replace(/https?:\/\/[^\s)"'`<>]+/gi, " ");
+
+  const found = [];
+  const evmRx = /(?<![0-9a-fA-F])(0x[a-fA-F0-9]{40})(?![0-9a-fA-F])/g;
+  let em;
+  while ((em = evmRx.exec(stripped)) !== null) {
+    found.push({ address: em[1], family: "evm" });
+  }
+
+  const tokens = stripped.split(/[\s,;:()[\]{}"'`<>!?|\\/]+/).filter(Boolean);
+  for (const tok of tokens) {
+    if (tok.startsWith("0x")) continue;
+    if (!isValidSolanaWalletAddress(tok)) continue;
+    if (tok === WALLET_SOLANA_CONFIG.splTokenProgram || tok === WALLET_SOLANA_CONFIG.token2022Program) {
+      continue;
+    }
+    found.push({ address: tok, family: "solana" });
+  }
+  return found;
+}
+
+function decodeWalletUint256(hex) {
+  if (typeof hex !== "string" || !hex.startsWith("0x") || hex.length < 3) return null;
+  try {
+    return BigInt(hex);
+  } catch {
+    return null;
+  }
+}
+
+function decodeSafeOwnersArray(hex) {
+  if (typeof hex !== "string" || !hex.startsWith("0x")) return null;
+  const clean = hex.slice(2);
+  if (clean.length < 128 || clean.length % 64 !== 0) return null;
+  try {
+    const offset = Number(BigInt("0x" + clean.slice(0, 64)));
+    const lenStart = offset * 2;
+    if (lenStart + 64 > clean.length) return null;
+    const count = Number(BigInt("0x" + clean.slice(lenStart, lenStart + 64)));
+    if (!Number.isInteger(count) || count < 1 || count > 50) return null;
+    if (lenStart + 64 + count * 64 > clean.length) return null;
+    const owners = [];
+    for (let i = 0; i < count; i += 1) {
+      const word = clean.slice(lenStart + 64 + i * 64, lenStart + 128 + i * 64);
+      owners.push("0x" + word.slice(24));
+    }
+    return owners;
+  } catch {
+    return null;
+  }
+}
+
+export function classifyWalletEvmBytecode(rawCode) {
+  const code = String(rawCode || "0x").trim();
+  const lower = code.toLowerCase();
+
+  if (!lower || lower === "0x" || lower === "0x0") {
+    return {
+      accountType: "eoa",
+      label: "EOA (Externally Owned Account)",
+      isContract: false,
+      codeBytes: 0,
+      delegatedTo: null,
+      implementation: null,
+    };
+  }
+
+  const hexBody = lower.startsWith("0x") ? lower.slice(2) : lower;
+  const codeBytes = Math.floor(hexBody.length / 2);
+
+  // EIP-7702 delegation designator: 0xef0100 || 20-byte implementation address
+  if (hexBody.startsWith("ef0100") && hexBody.length >= 46) {
+    return {
+      accountType: "eip7702_delegated",
+      label: "EIP-7702 Delegated Account",
+      isContract: true,
+      codeBytes,
+      delegatedTo: "0x" + hexBody.slice(6, 46),
+      implementation: null,
+    };
+  }
+
+  // EIP-1167 minimal clone proxy
+  if (hexBody.startsWith("363d3d373d3d3d363d73") && hexBody.length >= 60) {
+    return {
+      accountType: "eip1167_proxy",
+      label: "EIP-1167 Minimal Proxy / Smart Account",
+      isContract: true,
+      codeBytes,
+      delegatedTo: null,
+      implementation: "0x" + hexBody.slice(20, 60),
+    };
+  }
+
+  return {
+    accountType: "contract",
+    label: "Smart Contract",
+    isContract: true,
+    codeBytes,
+    delegatedTo: null,
+    implementation: null,
+  };
+}
+
+async function walletRpcBatchWithFailover(
+  rpcUrls,
+  batchRequests,
+  { fetchImpl = globalThis.fetch, timeoutMs = WALLET_DEFAULT_TIMEOUT_MS } = {}
+) {
+  let lastErr = "All RPC endpoints failed";
+  for (const rpcUrl of rpcUrls) {
+    try {
+      const res = await fetchImpl(rpcUrl, {
+        method: "POST",
+        signal: AbortSignal.timeout(timeoutMs),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(batchRequests),
+      });
+      if (!res.ok) {
+        lastErr = `HTTP ${res.status} from ${rpcUrl}`;
+        continue;
+      }
+      const parsed = await res.json();
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const byId = new Map(parsed.map((item) => [item.id, item]));
+        const allErrored = batchRequests.every((req) => byId.get(req.id)?.error);
+        if (allErrored) {
+          lastErr = byId.get(batchRequests[0].id)?.error?.message || "RPC batch error";
+          continue;
+        }
+        return { ok: true, rpcUrl, byId };
+      }
+
+      const singles = await Promise.all(
+        batchRequests.map(async (req) => {
+          const sr = await fetchImpl(rpcUrl, {
+            method: "POST",
+            signal: AbortSignal.timeout(timeoutMs),
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify(req),
+          });
+          return sr.ok ? sr.json() : { id: req.id, error: { message: `HTTP ${sr.status}` } };
+        })
+      );
+      const byId = new Map(singles.map((item, idx) => [item?.id ?? batchRequests[idx].id, item]));
+      const allFailed = batchRequests.every((req) => byId.get(req.id)?.error);
+      if (!allFailed) return { ok: true, rpcUrl, byId };
+      lastErr = byId.get(batchRequests[0].id)?.error?.message || "RPC single-fallback error";
+    } catch (err) {
+      lastErr =
+        err?.name === "TimeoutError"
+          ? `Timeout (${timeoutMs}ms) at ${rpcUrl}`
+          : err instanceof Error
+            ? err.message
+            : String(err);
+    }
+  }
+  return { ok: false, error: lastErr, byId: new Map() };
+}
+
+export async function inspectEvmWalletOnChain(
+  address,
+  chainCfg,
+  { fetchImpl = globalThis.fetch, timeoutMs = WALLET_DEFAULT_TIMEOUT_MS, customRpcUrl = null } = {}
+) {
+  const rpcList = customRpcUrl ? [customRpcUrl, ...chainCfg.rpcs] : chainCfg.rpcs;
+  const paddedAddr = address.slice(2).toLowerCase().padStart(64, "0");
+  const balanceCallData = `0x70a08231${paddedAddr}`;
+
+  const batch = [
+    { jsonrpc: "2.0", id: "block", method: "eth_getBlockByNumber", params: ["latest", false] },
+    { jsonrpc: "2.0", id: "balance", method: "eth_getBalance", params: [address, "latest"] },
+    { jsonrpc: "2.0", id: "nonce", method: "eth_getTransactionCount", params: [address, "latest"] },
+    { jsonrpc: "2.0", id: "code", method: "eth_getCode", params: [address, "latest"] },
+    ...chainCfg.tokens.map((tok, idx) => ({
+      jsonrpc: "2.0",
+      id: `tok_${idx}`,
+      method: "eth_call",
+      params: [{ to: tok.address, data: balanceCallData }, "latest"],
+    })),
+  ];
+
+  const batchRes = await walletRpcBatchWithFailover(rpcList, batch, { fetchImpl, timeoutMs });
+  if (!batchRes.ok) {
+    return {
+      ok: false,
+      chain: chainCfg.key,
+      chainName: chainCfg.name,
+      chainId: chainCfg.chainId,
+      error: batchRes.error,
+    };
+  }
+
+  const blockObj = batchRes.byId.get("block")?.result || null;
+  const blockNumber = blockObj?.number ? Number.parseInt(blockObj.number, 16) : null;
+  const blockTimestampSec = blockObj?.timestamp ? Number.parseInt(blockObj.timestamp, 16) : null;
+  const blockTimeUtc =
+    Number.isFinite(blockTimestampSec) && blockTimestampSec > 0
+      ? new Date(blockTimestampSec * 1000).toISOString()
+      : null;
+
+  const rawBalBig = decodeWalletUint256(batchRes.byId.get("balance")?.result) ?? 0n;
+  const nativeBalance = formatWalletUnitsExact(rawBalBig, chainCfg.nativeDecimals, 6);
+
+  const rawNonceBig = decodeWalletUint256(batchRes.byId.get("nonce")?.result) ?? 0n;
+  const nonce = Number(rawNonceBig);
+
+  const codeHex = batchRes.byId.get("code")?.result || "0x";
+  let accountClassification = classifyWalletEvmBytecode(codeHex);
+
+  if (
+    accountClassification.isContract &&
+    accountClassification.accountType !== "eip7702_delegated"
+  ) {
+    const smartWalletProbe = [
+      {
+        jsonrpc: "2.0",
+        id: "safe_threshold",
+        method: "eth_call",
+        params: [{ to: address, data: "0xe75235b8" }, "latest"],
+      },
+      {
+        jsonrpc: "2.0",
+        id: "safe_owners",
+        method: "eth_call",
+        params: [{ to: address, data: "0xa0e67e2b" }, "latest"],
+      },
+      {
+        jsonrpc: "2.0",
+        id: "erc4337_ep",
+        method: "eth_call",
+        params: [{ to: address, data: "0xb0d691fe" }, "latest"],
+      },
+    ];
+    const probeRes = await walletRpcBatchWithFailover(
+      [batchRes.rpcUrl, ...rpcList.filter((u) => u !== batchRes.rpcUrl)],
+      smartWalletProbe,
+      { fetchImpl, timeoutMs: Math.min(2500, timeoutMs) }
+    );
+    if (probeRes.ok) {
+      const threshBig = decodeWalletUint256(probeRes.byId.get("safe_threshold")?.result);
+      const owners = decodeSafeOwnersArray(probeRes.byId.get("safe_owners")?.result);
+      if (
+        threshBig !== null &&
+        threshBig >= 1n &&
+        threshBig <= 50n &&
+        Array.isArray(owners) &&
+        owners.length >= Number(threshBig)
+      ) {
+        const threshold = Number(threshBig);
+        accountClassification = {
+          ...accountClassification,
+          accountType: "gnosis_safe",
+          label: `Gnosis Safe (${threshold}-of-${owners.length} Multisig)`,
+          safeThreshold: threshold,
+          safeOwnersCount: owners.length,
+          safeOwners: owners,
+        };
+      } else {
+        const epHex = probeRes.byId.get("erc4337_ep")?.result;
+        if (typeof epHex === "string" && epHex.length === 66 && !/^0x0+$/.test(epHex)) {
+          accountClassification = {
+            ...accountClassification,
+            accountType: "erc4337",
+            label: "ERC-4337 Smart Wallet",
+            entryPoint: "0x" + epHex.slice(26),
+          };
+        }
+      }
+    }
+  }
+
+  const tokens = chainCfg.tokens.map((tok, idx) => {
+    const rawHex = batchRes.byId.get(`tok_${idx}`)?.result;
+    const rawBig = decodeWalletUint256(rawHex) ?? 0n;
+    const formatted = formatWalletUnitsExact(rawBig, tok.decimals, tok.decimals === 6 ? 2 : 4);
+    return {
+      symbol: tok.symbol,
+      contract: tok.address,
+      decimals: tok.decimals,
+      isStablecoin: tok.isStablecoin,
+      atomic: formatted.atomic,
+      balance: formatted.exact,
+      display: formatted.display,
+      numeric: formatted.numeric,
+    };
+  });
+
+  const nonZeroTokens = tokens.filter((t) => BigInt(t.atomic) > 0n);
+  const stablecoinUsdTotal = Number(
+    nonZeroTokens
+      .filter((t) => t.isStablecoin)
+      .reduce((acc, t) => acc + t.numeric, 0)
+      .toFixed(2)
+  );
+
+  const hasActivity =
+    nonce > 0 || rawBalBig > 0n || nonZeroTokens.length > 0 || accountClassification.isContract;
+
+  return {
+    ok: true,
+    chain: chainCfg.key,
+    chainName: chainCfg.name,
+    chainId: chainCfg.chainId,
+    rpcUsed: batchRes.rpcUrl,
+    explorerAddressUrl: `${chainCfg.explorerUrl}/address/${address}`,
+    blockNumber,
+    blockTimeUtc,
+    account: accountClassification,
+    nonce,
+    hasActivity,
+    native: {
+      symbol: chainCfg.nativeSymbol,
+      decimals: chainCfg.nativeDecimals,
+      atomic: nativeBalance.atomic,
+      balance: nativeBalance.exact,
+      display: nativeBalance.display,
+      numeric: nativeBalance.numeric,
+    },
+    stablecoinUsdTotal,
+    tokens,
+    nonZeroTokens,
+  };
+}
+
+function classifySolanaWalletOwner(accountVal) {
+  if (!accountVal) {
+    return {
+      accountType: "unfunded_system_wallet",
+      label: "System Wallet (0 SOL / Uninitialized)",
+      executable: false,
+      ownerProgram: WALLET_SOLANA_CONFIG.systemProgram,
+    };
+  }
+  const owner = accountVal.owner || WALLET_SOLANA_CONFIG.systemProgram;
+  const executable = Boolean(accountVal.executable);
+  if (executable) {
+    return {
+      accountType: "program",
+      label: "Executable Solana Program",
+      executable: true,
+      ownerProgram: owner,
+    };
+  }
+  if (owner === WALLET_SOLANA_CONFIG.systemProgram) {
+    return {
+      accountType: "system_wallet",
+      label: "System Wallet (EOA)",
+      executable: false,
+      ownerProgram: owner,
+    };
+  }
+  if (
+    owner === WALLET_SOLANA_CONFIG.splTokenProgram ||
+    owner === WALLET_SOLANA_CONFIG.token2022Program
+  ) {
+    return {
+      accountType: "token_account_or_mint",
+      label:
+        owner === WALLET_SOLANA_CONFIG.token2022Program
+          ? "Token-2022 Mint / Account"
+          : "SPL Token Mint / Account",
+      executable: false,
+      ownerProgram: owner,
+    };
+  }
+  if (
+    owner === "SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf" ||
+    owner === "SMPLecH534NA9acpos4G6x7uf3LWbCAwZQE9e8ZekMu"
+  ) {
+    return {
+      accountType: "squads_multisig",
+      label: "Squads Smart Wallet / Multisig",
+      executable: false,
+      ownerProgram: owner,
+    };
+  }
+  return {
+    accountType: "pda_or_program_account",
+    label: `Program-Owned Account (${owner.slice(0, 6)}…${owner.slice(-4)})`,
+    executable: false,
+    ownerProgram: owner,
+  };
+}
+
+async function solanaWalletRpcCall(
+  rpcUrls,
+  reqObj,
+  { fetchImpl = globalThis.fetch, timeoutMs = WALLET_DEFAULT_TIMEOUT_MS } = {}
+) {
+  let lastErr = "All Solana RPC endpoints failed";
+  for (const rpcUrl of rpcUrls) {
+    try {
+      const res = await fetchImpl(rpcUrl, {
+        method: "POST",
+        signal: AbortSignal.timeout(timeoutMs),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(reqObj),
+      });
+      if (!res.ok) {
+        lastErr = `HTTP ${res.status} from ${rpcUrl}`;
+        continue;
+      }
+      const parsed = await res.json();
+      const item = Array.isArray(parsed)
+        ? parsed.find((x) => x.id === reqObj.id) || parsed[0]
+        : parsed;
+      if (item?.error) {
+        lastErr = item.error.message || JSON.stringify(item.error);
+        continue;
+      }
+      return { ok: true, rpcUrl, item };
+    } catch (err) {
+      lastErr =
+        err?.name === "TimeoutError"
+          ? `Timeout (${timeoutMs}ms) at ${rpcUrl}`
+          : err instanceof Error
+            ? err.message
+            : String(err);
+    }
+  }
+  return { ok: false, error: lastErr, item: null };
+}
+
+export async function inspectSolanaWalletOnChain(
+  address,
+  {
+    signatureLimit = WALLET_DEFAULT_SIG_LIMIT,
+    fetchImpl = globalThis.fetch,
+    timeoutMs = WALLET_DEFAULT_TIMEOUT_MS,
+    customRpcUrl = null,
+  } = {}
+) {
+  const coreRpcs = customRpcUrl
+    ? [customRpcUrl, ...WALLET_SOLANA_CONFIG.rpcs]
+    : WALLET_SOLANA_CONFIG.rpcs;
+  const indexedRpcs = customRpcUrl
+    ? [customRpcUrl, ...WALLET_SOLANA_CONFIG.indexedRpcs]
+    : WALLET_SOLANA_CONFIG.indexedRpcs;
+
+  const knownEntries = Object.entries(WALLET_SOLANA_CONFIG.knownMints);
+  const derivedAtas = knownEntries
+    .map(([mint, meta]) => ({
+      mint,
+      meta,
+      ata: deriveSolanaAssociatedTokenAddress(address, meta.programId, mint),
+    }))
+    .filter((x) => Boolean(x.ata));
+
+  const [acctCall, splCall, tok22Call, ataMultiCall, sigsCall] = await Promise.all([
+    solanaWalletRpcCall(
+      coreRpcs,
+      {
+        jsonrpc: "2.0",
+        id: "acct",
+        method: "getAccountInfo",
+        params: [address, { encoding: "base64", commitment: "confirmed" }],
+      },
+      { fetchImpl, timeoutMs }
+    ),
+    solanaWalletRpcCall(
+      indexedRpcs,
+      {
+        jsonrpc: "2.0",
+        id: "spl",
+        method: "getTokenAccountsByOwner",
+        params: [
+          address,
+          { programId: WALLET_SOLANA_CONFIG.splTokenProgram },
+          { encoding: "jsonParsed", commitment: "confirmed" },
+        ],
+      },
+      { fetchImpl, timeoutMs }
+    ),
+    solanaWalletRpcCall(
+      indexedRpcs,
+      {
+        jsonrpc: "2.0",
+        id: "tok22",
+        method: "getTokenAccountsByOwner",
+        params: [
+          address,
+          { programId: WALLET_SOLANA_CONFIG.token2022Program },
+          { encoding: "jsonParsed", commitment: "confirmed" },
+        ],
+      },
+      { fetchImpl, timeoutMs }
+    ),
+    solanaWalletRpcCall(
+      coreRpcs,
+      {
+        jsonrpc: "2.0",
+        id: "atas",
+        method: "getMultipleAccounts",
+        params: [derivedAtas.map((x) => x.ata), { encoding: "jsonParsed", commitment: "confirmed" }],
+      },
+      { fetchImpl, timeoutMs }
+    ),
+    solanaWalletRpcCall(
+      coreRpcs,
+      {
+        jsonrpc: "2.0",
+        id: "sigs",
+        method: "getSignaturesForAddress",
+        params: [address, { limit: signatureLimit, commitment: "confirmed" }],
+      },
+      { fetchImpl, timeoutMs }
+    ),
+  ]);
+
+  if (!acctCall.ok && !sigsCall.ok && !ataMultiCall.ok) {
+    return {
+      ok: false,
+      chain: "solana",
+      chainName: WALLET_SOLANA_CONFIG.name,
+      error: acctCall.error || sigsCall.error,
+    };
+  }
+
+  const rpcUsed = acctCall.rpcUrl || sigsCall.rpcUrl || ataMultiCall.rpcUrl || coreRpcs[0];
+  const acctResult = acctCall.item?.result;
+  const slot =
+    acctResult?.context?.slot ??
+    ataMultiCall.item?.result?.context?.slot ??
+    splCall.item?.result?.context?.slot ??
+    null;
+  const lamportsBig = BigInt(acctResult?.value?.lamports ?? 0);
+  const nativeSol = formatWalletUnitsExact(lamportsBig, 9, 6);
+  const accountClassification = classifySolanaWalletOwner(acctResult?.value || null);
+
+  const splRaw = Array.isArray(splCall.item?.result?.value) ? splCall.item.result.value : [];
+  const tok22Raw = Array.isArray(tok22Call.item?.result?.value) ? tok22Call.item.result.value : [];
+
+  const byMint = new Map();
+  let splAccountCount = 0;
+  let token2022AccountCount = 0;
+
+  const ingestParsedAccountInfo = (info, programLabel, pubkey = null) => {
+    const tokAmt = info?.tokenAmount;
+    const mint = info?.mint;
+    if (!mint || !tokAmt) return;
+    const rawBig = BigInt(tokAmt.amount || "0");
+    const decimals = Number(tokAmt.decimals ?? 0);
+    const prev = byMint.get(mint);
+    if (prev) {
+      if (pubkey && prev.seenPubkeys.has(pubkey)) return;
+      if (pubkey) prev.seenPubkeys.add(pubkey);
+      prev.atomicBig += rawBig;
+      prev.accountCount += 1;
+    } else {
+      const known = WALLET_SOLANA_CONFIG.knownMints[mint];
+      byMint.set(mint, {
+        mint,
+        symbol: known?.symbol || `SPL:${mint.slice(0, 4)}…${mint.slice(-4)}`,
+        isKnown: Boolean(known),
+        isStablecoin: Boolean(known?.isStablecoin),
+        program: programLabel,
+        decimals,
+        atomicBig: rawBig,
+        accountCount: 1,
+        state: info.state || "initialized",
+        seenPubkeys: new Set(pubkey ? [pubkey] : []),
+      });
+    }
+    if (programLabel === "token-2022") token2022AccountCount += 1;
+    else splAccountCount += 1;
+  };
+
+  for (const row of splRaw) {
+    ingestParsedAccountInfo(row?.account?.data?.parsed?.info, "spl-token", row?.pubkey || null);
+  }
+  for (const row of tok22Raw) {
+    ingestParsedAccountInfo(row?.account?.data?.parsed?.info, "token-2022", row?.pubkey || null);
+  }
+
+  // Fallback / supplement from non-indexed O(1) getMultipleAccounts on canonical ATAs
+  const ataValues = Array.isArray(ataMultiCall.item?.result?.value)
+    ? ataMultiCall.item.result.value
+    : [];
+  ataValues.forEach((acctVal, idx) => {
+    if (!acctVal) return;
+    const entry = derivedAtas[idx];
+    if (!entry || byMint.has(entry.mint)) return;
+    const info = acctVal?.data?.parsed?.info;
+    const progLabel =
+      entry.meta.programId === WALLET_SOLANA_CONFIG.token2022Program ? "token-2022" : "spl-token";
+    ingestParsedAccountInfo(info, progLabel, entry.ata);
+  });
+
+  const totalTokenAccounts = splAccountCount + token2022AccountCount;
+
+  for (const [mint, meta] of [
+    ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", WALLET_SOLANA_CONFIG.knownMints.EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v],
+    ["Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", WALLET_SOLANA_CONFIG.knownMints.Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB],
+  ]) {
+    if (!byMint.has(mint)) {
+      byMint.set(mint, {
+        mint,
+        symbol: meta.symbol,
+        isKnown: true,
+        isStablecoin: true,
+        program: "spl-token",
+        decimals: meta.decimals,
+        atomicBig: 0n,
+        accountCount: 0,
+        state: "none",
+      });
+    }
+  }
+
+  const allTokens = [...byMint.values()]
+    .map((entry) => {
+      const fmt = formatWalletUnitsExact(entry.atomicBig, entry.decimals, entry.decimals === 6 ? 2 : 4);
+      return {
+        symbol: entry.symbol,
+        mint: entry.mint,
+        program: entry.program,
+        decimals: entry.decimals,
+        isKnown: entry.isKnown,
+        isStablecoin: entry.isStablecoin,
+        accountCount: entry.accountCount,
+        atomic: fmt.atomic,
+        balance: fmt.exact,
+        display: fmt.display,
+        numeric: fmt.numeric,
+      };
+    })
+    .sort((a, b) => {
+      if (a.isStablecoin !== b.isStablecoin) return a.isStablecoin ? -1 : 1;
+      if (a.isKnown !== b.isKnown) return a.isKnown ? -1 : 1;
+      return b.numeric - a.numeric;
+    });
+
+  const nonZeroTokens = allTokens.filter((t) => BigInt(t.atomic) > 0n);
+  const stablecoinUsdTotal = Number(
+    nonZeroTokens
+      .filter((t) => t.isStablecoin)
+      .reduce((acc, t) => acc + t.numeric, 0)
+      .toFixed(2)
+  );
+
+  const rawSigs = Array.isArray(sigsCall.item?.result) ? sigsCall.item.result : [];
+  const signatures = rawSigs.map((s) => ({
+    signature: s.signature,
+    slot: s.slot ?? null,
+    blockTimeUtc:
+      typeof s.blockTime === "number" && s.blockTime > 0
+        ? new Date(s.blockTime * 1000).toISOString()
+        : null,
+    status: s.err ? "FAILED" : "SUCCESS",
+    confirmationStatus: s.confirmationStatus || "confirmed",
+    error: s.err ? JSON.stringify(s.err) : null,
+    memo: s.memo || null,
+    explorerTxUrl: `${WALLET_SOLANA_CONFIG.explorerUrl}/tx/${s.signature}`,
+  }));
+
+  let slotTimeUtc = signatures[0]?.blockTimeUtc || null;
+  if (!slotTimeUtc && slot !== null) {
+    const btCall = await solanaWalletRpcCall(
+      [rpcUsed, ...coreRpcs.filter((u) => u !== rpcUsed)],
+      { jsonrpc: "2.0", id: "bt", method: "getBlockTime", params: [slot] },
+      { fetchImpl, timeoutMs: 1400 }
+    );
+    const ts = btCall.item?.result;
+    if (typeof ts === "number" && ts > 0) {
+      slotTimeUtc = new Date(ts * 1000).toISOString();
+    }
+  }
+  if (!slotTimeUtc) slotTimeUtc = new Date().toISOString();
+
+  const hasActivity = lamportsBig > 0n || totalTokenAccounts > 0 || signatures.length > 0;
+
+  return {
+    ok: true,
+    chain: "solana",
+    chainName: WALLET_SOLANA_CONFIG.name,
+    rpcUsed,
+    explorerAddressUrl: `${WALLET_SOLANA_CONFIG.explorerUrl}/account/${address}`,
+    slot,
+    slotTimeUtc,
+    account: accountClassification,
+    totalTokenAccounts,
+    splAccountCount,
+    token2022AccountCount,
+    recentSignatureCount: signatures.length,
+    hasActivity,
+    native: {
+      symbol: "SOL",
+      decimals: 9,
+      atomic: nativeSol.atomic,
+      balance: nativeSol.exact,
+      display: nativeSol.display,
+      numeric: nativeSol.numeric,
+    },
+    stablecoinUsdTotal,
+    tokens: allTokens.slice(0, 40),
+    nonZeroTokens: nonZeroTokens.slice(0, 30),
+    recentSignatures: signatures,
+  };
+}
+
+export async function scanMultiChainWallets(input = {}, options = {}) {
+  const t0 = performance.now();
+  const rawCandidates = [];
+
+  const pushCandidate = (val) => {
+    if (typeof val !== "string") return;
+    const trimmed = val.trim();
+    if (!trimmed) return;
+    if (isValidEvmWalletAddress(trimmed)) {
+      rawCandidates.push({ address: trimmed, family: "evm" });
+    } else if (isValidSolanaWalletAddress(trimmed)) {
+      rawCandidates.push({ address: trimmed, family: "solana" });
+    } else {
+      for (const extracted of extractWalletCandidatesFromText(trimmed)) {
+        rawCandidates.push(extracted);
+      }
+    }
+  };
+
+  if (typeof input === "string") {
+    pushCandidate(input);
+  } else if (Array.isArray(input)) {
+    input.forEach(pushCandidate);
+  } else if (input && typeof input === "object") {
+    if (typeof input.address === "string") pushCandidate(input.address);
+    if (typeof input.wallet === "string") pushCandidate(input.wallet);
+    if (Array.isArray(input.wallets)) input.wallets.forEach(pushCandidate);
+    if (Array.isArray(input.addresses)) input.addresses.forEach(pushCandidate);
+  }
+
+  const dedupedAll = [];
+  const seen = new Set();
+  for (const w of rawCandidates) {
+    const normKey = w.family === "evm" ? w.address.toLowerCase() : w.address;
+    if (seen.has(normKey)) continue;
+    seen.add(normKey);
+    dedupedAll.push(w);
+  }
+
+  if (dedupedAll.length === 0) {
+    throw new Error(
+      "Missing or invalid wallet address: provide 1 to 5 EVM ('0x...' 40-hex) and/or Solana (Base58 32-byte) wallet addresses via 'address' or 'wallets'."
+    );
+  }
+
+  const warnings = [];
+  const wallets = dedupedAll.slice(0, WALLET_MAX_COUNT);
+  if (dedupedAll.length > WALLET_MAX_COUNT) {
+    warnings.push(
+      `Inspected first ${WALLET_MAX_COUNT} of ${dedupedAll.length} supplied addresses. Unlock 25-Wallet Batch Treasury Watchlist + CSV/JSON Export in WalletLens Pro ($35 Bundle): ${FORGESUITE_LINKS.walletcheck}`
+    );
+  }
+
+  const chainsFilter =
+    input && typeof input === "object" && !Array.isArray(input)
+      ? normalizeWalletChainFilter(input.chains || input.chain)
+      : null;
+
+  let signatureLimit = WALLET_DEFAULT_SIG_LIMIT;
+  if (input && typeof input === "object" && !Array.isArray(input)) {
+    const rawLim = Number(input.signatureLimit ?? input.limit);
+    if (Number.isFinite(rawLim) && rawLim >= 1) {
+      signatureLimit = Math.min(WALLET_MAX_SIG_LIMIT, Math.floor(rawLim));
+    }
+  }
+
+  const customRpcUrl =
+    input && typeof input === "object" && input.rpcUrl
+      ? sanitizeCustomRpcUrl(input.rpcUrl)
+      : null;
+
+  const requestedEvmChains = chainsFilter
+    ? chainsFilter.filter((c) => c in WALLET_EVM_CHAINS)
+    : Object.keys(WALLET_EVM_CHAINS);
+  const evmChainKeys =
+    requestedEvmChains.length > 0 ? requestedEvmChains : Object.keys(WALLET_EVM_CHAINS);
+
+  const walletReports = await Promise.all(
+    wallets.map(async (w) => {
+      if (w.family === "evm") {
+        const chainResults = await Promise.all(
+          evmChainKeys.map((ck) =>
+            inspectEvmWalletOnChain(w.address, WALLET_EVM_CHAINS[ck], {
+              fetchImpl: options.fetchImpl,
+              timeoutMs: options.timeoutMs ?? WALLET_DEFAULT_TIMEOUT_MS,
+              customRpcUrl: evmChainKeys.length === 1 ? customRpcUrl : null,
+            })
+          )
+        );
+        for (const cr of chainResults) {
+          if (!cr.ok) warnings.push(`${w.address} (${cr.chainName}): ${cr.error}`);
+        }
+        const okChains = chainResults.filter((c) => c.ok);
+        const activeChains = okChains.filter((c) => c.hasActivity);
+        const totalNonce = okChains.reduce((acc, c) => acc + c.nonce, 0);
+        const totalStablecoinUsd = Number(
+          okChains.reduce((acc, c) => acc + c.stablecoinUsdTotal, 0).toFixed(2)
+        );
+
+        let verdict = "Fresh / Dormant EVM Address (0 on-chain activity)";
+        if (okChains.some((c) => c.account.accountType === "gnosis_safe")) {
+          verdict = `Gnosis Safe Multisig (Active on ${activeChains.length}/${okChains.length} chains)`;
+        } else if (okChains.some((c) => c.account.accountType === "eip7702_delegated")) {
+          verdict = `EIP-7702 Delegated Smart EOA (${totalNonce} outgoing txs across ${activeChains.length} active chains)`;
+        } else if (okChains.some((c) => c.account.accountType === "erc4337")) {
+          verdict = `ERC-4337 Smart Wallet (Active on ${activeChains.length}/${okChains.length} chains)`;
+        } else if (okChains.some((c) => c.account.isContract)) {
+          verdict = `Deployed Smart Contract / Proxy (Active on ${activeChains.length}/${okChains.length} chains)`;
+        } else if (activeChains.length >= 2) {
+          verdict = `Active Multi-Chain EOA (${activeChains.length} active chains · ${totalNonce} outgoing txs)`;
+        } else if (activeChains.length === 1) {
+          verdict = `Active Single-Chain EOA on ${activeChains[0].chainName} (${totalNonce} outgoing txs)`;
+        }
+
+        return {
+          address: w.address,
+          family: "evm",
+          verdict,
+          activeChainsCount: activeChains.length,
+          totalActivityCount: totalNonce,
+          totalStablecoinUsd,
+          chains: chainResults,
+        };
+      }
+
+      const solResult = await inspectSolanaWalletOnChain(w.address, {
+        signatureLimit,
+        fetchImpl: options.fetchImpl,
+        timeoutMs: options.timeoutMs ?? WALLET_DEFAULT_TIMEOUT_MS,
+        customRpcUrl,
+      });
+      if (!solResult.ok) warnings.push(`${w.address} (Solana): ${solResult.error}`);
+
+      let verdict = "Unfunded / Dormant Solana Address";
+      if (solResult.ok) {
+        if (solResult.account.accountType === "squads_multisig") {
+          verdict = "Squads Multisig Smart Wallet on Solana";
+        } else if (solResult.account.executable) {
+          verdict = "Executable Solana On-Chain Program";
+        } else if (solResult.hasActivity) {
+          verdict = `Active Solana Wallet (${solResult.native.display} SOL · ${solResult.nonZeroTokens.length} non-zero token(s) · ${solResult.recentSignatureCount} recent tx(s))`;
+        }
+      }
+
+      return {
+        address: w.address,
+        family: "solana",
+        verdict,
+        activeChainsCount: solResult.ok && solResult.hasActivity ? 1 : 0,
+        totalActivityCount: solResult.ok ? solResult.recentSignatureCount : 0,
+        totalStablecoinUsd: solResult.ok ? solResult.stablecoinUsdTotal : 0,
+        chains: [solResult],
+      };
+    })
+  );
+
+  const executionMs = Math.max(1, Math.round(performance.now() - t0));
+  const inspectedAtUtc = new Date().toISOString();
+  const totalStablecoinUsd = Number(
+    walletReports.reduce((acc, w) => acc + w.totalStablecoinUsd, 0).toFixed(2)
+  );
+  const activeChainsCount = walletReports.reduce((acc, w) => acc + w.activeChainsCount, 0);
+  const totalActivityCount = walletReports.reduce((acc, w) => acc + w.totalActivityCount, 0);
+  const anyChainOk = walletReports.some((w) => w.chains.some((c) => c.ok));
+
+  return {
+    ok: anyChainOk,
+    inspectedAtUtc,
+    executionMs,
+    walletCount: walletReports.length,
+    chainsFilter,
+    summary: `Inspected ${walletReports.length} wallet(s) across ${walletReports.reduce((acc, w) => acc + w.chains.length, 0)} chain endpoint(s) in ${executionMs}ms: ${activeChainsCount} active chain profile(s), $${totalStablecoinUsd.toFixed(2)} combined stablecoins.`,
+    warnings,
+    totals: {
+      activeChainsCount,
+      totalStablecoinUsd,
+      totalActivityCount,
+    },
+    wallets: walletReports,
+    upgradeLinks: {
+      walletLensUrl: FORGESUITE_LINKS.walletcheck,
+      proBundleUrl: FORGESUITE_LINKS.pricing,
+      proBundlePriceUsd: 35,
+      proWatchlistOffer:
+        "Unlock WalletLens Pro 25-Wallet Batch Treasury & Counterparty Watchlist CSV/JSON Export ($35 ForgeSuite All-Access Lifetime Bundle or $15 Single Pro)",
+      nearWalletScannerAgentUrl: FORGESUITE_LINKS.walletActivityScanner,
+      nearWalletScannerA2aEndpoint: "https://wallet-activity-scanner.market.near.ai/a2a/v1",
+      nearWalletScannerPriceUsdc: 0.15,
+      nearAgentFleet: NEAR_AGENT_FLEET,
+    },
+  };
+}
+
+/* ============================================================================
+ * 8. MCP Tool Definitions & Dispatch (8 Tools)
  * ========================================================================== */
 
 export const TOOLS = Object.freeze([
@@ -3141,6 +4440,41 @@ export const TOOLS = Object.freeze([
         },
       },
       required: ["name"],
+    },
+  },
+  {
+    name: "multi_chain_wallet_scan",
+    description:
+      "Inspect 1 to 5 EVM (0x...) and/or Solana (Base58) wallet addresses live in parallel across Ethereum, Base, Arbitrum, BSC, Polygon, and Solana Mainnet via CORS-clean JSON-RPC. Reports native gas balances (ETH, BNB, POL, SOL), major stablecoin & wrapped holdings (USDC, USDT, DAI, WETH, USDC-SPL, USDT-SPL, PYUSD), outgoing transaction nonces, smart account classification (EOA, EIP-7702 delegated 0xef0100..., Gnosis Safe M-of-N multisig, ERC-4337, Contract, Squads), SPL & Token-2022 holdings, and recent Solana transaction signatures.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        address: {
+          type: "string",
+          description:
+            "Single EVM (0x...) or Solana (Base58) wallet address, or comma/space-separated list of up to 5 addresses.",
+        },
+        wallets: {
+          type: "array",
+          items: { type: "string" },
+          description:
+            "Optional array of 1 to 5 EVM (0x...) and/or Solana (Base58) wallet addresses to inspect in parallel.",
+        },
+        chains: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["ethereum", "base", "arbitrum", "bsc", "polygon", "solana"],
+          },
+          description:
+            "Optional chain filter subset (default: all 5 EVM chains for 0x addresses + Solana Mainnet for Base58 addresses).",
+        },
+        signatureLimit: {
+          type: "number",
+          description: "Number of recent Solana transaction signatures to fetch (1-25, default: 10).",
+          default: 10,
+        },
+      },
     },
   },
 ]);
@@ -3420,8 +4754,10 @@ function executeTool(name, args = {}, options = {}) {
             `Upgrade to ForgeSuite All-Access Pro Bundle ($35 Lifetime, Save $14): ${FORGESUITE_LINKS.pricing}`,
             `NEAR AI Agent Market Fleet (A2A + x402):`,
             `- Forge AI Agent ($5.00 USDC/call): ${FORGESUITE_LINKS.forgeAgent}`,
+            `- Brand Availability Checker ($0.35 USDC/call): ${FORGESUITE_LINKS.forgeBrandChecker}`,
             `- Forge TokenGuard ($0.25 USDC/call): ${FORGESUITE_LINKS.forgeTokenGuard}`,
-            `- Forge Data & FinOps ($0.15 USDC/call): ${FORGESUITE_LINKS.forgeDataFinops}`
+            `- Forge Data & FinOps ($0.15 USDC/call): ${FORGESUITE_LINKS.forgeDataFinops}`,
+            `- Wallet Activity Scanner ($0.15 USDC/call): ${FORGESUITE_LINKS.walletActivityScanner}`
           );
           return {
             isError: false,
@@ -3435,6 +4771,122 @@ function executeTool(name, args = {}, options = {}) {
             {
               type: "text",
               text: `Brand Domain & Handle Scan Error: ${err instanceof Error ? err.message : String(err)}`,
+            },
+          ],
+        }));
+    }
+
+    case "multi_chain_wallet_scan": {
+      const hasAddr = typeof safeArgs.address === "string" && safeArgs.address.trim().length > 0;
+      const hasWallet = typeof safeArgs.wallet === "string" && safeArgs.wallet.trim().length > 0;
+      const hasWallets =
+        Array.isArray(safeArgs.wallets) &&
+        safeArgs.wallets.some((w) => typeof w === "string" && w.trim().length > 0);
+      const hasAddresses =
+        Array.isArray(safeArgs.addresses) &&
+        safeArgs.addresses.some((w) => typeof w === "string" && w.trim().length > 0);
+      if (!hasAddr && !hasWallet && !hasWallets && !hasAddresses) {
+        return {
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: "Invalid argument: provide 'address' (string) or 'wallets' (array of 1 to 5 EVM 0x... or Solana Base58 wallet addresses).",
+            },
+          ],
+        };
+      }
+      return scanMultiChainWallets(safeArgs, options)
+        .then((res) => {
+          const lines = [
+            `Multi-Chain Wallet Portfolio & Smart Account Scan (UTC: ${res.inspectedAtUtc} · ${res.executionMs}ms)`,
+            `Summary: ${res.walletCount} wallet(s) | Active Chain Profiles: ${res.totals.activeChainsCount} | Combined Stablecoins: $${res.totals.totalStablecoinUsd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          ];
+
+          for (const w of res.wallets) {
+            lines.push(
+              "",
+              `## ${w.address} (${w.family.toUpperCase()})`,
+              `- Verdict: ${w.verdict}`,
+              `- Stablecoins Held: $${w.totalStablecoinUsd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | Activity Count: ${w.totalActivityCount}`
+            );
+
+            if (w.family === "evm") {
+              lines.push(
+                "",
+                "| Chain | Account Type | Tx Nonce | Native Balance | Stablecoins & WETH |",
+                "| :--- | :--- | :---: | :---: | :--- |"
+              );
+              for (const c of w.chains) {
+                if (!c.ok) {
+                  lines.push(`| ${c.chainName} | RPC Error | - | - | ${c.error || "Unreachable"} |`);
+                  continue;
+                }
+                let acctCell = c.account.label;
+                if (c.account.delegatedTo) {
+                  acctCell += ` (-> ${c.account.delegatedTo})`;
+                } else if (c.account.accountType === "gnosis_safe" && Array.isArray(c.account.safeOwners)) {
+                  acctCell += ` [${c.account.safeOwners.length} signers]`;
+                } else if (c.account.entryPoint) {
+                  acctCell += ` (EP ${c.account.entryPoint.slice(0, 10)}...)`;
+                }
+                const tokSummary =
+                  c.nonZeroTokens.length > 0
+                    ? c.nonZeroTokens.map((t) => `${t.display} ${t.symbol}`).join(", ")
+                    : "$0.00";
+                lines.push(
+                  `| ${c.chainName} | ${acctCell} | ${c.nonce} | ${c.native.display} ${c.native.symbol} | ${tokSummary} |`
+                );
+              }
+            } else {
+              const sol = w.chains[0];
+              if (!sol?.ok) {
+                lines.push(`- Solana Mainnet Error: ${sol?.error || "Unreachable"}`);
+              } else {
+                lines.push(
+                  `- Account Type: ${sol.account.label} (Owner: ${sol.account.ownerProgram}) | Slot: ${sol.slot ?? "n/a"}`,
+                  `- Native Balance: ${sol.native.display} SOL | Stablecoins: $${sol.stablecoinUsdTotal.toFixed(2)} | Non-Zero Tokens: ${sol.nonZeroTokens.length}`
+                );
+                if (sol.nonZeroTokens.length > 0) {
+                  lines.push(
+                    `- Holdings: ${sol.nonZeroTokens.map((t) => `${t.display} ${t.symbol} (${t.program})`).join(", ")}`
+                  );
+                }
+                if (sol.recentSignatures.length > 0) {
+                  lines.push("", `Recent Solana Signatures (${sol.recentSignatures.length}):`);
+                  for (const sig of sol.recentSignatures.slice(0, 5)) {
+                    lines.push(
+                      `- [${sig.status}] ${sig.signature.slice(0, 10)}...${sig.signature.slice(-6)} @ ${sig.blockTimeUtc || "pending"}${sig.memo ? ` — Memo: ${sig.memo}` : ""}`
+                    );
+                  }
+                }
+              }
+            }
+          }
+
+          if (res.warnings.length > 0) {
+            lines.push("", "Warnings:");
+            for (const warn of res.warnings) lines.push(`- ${warn}`);
+          }
+
+          lines.push(
+            "",
+            `Interactive Browser WalletLens & Pro 25-Wallet Watchlist ($35 Bundle): ${FORGESUITE_LINKS.walletcheck}`,
+            `Autonomous Cloud A2A Agent @wallet-activity-scanner ($0.15 USDC/call on market.near.ai): ${FORGESUITE_LINKS.walletActivityScanner}`
+          );
+
+          return {
+            isError: false,
+            content: [{ type: "text", text: lines.join("\n") }],
+            structuredContent: res,
+          };
+        })
+        .catch((err) => ({
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: `Multi-Chain Wallet Scan Error: ${err instanceof Error ? err.message : String(err)}`,
             },
           ],
         }));
@@ -3496,7 +4948,7 @@ export function handleJsonRpcMessage(msg, options = {}) {
         },
         serverInfo: SERVER_INFO,
         instructions:
-          "ForgeSuite MCP Server (v1.2.0) provides 7 zero-dependency developer, FinOps, brand launch & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner), and brand_domain_handle_scan (authoritative RDAP + Google DoH .com/.io/.ai/.dev/.app/.org domains, npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability scanner). Global run: npx --yes github:youthmy11-ai/youthmy11-ai.github.io | Docs: https://youthmy11-ai.github.io/mcp.html",
+          "ForgeSuite MCP Server (v1.3.0) provides 8 zero-dependency developer, FinOps, brand launch & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner), brand_domain_handle_scan (authoritative RDAP + Google DoH .com/.io/.ai/.dev/.app/.org domains, npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability scanner), and multi_chain_wallet_scan (live 6-chain Ethereum/Base/Arbitrum/BSC/Polygon/Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector). Global run: npx --yes github:youthmy11-ai/youthmy11-ai.github.io | Docs: https://youthmy11-ai.github.io/mcp.html",
       });
     }
 
