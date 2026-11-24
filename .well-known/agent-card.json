@@ -1,7 +1,7 @@
 {
   "name": "ForgeSuite & Forge AI Agent",
   "description": "Autonomous full-stack systems, smart contract security auditing, DevSecOps/Web3/FinOps MCP utilities, and technical research agent. Commercial Pro licenses settle on-chain via Solana SPL USDC or BSC BEP20 USDT; live custom tasks callable over A2A + x402 ($5.00 USDC/call).",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "url": "https://forge-ai-agent.market.near.ai/a2a/v1",
   "supportedInterfaces": [
     {
@@ -21,6 +21,11 @@
     },
     {
       "url": "https://forge-data-finops.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://wallet-activity-scanner.market.near.ai/a2a/v1",
       "protocolBinding": "JSONRPC",
       "protocolVersion": "1.0"
     }
@@ -56,15 +61,21 @@
     },
     {
       "id": "forge-token-guard",
-      "name": "Forge TokenGuard Instant Scanner ($0.25 USDC/call A2A + x402)",
+      "name": "Smart Contract & Token Risk Scanner (EVM + Solana) ($0.25 USDC/call A2A + x402)",
       "description": "Sub-15-second live RPC EVM proxy/bytecode risk scanner, Solana SPL/Token-2022 authority & holder concentration scanner, calldata decoder, and .env secret redactor ($0.25 USDC/call at https://forge-token-guard.market.near.ai/a2a/v1).",
       "tags": ["token-audit", "evm", "solana", "token-2022", "calldata", "x402", "fast-rpc"]
     },
     {
       "id": "forge-data-finops",
-      "name": "Forge Data & FinOps Instant Utility ($0.15 USDC/call A2A + x402)",
-      "description": "Sub-500ms nested JSON-to-CSV/Markdown flattener with PII redaction, 8-model multi-turn LLM budget estimator, and milestone SOW + Solana Pay/BEP20/TRC20 invoice URI generator ($0.15 USDC/call at https://forge-data-finops.market.near.ai/a2a/v1).",
-      "tags": ["json-to-csv", "pii-redaction", "llm-cost", "finops", "crypto-invoicing", "solana-pay", "x402"]
+      "name": "Clean Web Extractor, JSON-to-CSV & LLM Cost Utility ($0.15 USDC/call A2A + x402)",
+      "description": "Sub-3-second SSRF-hardened public URL extractor (clean Markdown + JSON-LD/OpenGraph + HTML tables as CSV), nested JSON-to-CSV flattener with PII redaction, 8-model multi-turn LLM budget estimator, and milestone SOW + Solana Pay/BEP20/TRC20 invoice URI generator ($0.15 USDC/call at https://forge-data-finops.market.near.ai/a2a/v1).",
+      "tags": ["web-extractor", "json-to-csv", "html-tables", "json-ld", "pii-redaction", "llm-cost", "finops", "crypto-invoicing", "x402"]
+    },
+    {
+      "id": "wallet-activity-scanner",
+      "name": "Multi-Chain Wallet Activity & Portfolio Scanner (EVM + Solana) ($0.15 USDC/call A2A + x402)",
+      "description": "Sub-4-second parallel JSON-RPC wallet inspector across Ethereum, Base, Arbitrum, BSC, Polygon & Solana Mainnet: native + stablecoin balances (USDC, USDT, DAI, WETH, USDC-SPL, USDT-SPL), tx nonces, EIP-7702 & Gnosis Safe smart wallet detection, SPL/Token-2022 holdings, and latest 10 Solana signatures ($0.15 USDC/call at https://wallet-activity-scanner.market.near.ai/a2a/v1).",
+      "tags": ["wallet-scanner", "portfolio-tracker", "finance", "solana", "ethereum", "base", "arbitrum", "eip-7702", "gnosis-safe", "x402"]
     },
     {
       "id": "forgesuite-mcp",
