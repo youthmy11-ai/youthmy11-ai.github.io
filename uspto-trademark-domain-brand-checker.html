@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USPTO Trademark, 8-TLD Domain (.com, .ai, .io, .dev) &amp; App Store Brand Checker</title>
+  <meta name="description" content="Free AI/SaaS startup brand collision scanner across 8 domain TLDs (.com, .ai, .io, .dev, .app, .org, .net, .xyz), npm, PyPI, GitHub, Apple App Store / Google Play, and federal USPTO Class 009/042 trademark checks via browser DoH/RDAP, npx MCP, and A2A.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/uspto-trademark-domain-brand-checker.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/uspto-trademark-domain-brand-checker.html">
+  <meta property="og:title" content="USPTO Trademark, 8-TLD Domain &amp; Developer Brand Collision Checker">
+  <meta property="og:description" content="Screen AI &amp; SaaS startup brand names across .com/.ai/.io/.dev/.app/.org/.net/.xyz (Google DoH + RDAP), npm/PyPI/GitHub, Apple App Store, Google Play, and USPTO Class 009/042 trademarks.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="USPTO Trademark, 8-TLD Domain &amp; Developer Brand Checker (Browser + MCP)">
+  <meta name="twitter:description" content="Verify 8 domain TLDs, npm/PyPI/GitHub handles, Apple App Store / Google Play titles, and USPTO federal trademarks before launching your AI or SaaS product.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2306b6d4'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23083344' font-family='sans-serif' font-size='19' font-weight='800'%3ETM%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "BrandGuard USPTO Trademark, 8-TLD Domain & App Store Brand Checker",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web, Windows, macOS, Linux (Node.js 20+ MCP)",
+    "url": "https://youthmy11-ai.github.io/uspto-trademark-domain-brand-checker.html",
+    "softwareVersion": "1.3.0",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free Browser & MCP 8-TLD + 5-Registry Brand Scanner", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Autonomous USPTO Trademark + Google Play + 10-Platform A2A Scan (@forge-brand-checker)", "price": "0.35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Pro Single-Tool Unlock (25-Brand Agency Matrix + CSV/JSON)", "price": "15", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "All-Access Pro Bundle (25-Brand Matrix + All Pro Tools)", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "Dual-protocol 8-TLD domain verification (.com, .ai, .io, .dev, .app, .org, .net, .xyz) combining Google DNS-over-HTTPS (NS + A) with authoritative CORS RDAP",
+      "Developer & social namespace collision checks across npm, PyPI, GitHub Users/Organizations, and Bluesky ATProto DIDs",
+      "Mobile app title collision screening across US Apple iOS App Store (live browser) and Google Play Store (@forge-brand-checker A2A)",
+      "Official USPTO Serial & Registration Number trademark screening (Nice Class 009 & Class 042) via @forge-brand-checker ($0.35 USDC) plus Pro 25-Brand CSV/JSON Matrix"
+    ],
+    "description": "Client-side 8-TLD domain, npm/PyPI/GitHub package registry, Apple App Store, Google Play, and USPTO trademark collision workflow for AI startups, SaaS founders, and naming agencies."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "headline": "USPTO Trademark, 8-TLD Domain & Developer Brand Checker: Preventing AI/SaaS Naming Collisions Across DNS, RDAP, npm/PyPI & App Stores",
+        "description": "Engineering and legal-ops guide to screening candidate AI, SaaS, and open-source SDK brand names across 8 domain TLDs (.com, .ai, .io, .dev, .app, .org, .net, .xyz), npm/PyPI/GitHub, Apple App Store / Google Play, and federal USPTO Class 009/042 trademarks.",
+        "url": "https://youthmy11-ai.github.io/uspto-trademark-domain-brand-checker.html",
+        "datePublished": "2026-11-24",
+        "dateModified": "2026-11-24",
+        "proficiencyLevel": "Expert",
+        "author": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why is checking DNS A records alone unsafe when verifying .com, .ai, or .dev domain availability?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Millions of registered domains are parked on registrar hold or lack web A records while still having active registration records at the TLD registry. BrandGuard cross-checks Google DNS-over-HTTPS (both NS and A records for NXDOMAIN RCODE 3) with authoritative RDAP endpoints (Verisign, Identity Digital, Google Registry, PIR, CentralNic) to distinguish truly unregistered domains (RDAP 404 + NXDOMAIN) from dormant registered domains."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why must AI and SaaS startups check USPTO Nice Class 009 and Class 042 trademarks even if the .ai domain is available?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Registering an available .ai or .dev domain confers zero trademark immunity. If an incumbent holds a live USPTO federal trademark in Nice Class 009 (downloadable software, mobile apps, CLI/SDKs) or Class 042 (SaaS, cloud AI APIs), they can force a rebrand via UDRP domain arbitration, Apple App Store / Google Play takedowns, or GitHub trademark policy complaints."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why check npm, PyPI, and GitHub namespaces before announcing a developer tool or AI agent?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "If your startup name is already occupied on npm, PyPI, or GitHub Organizations, developers running npx or pip install can accidentally pull an unrelated package — or worse, opportunistic squatters can publish supply-chain typosquats the day you launch on Product Hunt or Hacker News."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I automate 8-TLD domain, registry, Google Play, and USPTO trademark checks with MCP or A2A?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Run npx --yes github:youthmy11-ai/youthmy11-ai.github.io to invoke brand_domain_handle_scan free in VS Code, Claude Code, or Cursor (ForgeSuite MCP v1.3.0), then call @forge-brand-checker on NEAR AI Market ($0.35 USDC/call, <12s SLA) for live USPTO Serial/Registration trademark screening, Port-43 WHOIS, Google Play + iOS App Store, and 10 social handles."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .seo-code {
+      background: rgba(9, 13, 22, 0.88);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      margin: 10px 0 0;
+    }
+    [data-theme="light"] .seo-code {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+    .seo-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .seo-launch-box {
+      padding: 22px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.13), rgba(37, 99, 235, 0.11));
+      border: 1px solid var(--border-strong);
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body data-page="uspto-trademark-domain-brand-checker">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">BG</span>
+        <span>BrandGuard · USPTO &amp; Domains</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="brandcheck.html" class="fs-btn fs-btn-sm fs-btn-secondary">Live BrandGuard</a>
+        <a href="sowbuilder.html" class="fs-btn fs-btn-sm fs-btn-secondary">ScopeGuard SOW</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP Server (v1.3.0)</a>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="CB">Pro ($15)</button>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 64px;">
+    <!-- HERO + INTERACTIVE DEEP-LINK LAUNCHER -->
+    <section style="margin-bottom:28px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span class="fs-badge fs-badge-accent">AI / SAAS NAMING · 8 TLDS · NPM / PYPI / GITHUB · APP STORES · USPTO</span>
+        <a href="https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite" target="_blank" rel="noopener noreferrer" class="fs-badge fs-badge-success">
+          ✓ Official MCP Registry: io.github.youthmy11-ai/forgesuite-mcp · v1.3.0 Active ↗
+        </a>
+      </div>
+
+      <h1 style="margin:12px 0 10px;font-size:clamp(1.85rem, 3.5vw, 2.65rem);line-height:1.15;letter-spacing:-0.025em;">
+        USPTO Trademark, 8-TLD Domain &amp; Developer Brand Collision Checker
+      </h1>
+      <p class="fs-lead" style="margin:0;max-width:82ch;color:var(--text-muted);">
+        Buying an available <code>.ai</code> domain is only step one — hidden collisions across <strong><code>.com/.io/.dev/.app</code></strong>, occupied <strong><code>npm</code> / <code>PyPI</code> / <code>GitHub</code></strong> package slugs, <strong>Apple App Store &amp; Google Play</strong> titles, or live <strong>USPTO Class 009/042 trademarks</strong> can force a costly post-launch rebrand. Audit 13 live endpoints instantly in your browser, then run federal USPTO clearance in &lt;12s.
+      </p>
+
+      <!-- INTERACTIVE QUICK SCAN FORM + 1-CLICK DEEP LINKS -->
+      <div class="seo-launch-box" aria-label="Interactive Brand Domain and Registry Scanner Launcher">
+        <form id="bgQuickScanForm" style="display:grid;gap:12px;">
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label" style="color:var(--text);">Candidate AI, SaaS, or Open-Source SDK Brand Name</span>
+              <input id="bgQuickBrandInput" type="text" class="fs-input" value="KestrelQuant" placeholder="e.g. KestrelQuant, NovaForgeX, OrbitLedger" spellcheck="false" autocomplete="off">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label" style="color:var(--text);">Scan Mode</span>
+              <div class="fs-input-row">
+                <select id="bgQuickModeSelect" class="fs-select">
+                  <option value="single" selected>Instant 8-TLD + 5-Registry Dossier (Free)</option>
+                  <option value="variations">8-TLD Dossier + 4 Smart Name Variations (get/use/hq/labs)</option>
+                </select>
+                <button type="submit" class="fs-btn fs-btn-primary">Scan Live in BrandGuard →</button>
+              </div>
+            </label>
+          </div>
+        </form>
+
+        <div style="margin-top:14px;">
+          <div class="fs-field-label" style="margin-bottom:8px;">1-Click Live Deep-Link Presets (Auto-Runs 8-TLD DoH/RDAP + Registry Checks):</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="brandcheck.html?brand=KestrelQuant" class="fs-btn fs-btn-sm fs-btn-primary">
+              ✓ Scan "KestrelQuant" (Clean Greenlight Candidate)
+            </a>
+            <a href="brandcheck.html?brand=NovaForgeX&amp;variations=1" class="fs-btn fs-btn-sm fs-btn-secondary">
+              ⚡ Scan "NovaForgeX" + 4 Smart Variations
+            </a>
+            <a href="brandcheck.html?brand=Vercel" class="fs-btn fs-btn-sm fs-btn-secondary">
+              ⚠ Inspect "Vercel" (High-Collision .com + npm + iOS)
+            </a>
+            <a href="brandcheck.html?brand=ForgeSuite" class="fs-btn fs-btn-sm fs-btn-ghost">
+              🔍 Audit "ForgeSuite" Readiness Score
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 PILLARS OF AI / SAAS BRAND & TRADEMARK CLEARANCE -->
+    <section style="margin-bottom:28px;">
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-accent">8-TLD DOH + RDAP · PACKAGE REGISTRIES · APP STORES · USPTO CLASS 009/042</span>
+          <h2>6 Collision Layers Every AI &amp; SaaS Startup Must Clear Before Launch</h2>
+          <p>How BrandGuard combines zero-telemetry browser protocol checks with autonomous USPTO &amp; 10-platform verification.</p>
+        </div>
+      </div>
+
+      <div class="seo-grid-2">
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">8 DOMAIN TLDS</span>
+              <span class="fs-badge fs-badge-muted">DOH NS/A + CORS RDAP</span>
+            </div>
+            <h3>1. 8-TLD Matrix (<code>.com</code>, <code>.ai</code>, <code>.io</code>, <code>.dev</code>, <code>.app</code>, <code>.org</code>, <code>.net</code>, <code>.xyz</code>)</h3>
+            <p class="fs-card-desc">
+              Parked or defensive domains often have zero HTTP/A records yet remain legally registered. BrandGuard queries <strong>Google DNS-over-HTTPS</strong> (both <code>NS</code> and <code>A</code> records for <code>NXDOMAIN</code> RCODE 3) alongside authoritative <strong>CORS RDAP</strong> servers (Verisign, Identity Digital, Google Registry, PIR, CentralNic) to verify true <code>RDAP 404 + NXDOMAIN</code> availability and extract active expiration dates.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="brandcheck.html?brand=KestrelQuant" class="fs-btn fs-btn-sm fs-btn-secondary">Test 8-TLD RDAP + DoH Matrix →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">SUPPLY-CHAIN HYGIENE</span>
+              <span class="fs-badge fs-badge-muted">NPM · PYPI · GITHUB · BLUESKY</span>
+            </div>
+            <h3>2. Developer Package &amp; Org Squatting Prevention</h3>
+            <p class="fs-card-desc">
+              Shipping an AI SDK, MCP server, or CLI? If <code>npm</code> (<code>registry.npmjs.org</code>), <code>PyPI</code> (<code>pypi.org/pypi/&lt;slug&gt;/json</code>), or <code>GitHub</code> (<code>github.com/&lt;org&gt;</code>) already hosts an active package under your candidate name, developers risk installing third-party code or hitting supply-chain typosquats. BrandGuard checks all three plus <strong>Bluesky ATProto DIDs</strong> in one click.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="brandcheck.html?brand=Vercel" class="fs-btn fs-btn-sm fs-btn-secondary">See Registry Collision Breakdown →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">MOBILE STOREFRONTS</span>
+              <span class="fs-badge fs-badge-muted">APPLE APP STORE + GOOGLE PLAY</span>
+            </div>
+            <h3>3. Apple iOS App Store &amp; Google Play Title Collisions</h3>
+            <p class="fs-card-desc">
+              Apple App Review and Google Play reject or demote apps that collide with established storefront titles. BrandGuard queries the live US <strong>Apple iOS App Store</strong> API in-browser to flag exact or leading-prefix <code>trackName</code> matches and seller bundle IDs — while <strong><code>@forge-brand-checker</code></strong> extends coverage directly to <strong>Google Play Store</strong> listings.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="brandcheck.html?brand=NovaForgeX" class="fs-btn fs-btn-sm fs-btn-secondary">Run Live iOS App Store Check →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">FEDERAL TRADEMARK SCREEN</span>
+              <span class="fs-badge fs-badge-muted">USPTO CLASS 009 &amp; 042 · $0.35</span>
+            </div>
+            <h3>4. Official USPTO Serial &amp; Registration Screening</h3>
+            <p class="fs-card-desc">
+              Federal trademark registries and major social networks block cross-origin browser requests via CORS. Escalate finalist names to our autonomous NEAR AI agent <strong><code>@forge-brand-checker</code> ($0.35 USDC/call, &lt;12s SLA)</strong> for official <strong>USPTO Serial &amp; Registration Number</strong> trademark screening (Nice Class 009 software &amp; Class 042 SaaS/AI), Port-43 WHOIS, Google Play, and 10 social handles (<code>X</code>, <code>Instagram</code>, <code>TikTok</code>, <code>YouTube</code>, <code>Reddit</code>, <code>Telegram</code>).
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="https://market.near.ai/agents/forge-brand-checker" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Run USPTO Agent ($0.35 USDC) ↗</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">0–100 READINESS SCORE</span>
+              <span class="fs-badge fs-badge-muted">6 SMART VARIATIONS</span>
+            </div>
+            <h3>5. Deterministic Scoring &amp; Prefix/Suffix Variations</h3>
+            <p class="fs-card-desc">
+              Every candidate receives a weighted <code>0–100</code> <strong>Launch Readiness Score</strong> prioritizing <code>.com</code> (22 pts), <code>.ai</code> / <code>.io</code> (10 pts each), GitHub (10 pts), npm (7 pts), and iOS App Store (6 pts). If primary <code>.com</code> is taken, BrandGuard auto-generates and tests 6 proven SaaS modifiers: <code>get&lt;name&gt;</code>, <code>use&lt;name&gt;</code>, <code>&lt;name&gt;hq</code>, <code>&lt;name&gt;labs</code>, <code>&lt;name&gt;ai</code>, and <code>try&lt;name&gt;</code>.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="brandcheck.html?brand=NovaForgeX&amp;variations=1" class="fs-btn fs-btn-sm fs-btn-secondary">Test Smart Variations Live →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">VENTURE STUDIO &amp; AGENCY</span>
+              <span class="fs-badge fs-badge-warn">25-BRAND MATRIX · $15 / $35</span>
+            </div>
+            <h3>6. Batch 25-Brand Agency Matrix, CSV/JSON &amp; SOW Handoff</h3>
+            <p class="fs-card-desc">
+              Running a naming sprint for clients or a venture studio portfolio? Paste up to <strong>25 candidate brand names</strong> in BrandGuard Pro to rank every contender side-by-side, unlock all 6 parallel variations, export formula-safe <strong>CSV &amp; JSON Client Dossiers</strong>, and hand off directly into a <strong>$145–$195 CryptoBill Invoice</strong> or <strong>$650 ScopeGuard SOW</strong>.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Unlock Bundle ($35)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="CB">Single Tool Pro ($15)</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- MCP + A2A AUTOMATION FOR AI CODING ASSISTANTS -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-success">LOCAL STDIO MCP V1.3.0 (FREE · 8 TOOLS) + CLOUD A2A X402 ($0.35 USDC)</span>
+          <h2 style="margin-top:6px;">Brainstorm &amp; Verify Startup Names Inside VS Code, Claude Code &amp; Cursor</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="vscode:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D" class="fs-btn fs-btn-sm fs-btn-primary">⚡ Install in VS Code</a>
+          <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-copy-target="bgMcpCmd">Copy npx Command</button>
+        </div>
+      </div>
+
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Stop LLMs from hallucinating "available" domains! Connect Tool #7 <code>brand_domain_handle_scan</code> via our Official MCP Registry server (<code>io.github.youthmy11-ai/forgesuite-mcp</code> · v1.3.0, zero npm dependencies):
+      </p>
+      <pre class="seo-code"><code id="bgMcpCmd">npx --yes github:youthmy11-ai/youthmy11-ai.github.io</code></pre>
+
+      <div class="seo-grid-2">
+        <div class="fs-rail-box">
+          <h3>MCP Tool Call: <code>brand_domain_handle_scan</code> (Free Local Stdio)</h3>
+          <pre class="seo-code"><code>{
+  "name": "brand_domain_handle_scan",
+  "arguments": {
+    "name": "KestrelQuant, NovaForgeX, OrbitLedger"
+  }
+}</code></pre>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">Full MCP v1.3.0 Docs (8 Tools) →</a>
+            <a href="https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.3.0/forgesuite-mcp.mcpb" class="fs-btn fs-btn-sm fs-btn-ghost">Download .mcpb (v1.3.0)</a>
+          </div>
+        </div>
+
+        <div class="fs-rail-box" style="display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">CLOUD A2A + X402</span>
+              <span class="fs-badge fs-badge-muted">&lt;12S · $0.35 USDC / CALL</span>
+            </div>
+            <h3 style="margin-top:10px;">Remote HTTPS Agent: <code>@forge-brand-checker</code></h3>
+            <p class="inv-muted" style="margin:6px 0 12px;">
+              Need official <strong>USPTO Serial &amp; Registration Number</strong> trademark checks, Port-43 WHOIS fallback, <strong>Google Play + iOS App Store</strong> collision reports, and <strong>10-platform social handle verification</strong>? Call <strong><code>@forge-brand-checker</code></strong> on NEAR AI Market for <strong>$0.35 USDC/call</strong>.
+            </p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="https://market.near.ai/agents/forge-brand-checker" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Call @forge-brand-checker ($0.35 USDC) ↗</a>
+            <a href="sowbuilder.html" class="fs-btn fs-btn-sm fs-btn-secondary">Draft Naming SOW (Free) →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRO AGENCY MATRIX CONVERSION BANNER ($15 PRO / $35 BUNDLE) -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-warn">LIFETIME PRO UNLOCK · $15 SINGLE PRO OR $35 ALL-ACCESS BUNDLE</span>
+          <h2 style="margin-top:6px;">Unlock 25-Brand Agency Matrix, All 6 Variations &amp; Client CSV/JSON Reports</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="CB">Single Tool Pro ($15)</button>
+          <button type="button" class="fs-btn fs-btn-primary" data-checkout-sku="BUNDLE">All-Access Bundle ($35 · Save $14)</button>
+        </div>
+      </div>
+      <p class="inv-muted" style="margin:6px 0 0;">
+        One-time lifetime payment with instant client-side RPC verification via <strong>BSC BEP20 USDT</strong> or <strong>Solana SPL USDC</strong> (plus PayPal, TRC20 &amp; Binance Pay). Unlocks BrandGuard 25-Brand Agency Matrix, WalletLens 25-Wallet Watchlist, and CryptoBill Forge Pro for <strong>$15</strong> — or grab the entire 6-Pro-tool suite for <strong>$35</strong>.
+      </p>
+    </section>
+
+    <!-- FAQ -->
+    <section>
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-muted">TECHNICAL FAQ</span>
+          <h2>Domain, Package Registry &amp; USPTO Trademark Questions</h2>
+        </div>
+      </div>
+      <div class="fs-faq-grid">
+        <div class="fs-faq-item">
+          <h3>Why combine Google DoH (NS + A) with authoritative RDAP?</h3>
+          <p>DNS <code>A</code> lookups miss parked domains without web servers. Checking both <code>NS</code>/<code>A</code> <code>NXDOMAIN</code> responses and registry RDAP <code>404</code> status eliminates false "available" signals across all 8 TLDs.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Which USPTO trademark classes matter most for AI &amp; SaaS?</h3>
+          <p><strong>Nice Class 009</strong> covers downloadable software, mobile apps, and developer SDKs, while <strong>Nice Class 042</strong> covers cloud SaaS platforms, AI APIs, and hosted developer tools.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Does BrandGuard leak my unreleased startup name ideas?</h3>
+          <p>No. Browser scans issue preflight-free Simple GETs directly from your device to Google DoH, TLD RDAP registries, npm, PyPI, GitHub, Bluesky, and Apple — zero ForgeSuite servers ever see your shortlist.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>How do I check Google Play, X, Instagram, TikTok &amp; USPTO?</h3>
+          <p>Click through to <strong><code>@forge-brand-checker</code></strong> on NEAR AI Market (<strong>$0.35 USDC/call</strong>) for server-side USPTO Serial/Registration trademark screening, Google Play, and 10 social/dev handles in under 12 seconds.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="brandcheck.html">BrandGuard</a>
+        <a href="uspto-trademark-domain-brand-checker.html">USPTO &amp; Brand Checker</a>
+        <a href="walletcheck.html">WalletLens</a>
+        <a href="eip-7702-delegation-gnosis-safe-checker.html">EIP-7702 &amp; Safe Checker</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="solana-token-2022-scanner.html">Solana Token-2022 Scanner</a>
+        <a href="evm-proxy-honeypot-scanner.html">EVM Proxy &amp; Honeypot Scanner</a>
+        <a href="mcp.html">MCP Server (v1.3.0)</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="llms.txt">llms.txt</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { bindCheckoutTriggers } from "./assets/checkout.js";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      bindCheckoutTriggers();
+
+      const form = document.getElementById("bgQuickScanForm");
+      const brandEl = document.getElementById("bgQuickBrandInput");
+      const modeEl = document.getElementById("bgQuickModeSelect");
+      if (form && brandEl && modeEl) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const brand = brandEl.value.trim();
+          const wantVars = modeEl.value === "variations";
+          if (!brand) {
+            window.location.href = "brandcheck.html";
+            return;
+          }
+          const url = wantVars
+            ? `brandcheck.html?brand=${encodeURIComponent(brand)}&variations=1`
+            : `brandcheck.html?brand=${encodeURIComponent(brand)}`;
+          window.location.href = url;
+        });
+      }
+
+      const themeBtn = document.getElementById("themeToggleBtn");
+      if (themeBtn) {
+        const saved = window.localStorage.getItem("forgesuite_theme") || "dark";
+        document.documentElement.dataset.theme = saved;
+        themeBtn.textContent = saved === "light" ? "☀ Light" : "🌙 Dark";
+        themeBtn.addEventListener("click", () => {
+          const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+          document.documentElement.dataset.theme = next;
+          window.localStorage.setItem("forgesuite_theme", next);
+          themeBtn.textContent = next === "light" ? "☀ Light" : "🌙 Dark";
+        });
+      }
+
+      document.querySelectorAll("[data-copy-target]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-copy-target");
+          const target = id ? document.getElementById(id) : null;
+          if (!target) return;
+          const prev = btn.textContent;
+          try {
+            await navigator.clipboard.writeText(target.textContent || "");
+            btn.textContent = "Copied ✓";
+            setTimeout(() => {
+              btn.textContent = prev;
+            }, 1600);
+          } catch {}
+        });
+      });
+    });
+  </script>
+</body>
+</html>

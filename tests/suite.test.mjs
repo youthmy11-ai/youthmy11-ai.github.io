@@ -124,6 +124,7 @@ import {
   generateBrandVariations,
   normalizeBrandName,
   parseBatchBrandList,
+  parseBrandCheckQueryParams,
   runBatchBrandScan,
   scanBrandVariations,
   scanSingleBrand,
@@ -1087,16 +1088,27 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsFull, /EnvShield Secret Scanner/);
   assert.match(llmsFull, /TokenGuard/);
   assert.match(llmsFull, /BrandGuard/);
+  assert.match(llmsFull, /WalletLens/);
   assert.match(llmsFull, /ForgeSuite MCP Server/);
+  assert.doesNotMatch(llmsTxt, /\b7 web (applications|utilities|tools)\b/i);
+  assert.doesNotMatch(llmsFull, /\b7 web (applications|utilities|tools)\b/i);
+  assert.match(llmsTxt, /All 9 web applications/);
+  assert.match(llmsFull, /All 9 web applications/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/mcp\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/tokenaudit\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/solana-token-2022-scanner\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/evm-proxy-honeypot-scanner\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/brandcheck\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/uspto-trademark-domain-brand-checker\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/walletcheck\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/eip-7702-delegation-gnosis-safe-checker\.html/);
+  assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/wallet-activity-scanner/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/forge-brand-checker/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/a\/forge-ai-agent/);
   assert.match(llmsFull, /solana-token-2022-scanner\.html/);
   assert.match(llmsFull, /evm-proxy-honeypot-scanner\.html/);
+  assert.match(llmsFull, /eip-7702-delegation-gnosis-safe-checker\.html/);
+  assert.match(llmsFull, /uspto-trademark-domain-brand-checker\.html/);
   assert.match(llmsFull, /BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx/);
 
   const robots = fs.readFileSync(path.join(repoRoot, "robots.txt"), "utf8");
@@ -1112,7 +1124,9 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
     { file: "tokenaudit.html", url: "https://youthmy11-ai.github.io/tokenaudit.html", category: "SecurityApplication" },
     { file: "solana-token-2022-scanner.html", url: "https://youthmy11-ai.github.io/solana-token-2022-scanner.html", category: "SecurityApplication" },
     { file: "evm-proxy-honeypot-scanner.html", url: "https://youthmy11-ai.github.io/evm-proxy-honeypot-scanner.html", category: "SecurityApplication" },
+    { file: "eip-7702-delegation-gnosis-safe-checker.html", url: "https://youthmy11-ai.github.io/eip-7702-delegation-gnosis-safe-checker.html", category: "SecurityApplication" },
     { file: "brandcheck.html", url: "https://youthmy11-ai.github.io/brandcheck.html", category: "BusinessApplication" },
+    { file: "uspto-trademark-domain-brand-checker.html", url: "https://youthmy11-ai.github.io/uspto-trademark-domain-brand-checker.html", category: "BusinessApplication" },
     { file: "tokencalc.html", url: "https://youthmy11-ai.github.io/tokencalc.html", category: "DeveloperApplication" },
     { file: "json2sheet.html", url: "https://youthmy11-ai.github.io/json2sheet.html", category: "DeveloperApplication" },
     { file: "sowbuilder.html", url: "https://youthmy11-ai.github.io/sowbuilder.html", category: "BusinessApplication" },
@@ -2957,4 +2971,165 @@ test("walletcheck.html and sitemap.xml ship valid SoftwareApplication + FAQPage 
   ]) {
     assert.ok(html.includes(term), `walletcheck.html missing "${term}"`);
   }
+});
+
+/* ============================================================================
+ * 18. Task-Intent SEO Pages: EIP-7702 & Safe Checker + USPTO & Brand Checker
+ * ========================================================================== */
+
+function verifyInternalRelativeHtmlLinks(repoRoot, sourceFile, html) {
+  const hrefs = [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+  for (const rawHref of hrefs) {
+    if (
+      rawHref.startsWith("http://") ||
+      rawHref.startsWith("https://") ||
+      rawHref.startsWith("mailto:") ||
+      rawHref.startsWith("vscode:") ||
+      rawHref.startsWith("vscode-insiders:") ||
+      rawHref.startsWith("data:") ||
+      rawHref.startsWith("#") ||
+      rawHref === "./"
+    ) {
+      continue;
+    }
+    const cleanRel = rawHref.split("#")[0].split("?")[0];
+    if (!cleanRel) continue;
+    assert.ok(
+      fs.existsSync(path.join(repoRoot, cleanRel)),
+      `${sourceFile} contains broken internal link "${rawHref}"`
+    );
+  }
+}
+
+test("parseBrandCheckQueryParams supports ?brand=..., ?name=..., variations flag, autorun override, and invalid inputs", () => {
+  const empty = parseBrandCheckQueryParams("");
+  assert.equal(empty.hasTarget, false);
+  assert.equal(empty.autorun, false);
+  assert.equal(empty.runVariations, false);
+
+  const clean = parseBrandCheckQueryParams("?brand=NovaForgeX&variations=1");
+  assert.equal(clean.hasTarget, true);
+  assert.equal(clean.brand, "NovaForgeX");
+  assert.equal(clean.normalizedSlug, "novaforgex");
+  assert.equal(clean.autorun, true);
+  assert.equal(clean.runVariations, true);
+
+  const urlInput = parseBrandCheckQueryParams("?name=https://@ForgeSuite.ai&autorun=0");
+  assert.equal(urlInput.hasTarget, true);
+  assert.equal(urlInput.normalizedSlug, "forgesuite");
+  assert.equal(urlInput.autorun, false);
+
+  const tooShort = parseBrandCheckQueryParams("?brand=a");
+  assert.equal(tooShort.hasTarget, false);
+});
+
+test("eip-7702-delegation-gnosis-safe-checker.html ships valid SoftwareApplication + TechArticle + FAQPage JSON-LD, 1-click WalletLens deep-links, MCP v1.3.0, A2A & Pro CTAs", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const file = "eip-7702-delegation-gnosis-safe-checker.html";
+  const canonicalUrl = `https://youthmy11-ai.github.io/${file}`;
+  const html = fs.readFileSync(path.join(repoRoot, file), "utf8");
+  const indexHtml = fs.readFileSync(path.join(repoRoot, "index.html"), "utf8");
+  const walletHtml = fs.readFileSync(path.join(repoRoot, "walletcheck.html"), "utf8");
+
+  assert.match(html, /<title>[^<]*EIP-7702[^<]*Gnosis Safe[^<]*<\/title>/);
+  assert.match(html, /<meta name="description" content="[^"]{80,}"/);
+  assert.ok(html.includes(`<link rel="canonical" href="${canonicalUrl}">`));
+  assert.ok(indexHtml.includes(`href="${file}"`), "index.html must link to EIP-7702 & Safe guide");
+  assert.ok(walletHtml.includes(`href="${file}"`), "walletcheck.html must link to EIP-7702 & Safe guide");
+
+  const { types } = extractAllJsonLdObjects(html);
+  assert.ok(types.has("SoftwareApplication"), "Missing SoftwareApplication JSON-LD");
+  assert.ok(types.has("TechArticle"), "Missing TechArticle JSON-LD");
+  assert.ok(types.has("FAQPage"), "Missing FAQPage JSON-LD");
+
+  for (const term of [
+    "EIP-7702",
+    "0xef0100",
+    "Pectra",
+    "Prague",
+    "Isthmus",
+    "Gnosis Safe",
+    "M-of-N",
+    "walletcheck.html",
+    "multi_chain_wallet_scan",
+    "npx --yes github:youthmy11-ai/youthmy11-ai.github.io",
+    "https://market.near.ai/agents/wallet-activity-scanner",
+    "$0.15 USDC",
+    'data-checkout-sku="CB"',
+    'data-checkout-sku="BUNDLE"',
+  ]) {
+    assert.ok(html.includes(term), `${file} missing "${term}"`);
+  }
+
+  const deepLinks = [...html.matchAll(/href="walletcheck\.html\?([^"]+)"/g)].map((m) =>
+    m[1].replace(/&amp;/g, "&")
+  );
+  assert.ok(deepLinks.length >= 4, "Expected at least 4 interactive WalletLens deep-links");
+  const families = new Set();
+  for (const qs of deepLinks) {
+    const parsed = parseWalletCheckQueryParams(qs);
+    assert.equal(parsed.hasTarget, true, `Invalid WalletLens deep-link query: ${qs}`);
+    assert.equal(parsed.autorun, true);
+    families.add(parsed.family);
+  }
+  assert.deepEqual([...families].sort(), ["evm", "solana"]);
+  verifyInternalRelativeHtmlLinks(repoRoot, file, html);
+});
+
+test("uspto-trademark-domain-brand-checker.html ships valid SoftwareApplication + TechArticle + FAQPage JSON-LD, 1-click BrandGuard deep-links, MCP v1.3.0, A2A & Pro CTAs", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const file = "uspto-trademark-domain-brand-checker.html";
+  const canonicalUrl = `https://youthmy11-ai.github.io/${file}`;
+  const html = fs.readFileSync(path.join(repoRoot, file), "utf8");
+  const indexHtml = fs.readFileSync(path.join(repoRoot, "index.html"), "utf8");
+  const brandHtml = fs.readFileSync(path.join(repoRoot, "brandcheck.html"), "utf8");
+
+  assert.match(html, /<title>[^<]*USPTO Trademark[^<]*Brand Checker[^<]*<\/title>/);
+  assert.match(html, /<meta name="description" content="[^"]{80,}"/);
+  assert.ok(html.includes(`<link rel="canonical" href="${canonicalUrl}">`));
+  assert.ok(indexHtml.includes(`href="${file}"`), "index.html must link to USPTO & Brand guide");
+  assert.ok(brandHtml.includes(`href="${file}"`), "brandcheck.html must link to USPTO & Brand guide");
+
+  const { types } = extractAllJsonLdObjects(html);
+  assert.ok(types.has("SoftwareApplication"), "Missing SoftwareApplication JSON-LD");
+  assert.ok(types.has("TechArticle"), "Missing TechArticle JSON-LD");
+  assert.ok(types.has("FAQPage"), "Missing FAQPage JSON-LD");
+
+  for (const term of [
+    "USPTO",
+    ".com",
+    ".ai",
+    ".io",
+    ".dev",
+    ".app",
+    ".org",
+    ".net",
+    ".xyz",
+    "npm",
+    "PyPI",
+    "GitHub",
+    "Apple",
+    "Google Play",
+    "brandcheck.html",
+    "brand_domain_handle_scan",
+    "npx --yes github:youthmy11-ai/youthmy11-ai.github.io",
+    "https://market.near.ai/agents/forge-brand-checker",
+    "$0.35 USDC",
+    'data-checkout-sku="CB"',
+    'data-checkout-sku="BUNDLE"',
+  ]) {
+    assert.ok(html.includes(term), `${file} missing "${term}"`);
+  }
+
+  const deepLinks = [...html.matchAll(/href="brandcheck\.html\?([^"]+)"/g)].map((m) =>
+    m[1].replace(/&amp;/g, "&")
+  );
+  assert.ok(deepLinks.length >= 4, "Expected at least 4 interactive BrandGuard deep-links");
+  for (const qs of deepLinks) {
+    const parsed = parseBrandCheckQueryParams(qs);
+    assert.equal(parsed.hasTarget, true, `Invalid BrandGuard deep-link query: ${qs}`);
+    assert.equal(parsed.autorun, true);
+  }
+  verifyInternalRelativeHtmlLinks(repoRoot, file, html);
+  verifyInternalRelativeHtmlLinks(repoRoot, "index.html", indexHtml);
 });

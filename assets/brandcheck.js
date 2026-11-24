@@ -154,6 +154,62 @@ export function generateBrandVariations(rawName) {
   return unique;
 }
 
+/**
+ * Parses URL query parameters for 1-click BrandGuard deep-links:
+ * ?brand=NovaForgeX&variations=1&autorun=1
+ */
+export function parseBrandCheckQueryParams(rawSearch = "") {
+  const qs = String(rawSearch || "").replace(/^\?/, "");
+  const params = new URLSearchParams(qs);
+  const rawBrand = (
+    params.get("brand") ||
+    params.get("name") ||
+    params.get("q") ||
+    params.get("candidate") ||
+    ""
+  ).trim();
+  const autorunParam = (params.get("autorun") || "").trim().toLowerCase();
+  const autorunOverride =
+    autorunParam === "0" || autorunParam === "false"
+      ? false
+      : autorunParam === "1" || autorunParam === "true"
+        ? true
+        : null;
+  const modeParam = (params.get("mode") || "").trim().toLowerCase();
+  const runVariations =
+    modeParam === "variations" ||
+    params.get("variations") === "1" ||
+    params.get("variations") === "true";
+
+  if (!rawBrand) {
+    return {
+      hasTarget: false,
+      brand: "",
+      normalizedSlug: "",
+      autorun: false,
+      runVariations: false,
+    };
+  }
+  try {
+    const spec = normalizeBrandName(rawBrand);
+    return {
+      hasTarget: true,
+      brand: spec.displayName,
+      normalizedSlug: spec.domainLabel,
+      autorun: autorunOverride ?? true,
+      runVariations,
+    };
+  } catch {
+    return {
+      hasTarget: false,
+      brand: "",
+      normalizedSlug: "",
+      autorun: false,
+      runVariations: false,
+    };
+  }
+}
+
 /* ============================================================================
  * 2. CORS-Safe Simple GET Fetcher (No Custom Headers -> Zero Preflight)
  * ========================================================================== */
@@ -1668,7 +1724,16 @@ function initBrandGuardApp() {
 
   syncProUi();
 
-  if (nameInputEl && !nameInputEl.value.trim()) {
+  const qp = parseBrandCheckQueryParams(window.location.search);
+  if (qp.hasTarget && nameInputEl) {
+    nameInputEl.value = qp.brand;
+    if (qp.autorun) {
+      executeSingleScan();
+      if (qp.runVariations) {
+        executeVariationsScan();
+      }
+    }
+  } else if (nameInputEl && !nameInputEl.value.trim()) {
     nameInputEl.value = BRANDGUARD_SAMPLES.kestrelquant;
     executeSingleScan();
   }

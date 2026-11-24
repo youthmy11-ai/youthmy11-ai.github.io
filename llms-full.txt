@@ -8,7 +8,7 @@
 
 ForgeSuite Studio is engineered as a **zero-backend, local-first software suite** hosted on static GitHub Pages (`https://youthmy11-ai.github.io/`) and open-source GitHub repositories (`https://github.com/youthmy11-ai`):
 
-1. **Zero Data Uploads & Zero Telemetry**: All 7 web tools execute purely inside local browser memory (`HTML5 + ES Modules`). No prompts, invoices, API payloads, contracts, EVM calldata, or `.env` secrets are ever transmitted to any ForgeSuite server. TokenGuard queries CORS-friendly public JSON-RPC nodes (`PublicNode`, `Zan`) directly from the user's browser.
+1. **Zero Data Uploads & Zero Telemetry**: All 9 web applications execute purely inside local browser memory (`HTML5 + ES Modules`). No prompts, invoices, API payloads, contracts, wallet watchlists, brand shortlists, EVM calldata, or `.env` secrets are ever transmitted to any ForgeSuite server. BrandGuard queries Google DoH + CORS RDAP directly, and TokenGuard / WalletLens query CORS-friendly public JSON-RPC nodes (`PublicNode`, `Zan`) directly from the user's browser.
 2. **Offline Pure-JS QR Generation (`assets/qr.js`)**: Every payment QR code across the storefront and CryptoBill Forge is generated deterministically in-browser using a custom ISO/IEC 18004 Version 1–10 pure JavaScript encoder with zero external QR image APIs.
 3. **Serverless URL-Fragment Sharing (`#inv=`)**: CryptoBill Forge encodes shareable client invoices directly into UTF-8 Base64URL hash fragments (`#inv=...`) so clients can inspect read-only A4 invoices and scan payment QR codes without any database.
 4. **Deterministic Offline License Keys (`FS-PRO-...`)**: Pro licenses use a shared 4-hex-digit FNV-1a 32-bit folded checksum (`^FS-PRO-(CB|AS|WL|BUNDLE)-[A-Z0-9]{8}-[0-9A-F]{4}$`) verified 100% offline across the web storefront, TokenGuard Pro Watchlist, AutoShorts Studio (Python), and WebLead Extractor (Chrome MV3).
@@ -69,7 +69,7 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 
 ### 3.4 All-Access Creator & Freelancer Bundle (`https://youthmy11-ai.github.io/#pricing`)
 - **Pricing**: **$35 Lifetime** (Compare at $49 individual total — Save $14, SKU `BUNDLE`).
-- **Scope**: Issues one universal `FS-PRO-BUNDLE-...` key that instantly unlocks CryptoBill Forge Pro and TokenGuard 25-Token Batch Watchlist in-browser, and activates both AutoShorts Studio Pro and WebLead & Table Extractor Pro offline, including v1.x updates and priority email support.
+- **Scope**: Issues one universal `FS-PRO-BUNDLE-...` key that instantly unlocks CryptoBill Forge Pro, TokenGuard 25-Token Batch Watchlist, BrandGuard 25-Brand Agency Matrix, and WalletLens 25-Wallet Treasury Watchlist in-browser, and activates both AutoShorts Studio Pro and WebLead & Table Extractor Pro offline, including v1.x updates and priority email support.
 
 ### 3.5 TokenCost Lab (`https://youthmy11-ai.github.io/tokencalc.html`)
 - **Category**: DeveloperApplication (Web — 100% Free)
@@ -132,6 +132,8 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 
 ### 3.12 BrandGuard — 8-TLD Domain, Developer Registry & App Store Scanner (`https://youthmy11-ai.github.io/brandcheck.html`)
 - **Category**: BusinessApplication (Web — Free Single + 4 Variations + Pro 25-Brand Agency Matrix in `$15` Pro / `$35` Bundle)
+- **Specialized Deep-Dive Scanner & Guide**: `https://youthmy11-ai.github.io/uspto-trademark-domain-brand-checker.html`
+- **URL Deep-Link Parameters**: Pre-fills and auto-runs via `?brand=<name>` (plus optional `&variations=1` and `&autorun=0`).
 - **Reusable Engine**: `https://youthmy11-ai.github.io/assets/brandcheck.js` (Pure ES Module compatible with Browser & Node.js 20+)
 - **Capabilities**:
   - **100% CORS-Clean 8-TLD Domain Verification**: Queries Google DNS-over-HTTPS (`NS` + `A` records at `dns.google/resolve`) and CORS-enabled authoritative RDAP endpoints across `.com`, `.io`, `.ai`, `.dev`, `.app`, `.org`, `.net`, and `.xyz` (with automatic clean fallback to DoH if `rdap.org` redirects to a non-CORS registry), distinguishing `Likely Available (NXDOMAIN)` from `Registered (Active DNS/RDAP)`.
@@ -140,6 +142,7 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 
 ### 3.13 WalletLens — Multi-Chain Wallet Portfolio, EIP-7702 & Gnosis Safe Inspector (`https://youthmy11-ai.github.io/walletcheck.html`)
 - **Category**: FinanceApplication (Web — Free Single 6-Chain Scan + Pro 25-Wallet Treasury Watchlist in `$15` Pro / `$35` Bundle)
+- **Specialized Deep-Dive Scanner & Guide**: `https://youthmy11-ai.github.io/eip-7702-delegation-gnosis-safe-checker.html`
 - **URL Deep-Link Parameters**: Pre-fills and auto-runs via `?address=<0x...|base58>` (plus optional `&chains=ethereum,base,...` and `&rpc=https://...`).
 - **Reusable Engine**: `https://youthmy11-ai.github.io/assets/walletcheck.js` (Pure ES Module compatible with Browser & Node.js 20+)
 - **Capabilities**:
@@ -185,8 +188,12 @@ ForgeSuite operates 5 live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 
 
 - **Storefront**: https://youthmy11-ai.github.io/
 - **WalletLens Inspector**: https://youthmy11-ai.github.io/walletcheck.html
+- **EIP-7702 & Gnosis Safe Guide**: https://youthmy11-ai.github.io/eip-7702-delegation-gnosis-safe-checker.html
 - **TokenGuard Scanner**: https://youthmy11-ai.github.io/tokenaudit.html
+- **Solana Token-2022 Scanner**: https://youthmy11-ai.github.io/solana-token-2022-scanner.html
+- **EVM Proxy & Honeypot Scanner**: https://youthmy11-ai.github.io/evm-proxy-honeypot-scanner.html
 - **BrandGuard Scanner**: https://youthmy11-ai.github.io/brandcheck.html
+- **USPTO Trademark & 8-TLD Brand Guide**: https://youthmy11-ai.github.io/uspto-trademark-domain-brand-checker.html
 - **MCP Server v1.3.0**: https://youthmy11-ai.github.io/mcp.html
 - **Concise LLM Index**: https://youthmy11-ai.github.io/llms.txt
 - **Live A2A + x402 Agent**: https://market.near.ai/a/forge-ai-agent

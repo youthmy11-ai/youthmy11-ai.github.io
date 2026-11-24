@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EIP-7702 Delegation &amp; Gnosis Safe Multisig Checker (6-Chain EVM + Solana RPC + MCP)</title>
+  <meta name="description" content="Free client-side EIP-7702 smart account delegation (0xef0100 bytecode indicator post-Pectra/Prague/Isthmus), Gnosis Safe M-of-N signer threshold verifier, and 6-chain EVM &amp; Solana balance reconciler in browser or via npx MCP.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/eip-7702-delegation-gnosis-safe-checker.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/eip-7702-delegation-gnosis-safe-checker.html">
+  <meta property="og:title" content="EIP-7702 Delegation &amp; Gnosis Safe Multisig Checker (6-Chain Browser RPC + MCP)">
+  <meta property="og:description" content="Detect post-Pectra/Isthmus EIP-7702 (0xef0100) EOA delegations, audit Gnosis Safe M-of-N signer thresholds, and reconcile native &amp; stablecoin balances across Ethereum, Base, Arbitrum, BSC, Polygon, and Solana.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="EIP-7702 Delegation &amp; Gnosis Safe Multisig Checker (Free Browser RPC + MCP)">
+  <meta name="twitter:description" content="Inspect 0xef0100 EIP-7702 smart account delegations, Gnosis Safe M-of-N owners, ERC-4337 EntryPoints, and 6-chain stablecoin holdings with zero backend uploads.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310b981'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23052e16' font-family='sans-serif' font-size='18' font-weight='800'%3E7702%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "WalletLens EIP-7702 Delegation & Gnosis Safe Multisig Checker",
+    "applicationCategory": "SecurityApplication",
+    "operatingSystem": "Web, Windows, macOS, Linux (Node.js 20+ MCP)",
+    "url": "https://youthmy11-ai.github.io/eip-7702-delegation-gnosis-safe-checker.html",
+    "softwareVersion": "1.3.0",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free Browser & MCP 6-Chain Single-Wallet Inspector", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Autonomous Cloud A2A Scan (@wallet-activity-scanner)", "price": "0.15", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Pro Single-Tool Unlock (25-Wallet Treasury Watchlist + CSV/JSON)", "price": "15", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "All-Access Pro Bundle (25-Wallet Watchlist + All Pro Tools)", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "Detects EIP-7702 23-byte bytecode delegation indicators (0xef0100 + 20-byte implementation address) post-Pectra/Prague/Isthmus upgrades",
+      "Verifies Gnosis Safe M-of-N signer governance via getThreshold() (0xe75235b8) and getOwners() (0xa0e67e2b) across Ethereum, Base, Arbitrum, BSC, and Polygon",
+      "Classifies ERC-4337 Smart Accounts (entryPoint() 0xb0d691fe), EIP-1167 minimal clones, and Solana Squads v4 multisigs",
+      "Reconciles 6-chain native gas (ETH, BNB, POL, SOL), stablecoins (USDC, USDT, DAI, PYUSD), nonces, and pure-JS Ed25519 Solana ATAs"
+    ],
+    "description": "Zero-backend browser JSON-RPC and Node.js MCP v1.3.0 inspector for auditing EIP-7702 EOA delegations, Gnosis Safe M-of-N multisig thresholds, and 6-chain EVM + Solana treasury balances."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "headline": "EIP-7702 Delegation & Gnosis Safe Multisig Checker: Auditing 0xef0100 Bytecode Designators, Signer Thresholds & 6-Chain Treasuries",
+        "description": "Technical security and treasury ops guide to detecting EIP-7702 delegated EOAs after Ethereum Pectra/Prague and OP-Stack Isthmus, verifying Gnosis Safe M-of-N multisig quorums across L1/L2s, and reconciling 6-chain EVM + Solana stablecoin holdings.",
+        "url": "https://youthmy11-ai.github.io/eip-7702-delegation-gnosis-safe-checker.html",
+        "datePublished": "2026-11-24",
+        "dateModified": "2026-11-24",
+        "proficiencyLevel": "Expert",
+        "author": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ForgeSuite Studio (youthmy11-ai)",
+          "url": "https://youthmy11-ai.github.io/"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do you detect an EIP-7702 smart account delegation on Ethereum, Base, Arbitrum, or BSC?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Following the Ethereum Pectra (Prague-Electra), BNB Chain Pascal, and OP-Stack Isthmus upgrades, an Externally Owned Account (EOA) that signs a Type-0x04 SetCode authorization stores a 23-byte delegation indicator in its account code: the 3-byte magic prefix 0xef0100 followed by the 20-byte target contract address. Querying eth_getCode reveals 0xef0100<address> immediately."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why are malicious EIP-7702 chain_id = 0 authorizations dangerous for hardware and hot wallets?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Unlike traditional ERC-20 approve() phishing that only exposes one token on one chain, signing an EIP-7702 authorization tuple with chain_id = 0 lets an attacker replay the SetCode delegation across every EIP-7702-enabled EVM network, turning the victim's EOA into an automated sweeper that drains native ETH/BNB and tokens whenever funds arrive."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does WalletLens verify Gnosis Safe M-of-N signer thresholds across multiple L2s?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "WalletLens batches eth_call probes for getThreshold() (selector 0xe75235b8) and getOwners() (selector 0xa0e67e2b) independently on Ethereum, Base, Arbitrum, BSC, and Polygon. This catches dangerous 1-of-N threshold downgrades and L1/L2 signer drift where a deterministic Safe address was updated on Mainnet but left with stale signers on an L2."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can AI agents check EIP-7702 delegations, Safe signers, and 6-chain balances via MCP or A2A?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Run npx --yes github:youthmy11-ai/youthmy11-ai.github.io to invoke multi_chain_wallet_scan locally for free inside VS Code, Claude Code, or Cursor (ForgeSuite MCP v1.3.0, 8 tools), or call @wallet-activity-scanner on NEAR AI Market via HTTPS JSON-RPC + x402 for $0.15 USDC/call."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .seo-code {
+      background: rgba(9, 13, 22, 0.88);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      margin: 10px 0 0;
+    }
+    [data-theme="light"] .seo-code {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+    .seo-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .seo-launch-box {
+      padding: 22px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(37, 99, 235, 0.11));
+      border: 1px solid var(--border-strong);
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body data-page="eip-7702-delegation-gnosis-safe-checker">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">WL</span>
+        <span>WalletLens · 7702 &amp; Safe</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="walletcheck.html" class="fs-btn fs-btn-sm fs-btn-secondary">Live WalletLens</a>
+        <a href="evm-proxy-honeypot-scanner.html" class="fs-btn fs-btn-sm fs-btn-secondary">EVM Proxy Guide</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP Server (v1.3.0)</a>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="CB">Pro ($15)</button>
+        <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 64px;">
+    <!-- HERO + INTERACTIVE DEEP-LINK LAUNCHER -->
+    <section style="margin-bottom:28px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span class="fs-badge fs-badge-warn">POST-PECTRA / PRAGUE / ISTHMUS SMART ACCOUNT &amp; MULTISIG SECURITY</span>
+        <a href="https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite" target="_blank" rel="noopener noreferrer" class="fs-badge fs-badge-success">
+          ✓ Official MCP Registry: io.github.youthmy11-ai/forgesuite-mcp · v1.3.0 Active ↗
+        </a>
+      </div>
+
+      <h1 style="margin:12px 0 10px;font-size:clamp(1.85rem, 3.5vw, 2.65rem);line-height:1.15;letter-spacing:-0.025em;">
+        EIP-7702 Delegation &amp; Gnosis Safe Multisig Checker (6-Chain EVM + Solana RPC + MCP)
+      </h1>
+      <p class="fs-lead" style="margin:0;max-width:82ch;color:var(--text-muted);">
+        After Ethereum’s <strong>Pectra (Prague)</strong>, BNB Chain’s Pascal, and OP-Stack <strong>Isthmus</strong> (Base) upgrades, a regular <code>0x...</code> EOA can silently execute arbitrary smart contract code via an <strong><code>EIP-7702</code> (<code>0xef0100</code>) delegation indicator</strong>. Verify live EOA delegations, audit <strong><code>Gnosis Safe</code> <code>M-of-N</code> signer thresholds</strong>, and reconcile native + stablecoin balances across <strong>6 chains</strong> in your browser with zero backend telemetry.
+      </p>
+
+      <!-- INTERACTIVE QUICK SCAN FORM + 1-CLICK DEEP LINKS -->
+      <div class="seo-launch-box" aria-label="Interactive EIP-7702 and Gnosis Safe Wallet Launcher">
+        <form id="wlQuickScanForm" style="display:grid;gap:12px;">
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label" style="color:var(--text);">Target EVM (<code>0x...</code>) or Solana (Base58) Address</span>
+              <input id="wlQuickAddrInput" type="text" class="fs-input" value="0x874ebd03bee4ac1950796598d10f78be2ab3db3f" placeholder="0xfeB016... or BSdWMAHH..." spellcheck="false" autocomplete="off">
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label" style="color:var(--text);">Chain Scope</span>
+              <div class="fs-input-row">
+                <select id="wlQuickChainsSelect" class="fs-select">
+                  <option value="ethereum,base,arbitrum,bsc,polygon,solana" selected>All 6 Chains (Ethereum, Base, Arbitrum, BSC, Polygon, Solana)</option>
+                  <option value="ethereum,base,arbitrum,bsc,polygon">5 EVM Chains (EIP-7702 &amp; Safe Probe)</option>
+                  <option value="ethereum,base,arbitrum">Ethereum + Base + Arbitrum</option>
+                  <option value="solana">Solana Mainnet Only (SPL + Token-2022 + Sigs)</option>
+                </select>
+                <button type="submit" class="fs-btn fs-btn-primary">Inspect Live in WalletLens →</button>
+              </div>
+            </label>
+          </div>
+        </form>
+
+        <div style="margin-top:14px;">
+          <div class="fs-field-label" style="margin-bottom:8px;">1-Click Live Mainnet Deep-Link Presets (Auto-Runs 6-Chain JSON-RPC Inspection):</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="walletcheck.html?address=0x874ebd03bee4ac1950796598d10f78be2ab3db3f&amp;chains=ethereum,base,arbitrum,bsc,polygon" class="fs-btn fs-btn-sm fs-btn-primary">
+              ⚡ Scan Live EIP-7702 Delegated EOA (0xef0100...)
+            </a>
+            <a href="walletcheck.html?address=0xfeB016d0D14AC0fa6d69199608B0776d007203B2&amp;chains=ethereum,base,arbitrum" class="fs-btn fs-btn-sm fs-btn-secondary">
+              🔐 Verify ENS DAO Gnosis Safe (M-of-N Signers)
+            </a>
+            <a href="walletcheck.html?address=0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045&amp;chains=ethereum,base,arbitrum,bsc,polygon" class="fs-btn fs-btn-sm fs-btn-secondary">
+              🔍 Reconcile Vitalik.eth 5-Chain EOA Nonces
+            </a>
+            <a href="walletcheck.html?address=BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx&amp;chains=solana" class="fs-btn fs-btn-sm fs-btn-ghost">
+              ◎ Inspect Solana Treasury (Ed25519 ATAs + PYUSD)
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 TECHNICAL SMART-ACCOUNT, MULTISIG & TREASURY FORENSICS VECTORS -->
+    <section style="margin-bottom:28px;">
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-accent">EIP-7702 DESIGNATORS · SAFE QUORUM PROBES · 6-CHAIN RECONCILIATION</span>
+          <h2>How EIP-7702 Bytecode Delegations, Safe Multisig Audits &amp; 6-Chain Checks Work</h2>
+          <p>Why assuming <code>eth_getCode == "0x"</code> for EOAs or trusting single-chain multisig UIs breaks modern DevSecOps and DAO treasury security.</p>
+        </div>
+      </div>
+
+      <div class="seo-grid-2">
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">23-BYTE DESIGNATOR</span>
+              <span class="fs-badge fs-badge-muted">0xef0100 + 20-BYTE TARGET</span>
+            </div>
+            <h3>1. <code>EIP-7702</code> Delegation Indicator Forensics</h3>
+            <p class="fs-card-desc">
+              Introduced in Ethereum’s <strong>Pectra/Prague</strong> hardfork and OP-Stack <strong>Isthmus</strong>, Type-<code>0x04</code> (<code>SET_CODE_TX_TYPE</code>) transactions write a 23-byte delegation designator directly into an EOA’s code slot: <code>0xef0100 || target_address</code> (leveraging EIP-3541’s reserved <code>0xef</code> prefix). WalletLens queries <code>eth_getCode</code> across all 5 EVM chains simultaneously, extracts the exact 20-byte implementation contract, and hands it off to TokenGuard for opcode disassembly.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="walletcheck.html?address=0x874ebd03bee4ac1950796598d10f78be2ab3db3f&amp;chains=ethereum,base,arbitrum,bsc,polygon" class="fs-btn fs-btn-sm fs-btn-secondary">Inspect 0xef0100 EOA Live →</a>
+            <a href="evm-proxy-honeypot-scanner.html" class="fs-btn fs-btn-sm fs-btn-ghost">Disassemble Target →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">CRITICAL PHISHING VECTOR</span>
+              <span class="fs-badge fs-badge-muted">CHAIN_ID = 0 SWEEPERS</span>
+            </div>
+            <h3>2. Catching Cross-Chain <code>EIP-7702</code> Sweeper Drainers</h3>
+            <p class="fs-card-desc">
+              Malicious phishing kits trick users into signing off-chain EIP-7702 authorization tuples with <code>chain_id = 0</code> (universal cross-chain wildcard). Relayers broadcast that tuple across Ethereum, Base, Arbitrum, BSC, and Polygon so any incoming ETH, BNB, or ERC-20 deposit is auto-forwarded to a drainer. Auditing all 5 EVM networks in one WalletLens pass reveals lingering delegations before you fund or pay a counterparty wallet.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="walletcheck.html?address=0x874ebd03bee4ac1950796598d10f78be2ab3db3f" class="fs-btn fs-btn-sm fs-btn-secondary">Check Cross-Chain Delegation Status →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">MULTISIG QUORUM AUDIT</span>
+              <span class="fs-badge fs-badge-muted">GNOSIS SAFE M-OF-N</span>
+            </div>
+            <h3>3. <code>Gnosis Safe</code> Threshold &amp; L1/L2 Signer Drift</h3>
+            <p class="fs-card-desc">
+              Before wiring treasury milestones or DAO grants to a multisig, verify on-chain governance directly via JSON-RPC. WalletLens calls <code>getThreshold()</code> (<code>0xe75235b8</code>) and <code>getOwners()</code> (<code>0xa0e67e2b</code>) on every chain to flag risky <code>1-of-N</code> quorum setups and L1/L2 signer desynchronization (where a Safe rotated compromised keys on Ethereum Mainnet but forgot to rotate them on Base or Arbitrum).
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="walletcheck.html?address=0xfeB016d0D14AC0fa6d69199608B0776d007203B2&amp;chains=ethereum,base,arbitrum" class="fs-btn fs-btn-sm fs-btn-secondary">Verify Live Gnosis Safe Signers →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-accent">ACCOUNT ABSTRACTION</span>
+              <span class="fs-badge fs-badge-muted">ERC-4337 · SQUADS V4</span>
+            </div>
+            <h3>4. <code>ERC-4337</code> EntryPoints, EIP-1167 &amp; Solana Squads</h3>
+            <p class="fs-card-desc">
+              Beyond EIP-7702 and Safe, WalletLens fingerprints <strong>ERC-4337 Smart Accounts</strong> via <code>entryPoint()</code> (<code>0xb0d691fe</code>, matching canonical v0.6/v0.7 EntryPoints), unwraps 45-byte <strong>EIP-1167 minimal proxy clones</strong>, and identifies <strong>Squads v3/v4 multisig</strong> program ownership (<code>SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf</code>) on Solana Mainnet.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="txdecode.html" class="fs-btn fs-btn-sm fs-btn-secondary">Decode Safe / AA Calldata →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">6-CHAIN RECONCILIATION</span>
+              <span class="fs-badge fs-badge-muted">PURE-JS ED25519 ATAS</span>
+            </div>
+            <h3>5. Parallel 6-Chain Stablecoin &amp; Solana ATA Math</h3>
+            <p class="fs-card-desc">
+              Reconcile native gas (<code>ETH</code>, <code>BNB</code>, <code>POL</code>, <code>SOL</code>), exact outgoing tx nonces, and canonical stablecoins (<code>USDC</code> 6dp vs 18dp on BSC, <code>USDT</code>, <code>DAI</code>, <code>WETH</code>, <code>USDC-SPL</code>, <code>USDT-SPL</code>, Token-2022 <code>PYUSD</code>). On Solana, WalletLens derives Associated Token Addresses in pure JS (<code>SHA-256</code> + Ed25519 off-curve PDA check) so balances load cleanly via <code>getMultipleAccounts</code> even when public RPCs block indexed queries.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <a href="walletcheck.html?address=BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx&amp;chains=solana" class="fs-btn fs-btn-sm fs-btn-secondary">Test Pure-JS Solana ATA Scan →</a>
+          </div>
+        </article>
+
+        <article class="fs-card">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-success">PRO TREASURY OPS</span>
+              <span class="fs-badge fs-badge-warn">25-WALLET BATCH · $15 / $35</span>
+            </div>
+            <h3>6. Batch 25-Wallet Treasury Watchlist &amp; CSV/JSON Export</h3>
+            <p class="fs-card-desc">
+              Auditing a DAO treasury cohort, contributor payroll roster, or OTC counterparty list? Paste up to <strong>25 labeled EVM &amp; Solana wallets</strong> in WalletLens Pro to verify EIP-7702 status, Safe thresholds, and aggregated stablecoin liquidity in parallel — with formula-safe <strong>CSV &amp; JSON Reconciliation Exports</strong> unlocked permanently via <strong>Single Pro ($15)</strong> or the <strong>All-Access Bundle ($35)</strong>.
+            </p>
+          </div>
+          <div class="fs-card-actions">
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Unlock Bundle ($35)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="CB">Single Tool Pro ($15)</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- MCP + A2A AUTOMATION FOR AI AGENTS & TREASURY BOTS -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-success">LOCAL STDIO MCP V1.3.0 (FREE · 8 TOOLS) + CLOUD A2A X402 ($0.15 USDC)</span>
+          <h2 style="margin-top:6px;">Automate EIP-7702, Safe Multisig &amp; 6-Chain Wallet Scans in VS Code, Claude Code &amp; Cursor</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="vscode:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D" class="fs-btn fs-btn-sm fs-btn-primary">⚡ Install in VS Code</a>
+          <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-copy-target="wlMcpCmd">Copy npx Command</button>
+        </div>
+      </div>
+
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Run Tool #8 <code>multi_chain_wallet_scan</code> locally with zero npm dependencies via our Official MCP Registry server (<code>io.github.youthmy11-ai/forgesuite-mcp</code> · v1.3.0, 8 tools):
+      </p>
+      <pre class="seo-code"><code id="wlMcpCmd">npx --yes github:youthmy11-ai/youthmy11-ai.github.io</code></pre>
+
+      <div class="seo-grid-2">
+        <div class="fs-rail-box">
+          <h3>MCP Tool Call: <code>multi_chain_wallet_scan</code> (Free Local Stdio)</h3>
+          <pre class="seo-code"><code>{
+  "name": "multi_chain_wallet_scan",
+  "arguments": {
+    "address": "0x874ebd03bee4ac1950796598d10f78be2ab3db3f, 0xfeB016d0D14AC0fa6d69199608B0776d007203B2",
+    "chains": ["ethereum", "base", "arbitrum", "bsc", "polygon", "solana"]
+  }
+}</code></pre>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">Full MCP v1.3.0 Docs (8 Tools) →</a>
+            <a href="https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.3.0/forgesuite-mcp.mcpb" class="fs-btn fs-btn-sm fs-btn-ghost">Download .mcpb (v1.3.0)</a>
+          </div>
+        </div>
+
+        <div class="fs-rail-box" style="display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div class="fs-card-top">
+              <span class="fs-badge fs-badge-warn">CLOUD A2A + X402</span>
+              <span class="fs-badge fs-badge-muted">&lt;4S · $0.15 USDC / CALL</span>
+            </div>
+            <h3 style="margin-top:10px;">Remote HTTPS Agent: <code>@wallet-activity-scanner</code></h3>
+            <p class="inv-muted" style="margin:6px 0 12px;">
+              Building an autonomous treasury monitor, payout compliance webhook, or cloud AI agent without local Node.js? Call <strong><code>@wallet-activity-scanner</code></strong> on NEAR AI Market over synchronous JSON-RPC for <strong>$0.15 USDC/call</strong> (1–5 EVM + Solana wallets in &lt;4s) — or escalate delegated contract audits to <strong><code>@forge-ai-agent</code> ($5.00 USDC)</strong>.
+            </p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="https://market.near.ai/agents/wallet-activity-scanner" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-primary">Call @wallet-activity-scanner ($0.15 USDC) ↗</a>
+            <a href="https://market.near.ai/agents/forge-ai-agent" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-sm fs-btn-secondary">Deep Smart Account Audit ($5 USDC) ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRO WATCHLIST CONVERSION BANNER ($15 PRO / $35 BUNDLE) -->
+    <section class="cb-panel" style="margin-bottom:28px;">
+      <div class="cb-panel-head">
+        <div>
+          <span class="fs-badge fs-badge-warn">LIFETIME PRO UNLOCK · $15 SINGLE PRO OR $35 ALL-ACCESS BUNDLE</span>
+          <h2 style="margin-top:6px;">Unlock 25-Wallet Multi-Chain Treasury Watchlist + CSV/JSON Exports</h2>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="fs-btn fs-btn-secondary" data-checkout-sku="CB">Single Tool Pro ($15)</button>
+          <button type="button" class="fs-btn fs-btn-primary" data-checkout-sku="BUNDLE">All-Access Bundle ($35 · Save $14)</button>
+        </div>
+      </div>
+      <p class="inv-muted" style="margin:6px 0 0;">
+        Pay once via <strong>BSC BEP20 USDT</strong> or <strong>Solana SPL USDC</strong> for instant client-side RPC license verification. <strong>Single Pro ($15)</strong> unlocks CryptoBill Forge Pro, WalletLens 25-Wallet Watchlist, and BrandGuard 25-Brand Matrix; the <strong>$35 All-Access Bundle</strong> adds TokenGuard 25-Token Batch Watchlist, AutoShorts Studio Pro ($19), and WebLead Extractor Pro ($15).
+      </p>
+    </section>
+
+    <!-- FAQ -->
+    <section>
+      <div class="fs-section-head">
+        <div>
+          <span class="fs-badge fs-badge-muted">TECHNICAL FAQ</span>
+          <h2>EIP-7702 Delegation &amp; Gnosis Safe Verification Questions</h2>
+        </div>
+      </div>
+      <div class="fs-faq-grid">
+        <div class="fs-faq-item">
+          <h3>How do you detect an EIP-7702 delegation on an EOA?</h3>
+          <p>Post-Pectra/Isthmus, an EOA with an active Type-<code>0x04</code> SetCode authorization returns a 23-byte indicator from <code>eth_getCode</code> starting with <code>0xef0100</code> followed by the 20-byte delegated contract address.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Why are chain_id = 0 EIP-7702 signatures so risky?</h3>
+          <p>An EIP-7702 authorization signed with <code>chain_id = 0</code> can be replayed across every EIP-7702-compatible EVM chain, allowing malicious sweepers to hijack the EOA simultaneously on Ethereum, Base, Arbitrum, BSC, and Polygon.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>How does Gnosis Safe M-of-N verification work?</h3>
+          <p>WalletLens calls <code>getThreshold()</code> (<code>0xe75235b8</code>) and <code>getOwners()</code> (<code>0xa0e67e2b</code>) live on each selected EVM network so you can confirm multi-signer quorums and spot L1/L2 signer drift before sending funds.</p>
+        </div>
+        <div class="fs-faq-item">
+          <h3>Are queried treasury addresses ever uploaded to a server?</h3>
+          <p>Never. Browser scans query CORS-clean PublicNode JSON-RPC endpoints directly from local memory with zero ForgeSuite backend servers or analytics.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="walletcheck.html">WalletLens</a>
+        <a href="eip-7702-delegation-gnosis-safe-checker.html">EIP-7702 &amp; Safe Checker</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="solana-token-2022-scanner.html">Solana Token-2022 Scanner</a>
+        <a href="evm-proxy-honeypot-scanner.html">EVM Proxy &amp; Honeypot Scanner</a>
+        <a href="brandcheck.html">BrandGuard</a>
+        <a href="uspto-trademark-domain-brand-checker.html">USPTO &amp; Brand Checker</a>
+        <a href="mcp.html">MCP Server (v1.3.0)</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="txdecode.html">Calldata Lens</a>
+        <a href="llms.txt">llms.txt</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { bindCheckoutTriggers } from "./assets/checkout.js";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      bindCheckoutTriggers();
+
+      const form = document.getElementById("wlQuickScanForm");
+      const addrEl = document.getElementById("wlQuickAddrInput");
+      const chainsEl = document.getElementById("wlQuickChainsSelect");
+      if (form && addrEl && chainsEl) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const addr = addrEl.value.trim();
+          const chains = chainsEl.value || "ethereum,base,arbitrum,bsc,polygon,solana";
+          const url = addr
+            ? `walletcheck.html?address=${encodeURIComponent(addr)}&chains=${encodeURIComponent(chains)}`
+            : `walletcheck.html?chains=${encodeURIComponent(chains)}`;
+          window.location.href = url;
+        });
+      }
+
+      const themeBtn = document.getElementById("themeToggleBtn");
+      if (themeBtn) {
+        const saved = window.localStorage.getItem("forgesuite_theme") || "dark";
+        document.documentElement.dataset.theme = saved;
+        themeBtn.textContent = saved === "light" ? "☀ Light" : "🌙 Dark";
+        themeBtn.addEventListener("click", () => {
+          const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+          document.documentElement.dataset.theme = next;
+          window.localStorage.setItem("forgesuite_theme", next);
+          themeBtn.textContent = next === "light" ? "☀ Light" : "🌙 Dark";
+        });
+      }
+
+      document.querySelectorAll("[data-copy-target]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-copy-target");
+          const target = id ? document.getElementById(id) : null;
+          if (!target) return;
+          const prev = btn.textContent;
+          try {
+            await navigator.clipboard.writeText(target.textContent || "");
+            btn.textContent = "Copied ✓";
+            setTimeout(() => {
+              btn.textContent = prev;
+            }, 1600);
+          } catch {}
+        });
+      });
+    });
+  </script>
+</body>
+</html>
