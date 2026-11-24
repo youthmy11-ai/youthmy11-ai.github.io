@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TokenGuard — Browser EVM &amp; Solana Token / Smart Contract Risk Scanner</title>
+  <meta name="description" content="Free client-side EVM (Ethereum, Base, BSC, Arbitrum) and Solana (SPL &amp; Token-2022) token and smart contract rug, proxy, opcode, mint/freeze authority, and permanentDelegate risk scanner.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/tokenaudit.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/tokenaudit.html">
+  <meta property="og:title" content="TokenGuard — Live EVM &amp; Solana Token / Contract Risk Scanner">
+  <meta property="og:description" content="Audit EVM bytecode opcodes (SELFDESTRUCT, DELEGATECALL), EIP-1967/1167 proxies, honeypot tax selectors, and Solana SPL / Token-2022 mint, freeze &amp; permanentDelegate risks directly in your browser.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TokenGuard — Live EVM &amp; Solana Token / Contract Risk Scanner">
+  <meta name="twitter:description" content="Zero-backend browser EVM &amp; Solana token rug, proxy, authority, and Token-2022 extension risk inspector.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ef4444'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='22' font-weight='800'%3ETG%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TokenGuard",
+    "applicationCategory": "SecurityApplication",
+    "operatingSystem": "Web",
+    "url": "https://youthmy11-ai.github.io/tokenaudit.html",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free Single-Token Live Scanner", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "All-Access Pro Bundle (Batch 25-Token Watchlist + CSV/JSON Dossier)", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "PUSH-aware EVM bytecode disassembler for SELFDESTRUCT, DELEGATECALL, CALLCODE, and ORIGIN",
+      "EIP-1967, ZeppelinOS/FiatToken, Beacon, and EIP-1167 proxy implementation inspection across Base, Ethereum, BSC, and Arbitrum",
+      "Mint, blacklist, pause, and mutable honeypot tax/maxTx selector detection",
+      "Live Solana SPL & Token-2022 mintAuthority, freezeAuthority, permanentDelegate, transferFeeConfig, and transferHook audit",
+      "Pro 25-token Batch Watchlist audit with JSON & CSV Risk Dossier export"
+    ],
+    "description": "Browser-based EVM and Solana token/contract security and rug-vector scanner powered by CORS-friendly public RPCs with zero backend telemetry."
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="tokenaudit">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">TG</span>
+        <span>TokenGuard</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="txdecode.html" class="fs-btn fs-btn-sm fs-btn-secondary">Calldata Lens</a>
+        <a href="envshield.html" class="fs-btn fs-btn-sm fs-btn-secondary">EnvShield</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP Server</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill</a>
+        <button type="button" id="tgaBundleBtn" class="fs-btn fs-btn-sm fs-btn-primary">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 60px;">
+    <div class="fs-section-head" style="margin-bottom:20px;">
+      <div>
+        <span class="fs-badge fs-badge-accent">LIVE EVM &amp; SOLANA RPC · PROXY &amp; OPCODE DISASSEMBLER · TOKEN-2022 RUG GUARD</span>
+        <h1 style="margin-top:10px;">EVM &amp; Solana Token / Contract Risk Scanner</h1>
+        <p class="fs-lead" style="margin-top:6px;">
+          Inspect live contract bytecode (<code>SELFDESTRUCT</code>, <code>DELEGATECALL</code>), EIP-1967 / FiatToken / EIP-1167 proxies, honeypot tax selectors, and Solana SPL / Token-2022 authorities (<code>mintAuthority</code>, <code>freezeAuthority</code>, <code>permanentDelegate</code>, <code>transferFeeConfig</code>) directly in your browser via CORS-safe public RPCs.
+        </p>
+      </div>
+    </div>
+
+    <div class="cb-workspace">
+      <!-- LEFT COLUMN: SINGLE SCANNER + PRO BATCH WATCHLIST + DEEP AUDIT CTA -->
+      <section class="cb-editor-pane" aria-label="Token Target & Watchlist Controls">
+        <!-- 1. FREE SINGLE-TOKEN SCANNER -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Single Token / Contract Live Scan (Free)</h2>
+            <span class="fs-badge fs-badge-success">UNLIMITED FREE</span>
+          </div>
+
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-tga-sample="base_usdc">Base USDC (Proxy)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-tga-sample="sol_pyusd">Solana PYUSD (Token-2022)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-tga-sample="eth_usdt">Ethereum USDT</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-tga-sample="sol_bonk">Solana BONK (Revoked)</button>
+          </div>
+
+          <div class="cb-grid-2">
+            <label class="fs-field">
+              <span class="fs-field-label">Target Network</span>
+              <select id="tgaChainSelect" class="fs-select">
+                <option value="base" selected>Base Mainnet (EIP-155:8453)</option>
+                <option value="ethereum">Ethereum Mainnet (EIP-155:1)</option>
+                <option value="bsc">BNB Smart Chain (EIP-155:56)</option>
+                <option value="arbitrum">Arbitrum One (EIP-155:42161)</option>
+                <option value="solana">Solana Mainnet (SPL &amp; Token-2022)</option>
+              </select>
+            </label>
+            <label class="fs-field">
+              <span class="fs-field-label">Optional Custom HTTPS RPC</span>
+              <input id="tgaCustomRpcInput" type="url" class="fs-input" placeholder="Default: PublicNode CORS RPC" spellcheck="false" autocomplete="off">
+            </label>
+          </div>
+
+          <label class="fs-field">
+            <span class="fs-field-label">EVM Contract Address (<code>0x...</code>) or Solana Mint (Base58)</span>
+            <div class="fs-input-row">
+              <input id="tgaAddressInput" type="text" class="fs-input" placeholder="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 or 2b1kV6DkPAnxd5ix..." spellcheck="false" autocomplete="off">
+              <button type="button" id="tgaScanBtn" class="fs-btn fs-btn-primary">Scan Token / Contract</button>
+            </div>
+          </label>
+          <div id="tgaStatusMsg" class="fs-status-msg" aria-live="polite"></div>
+        </div>
+
+        <!-- 2. PRO BATCH WATCHLIST MULTI-TOKEN AUDIT -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Batch Watchlist Audit (&le; 25 Tokens)</h2>
+            <span id="tgaProStatusBadge" class="fs-badge fs-badge-warn">PRO FEATURE · BUNDLE ($35)</span>
+          </div>
+
+          <div id="tgaProLockBanner" class="cb-pro-lock">
+            <strong>Pro Treasury &amp; Watchlist Mode:</strong> Audit up to <strong>25 multi-chain EVM &amp; Solana addresses</strong> in one batch and export full <strong>JSON / CSV Risk Dossiers</strong> with the <strong>ForgeSuite All-Access Bundle ($35 lifetime)</strong> — instant auto-unlock via Solana SPL-USDC or BSC BEP20 USDT.
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Unlock All-Access Bundle ($35)</button>
+              <button type="button" id="tgaActivateKeyBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Activate Existing Pro Key</button>
+            </div>
+          </div>
+
+          <label class="fs-field">
+            <span class="fs-field-label">One target per line (<code>chain:address</code> or raw <code>0x</code> / Base58 mint — max 25)</span>
+            <textarea id="tgaBatchInput" class="fs-textarea" rows="5" spellcheck="false" placeholder="base:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&#10;solana:2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo"></textarea>
+          </label>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="tgaBatchRunBtn" class="fs-btn fs-btn-primary">Unlock Batch Audit — Bundle ($35)</button>
+            <button type="button" id="tgaExportJsonBtn" class="fs-btn fs-btn-secondary" disabled>Export JSON Dossier</button>
+            <button type="button" id="tgaExportCsvBtn" class="fs-btn fs-btn-secondary" disabled>Export CSV Matrix</button>
+          </div>
+          <div id="tgaBatchStatusMsg" class="fs-status-msg" aria-live="polite"></div>
+
+          <div style="overflow-x:auto;">
+            <table class="fs-table">
+              <thead>
+                <tr>
+                  <th>Chain</th>
+                  <th>Asset</th>
+                  <th>Score</th>
+                  <th>Top Flags</th>
+                  <th>View</th>
+                </tr>
+              </thead>
+              <tbody id="tgaBatchBody">
+                <tr>
+                  <td colspan="5" class="inv-muted">Run a Pro Watchlist scan to populate multi-token risk scores and unlock 1-click JSON/CSV dossier downloads.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. FORGE AI AGENT DEEP AUDIT & FREELANCE BILLING CTA -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h3>Need a Deep Line-by-Line Solidity / Rust Source Audit?</h3>
+            <span class="fs-badge fs-badge-accent">A2A + X402 · $5.00 USDC</span>
+          </div>
+          <p class="inv-muted" style="margin:4px 0 12px;">
+            Bytecode heuristics catch structural rug vectors fast, but custom logic bugs hide in source code. Hire <strong>Forge AI Agent</strong> on NEAR AI Market for an autonomous line-by-line Solidity, Rust/Anchor, or PR diff security audit (<strong>$5.00 USDC</strong> escrowed via A2A + x402, 6h SLA) — or bill your own client review via <strong>CryptoBill Forge</strong>.
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="https://market.near.ai/a/forge-ai-agent" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-primary">Hire Forge AI Agent ($5 USDC) ↗</a>
+            <button type="button" id="tgaSendInvoiceBtn" class="fs-btn fs-btn-secondary">Invoice Client Audit ($185) →</button>
+            <a href="sowbuilder.html" class="fs-btn fs-btn-ghost">Draft Audit SOW</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: LIVE RISK DOSSIER OUTPUT -->
+      <section class="cb-preview-pane" aria-label="Live Risk Dossier">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <div>
+              <h2>Live Contract &amp; Authority Risk Dossier</h2>
+              <div id="tgaScoreSummary" style="margin-top:4px;font-size:0.88rem;" class="inv-muted">Select a sample or enter an address to scan live on-chain state.</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span id="tgaRiskBadge" class="fs-badge fs-badge-muted">READY</span>
+              <button type="button" id="tgaCopyMdBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Copy Markdown Summary</button>
+            </div>
+          </div>
+
+          <div id="tgaMetaGrid" class="cb-grid-2"></div>
+
+          <div>
+            <h3 style="margin:6px 0 10px;font-size:0.95rem;">Triggered Risk Flags &amp; Bytecode / Extension Evidence</h3>
+            <div style="overflow-x:auto;">
+              <table class="fs-table">
+                <thead>
+                  <tr>
+                    <th>Severity</th>
+                    <th>Vector Code</th>
+                    <th>Pts</th>
+                    <th>On-Chain Evidence</th>
+                  </tr>
+                </thead>
+                <tbody id="tgaFlagsBody">
+                  <tr>
+                    <td colspan="4" class="inv-muted">Waiting for live RPC scan...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="margin:6px 0 8px;font-size:0.95rem;">Actionable Security Recommendations</h3>
+            <ul id="tgaRecsList" class="fs-feature-list">
+              <li>Verify proxy admin timelocks, authority revocations, and swap simulation before committing treasury capital.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="mcp.html">MCP Server</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="txdecode.html">Calldata Lens</a>
+        <a href="envshield.html">EnvShield</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="json2sheet.html">JSON2Sheet Lab</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="https://market.near.ai/a/forge-ai-agent" target="_blank" rel="noopener noreferrer">Forge AI Agent ($5 USDC)</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/tokenaudit.js"></script>
+</body>
+</html>

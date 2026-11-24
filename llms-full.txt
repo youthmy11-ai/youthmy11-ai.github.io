@@ -1,17 +1,17 @@
 # ForgeSuite Studio — Full Portfolio Reference (`llms-full.txt`)
 
-> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 9 catalog offerings (6 live client-side web apps, 2 open-core packaged GitHub tools, and 1 All-Access Lifetime Bundle), transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict offline privacy guarantees, and zero-backend crypto + PayPal checkout.
+> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 10 catalog offerings (7 live client-side web apps including TokenGuard EVM & Solana Risk Scanner, 2 open-core packaged GitHub tools, 1 zero-dependency Node 22+ MCP Server v1.1.0 with 6 tools, and 1 All-Access Lifetime Bundle), transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict client-side privacy guarantees, and zero-backend crypto + PayPal checkout.
 
 ---
 
-## 1. Architecture & Offline Privacy Guarantees
+## 1. Architecture & Client-Side Privacy Guarantees
 
 ForgeSuite Studio is engineered as a **zero-backend, local-first software suite** hosted on static GitHub Pages (`https://youthmy11-ai.github.io/`) and open-source GitHub repositories (`https://github.com/youthmy11-ai`):
 
-1. **Zero Data Uploads & Zero Telemetry**: All 6 web tools execute purely inside local browser memory (`HTML5 + ES Modules`). No prompts, invoices, API payloads, contracts, EVM calldata, or `.env` secrets are ever transmitted to any ForgeSuite server.
+1. **Zero Data Uploads & Zero Telemetry**: All 7 web tools execute purely inside local browser memory (`HTML5 + ES Modules`). No prompts, invoices, API payloads, contracts, EVM calldata, or `.env` secrets are ever transmitted to any ForgeSuite server. TokenGuard queries CORS-friendly public JSON-RPC nodes (`PublicNode`, `Zan`) directly from the user's browser.
 2. **Offline Pure-JS QR Generation (`assets/qr.js`)**: Every payment QR code across the storefront and CryptoBill Forge is generated deterministically in-browser using a custom ISO/IEC 18004 Version 1–10 pure JavaScript encoder with zero external QR image APIs.
 3. **Serverless URL-Fragment Sharing (`#inv=`)**: CryptoBill Forge encodes shareable client invoices directly into UTF-8 Base64URL hash fragments (`#inv=...`) so clients can inspect read-only A4 invoices and scan payment QR codes without any database.
-4. **Deterministic Offline License Keys (`FS-PRO-...`)**: Pro licenses use a shared 4-hex-digit FNV-1a 32-bit folded checksum (`^FS-PRO-(CB|AS|WL|BUNDLE)-[A-Z0-9]{8}-[0-9A-F]{4}$`) verified 100% offline across the web storefront, AutoShorts Studio (Python), and WebLead Extractor (Chrome MV3).
+4. **Deterministic Offline License Keys (`FS-PRO-...`)**: Pro licenses use a shared 4-hex-digit FNV-1a 32-bit folded checksum (`^FS-PRO-(CB|AS|WL|BUNDLE)-[A-Z0-9]{8}-[0-9A-F]{4}$`) verified 100% offline across the web storefront, TokenGuard Pro Watchlist, AutoShorts Studio (Python), and WebLead Extractor (Chrome MV3).
 
 ---
 
@@ -22,13 +22,14 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 | 1 | **CryptoBill Forge** | Live Web App (`cryptobill.html`) | Full A4 PDF, offline QR, `#inv=` links (up to 3 line items, 2 templates) | **$15** | `CB` |
 | 2 | **AutoShorts Studio** | Windows/macOS/Linux Python GUI + CLI | MIT Community Edition (unlimited SHA-256 dedup, beat slicer, up to 5 outputs/run) | **$19** | `AS` |
 | 3 | **WebLead & Table Extractor** | Chrome/Edge/Brave MV3 Extension | MIT Lite Edition (HTML/ARIA/JSON-LD tables, emails, Markdown, up to 25 rows/table) | **$15** | `WL` |
-| 4 | **All-Access Creator & Freelancer Bundle** | Universal Lifetime Key (`CB + AS + WL`) | Access all Free & Community releases | **$35** *(Compare at $49 · Save $14)* | `BUNDLE` |
-| 5 | **TokenCost Lab** | Live Web App (`tokencalc.html`) | 100% Free ($0) — 7 frontier models, prompt-cache math, CryptoBill quote handoff | **$0** | Free |
-| 6 | **JSON2Sheet & PII Masker** | Live Web App (`json2sheet.html`) | 100% Free ($0) — nested JSON to CSV/TSV/Markdown, formula guard, PII redaction | **$0** | Free |
-| 7 | **ScopeGuard SOW Builder** | Live Web App (`sowbuilder.html`) | 100% Free ($0) — AI/Web3/Chrome SOW templates, milestone splits, CryptoBill export | **$0** | Free |
-| 8 | **Calldata Lens** | Live Web App (`txdecode.html`) | 100% Free ($0) — offline EVM ABI decoder & `MAX_UINT256` approval risk alerts | **$0** | Free |
-| 9 | **EnvShield Secret Scanner** | Live Web App (`envshield.html`) | 100% Free ($0) — 13 secret detectors + Shannon entropy scanner & 1-click redactor | **$0** | Free |
-| 10 | **ForgeSuite MCP Server** | Node 22+ Stdio MCP (`mcp.html` / `mcp/forgesuite-mcp.mjs`) | 100% Free ($0, MIT) — zero-dep offline MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`) | **$0** | Free |
+| 4 | **All-Access Creator & Freelancer Bundle** | Universal Lifetime Key (`CB + AS + WL + TokenGuard Batch`) | Access all Free & Community releases | **$35** *(Compare at $49 · Save $14)* | `BUNDLE` |
+| 5 | **TokenGuard Risk Scanner** | Live Web App (`tokenaudit.html`) | Free unlimited single-token EVM & Solana live scans + Markdown copy | **Included in $35 Bundle** *(<= 25 Batch Watchlist + JSON/CSV Dossier)* | `BUNDLE` |
+| 6 | **TokenCost Lab** | Live Web App (`tokencalc.html`) | 100% Free ($0) — frontier models, prompt-cache math, CryptoBill quote handoff | **$0** | Free |
+| 7 | **JSON2Sheet & PII Masker** | Live Web App (`json2sheet.html`) | 100% Free ($0) — nested JSON to CSV/TSV/Markdown, formula guard, PII redaction | **$0** | Free |
+| 8 | **ScopeGuard SOW Builder** | Live Web App (`sowbuilder.html`) | 100% Free ($0) — AI/Web3/Chrome SOW templates, milestone splits, CryptoBill export | **$0** | Free |
+| 9 | **Calldata Lens** | Live Web App (`txdecode.html`) | 100% Free ($0) — offline EVM ABI decoder & `MAX_UINT256` approval risk alerts | **$0** | Free |
+| 10 | **EnvShield Secret Scanner** | Live Web App (`envshield.html`) | 100% Free ($0) — 13 secret detectors + Shannon entropy scanner & 1-click redactor | **$0** | Free |
+| 11 | **ForgeSuite MCP Server (v1.1.0)** | Node 22+ Stdio MCP (`mcp.html` / `mcp/forgesuite-mcp.mjs`) | 100% Free ($0, MIT) — zero-dep MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`) | **$0** | Free |
 
 ---
 
@@ -40,7 +41,7 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 - **Capabilities**:
   - A4 print-ready invoice layout (`@media print` to PDF) with live editor preview and automatic `localStorage` draft saving.
   - Supports USD, EUR, and USDT currency formatting, line-item quantity/price math, percentage discounts, and tax calculation.
-  - Multi-rail freelancer receiving config: USDT (BEP20/BSC), USDT (TRC20/TRON), PayPal Direct URL, and Binance Pay ID with offline SVG/PNG QR generation.
+  - Multi-rail freelancer receiving config: Solana SPL USDC, USDT (BEP20/BSC), USDT (TRC20/TRON), PayPal Direct URL, and Binance Pay ID with offline SVG/PNG QR generation.
   - Read-only Client Payment View via serverless `#inv=<base64url>` shareable URLs.
   - JSON export/import backup of single invoices or bulk templates.
   - **Pro Unlocks ($15 Lifetime)**: Unlimited line items (Free caps at 3), unlimited saved templates (Free caps at 2), white-label PDF (remove footer badge), custom brand accent color & monogram, and bulk batch JSON template presets.
@@ -53,7 +54,6 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
   - **Beat-milestone audio slicer** (`MM:SS`, `HH:MM:SS`, seconds, or cumulative durations) with fade-in/fade-out envelopes and montage synchronization.
   - **Beat-synced SubRip (`.srt`) subtitle generator** (`python -m autoshorts_studio.cli subtitles-srt`) aligning caption lines directly to beat timestamps.
   - **Multi-aspect FFmpeg render pipeline**: `9:16` (`1080x1920` blurred ambient pillarbox or smart crop), `16:9` (`1920x1080`), `1:1` (`1080x1080`), smooth Ken Burns motion for static images, and optional EBU R128 (`-14 LUFS`) loudness normalization.
-  - Includes dark-slate Tkinter Desktop GUI (`launch_studio.bat` / `python -m autoshorts_studio.gui`) and scriptable CLI (`scan`, `build`, `slice-audio`, `subtitles-srt`, `check-license`).
   - **Pro Unlocks ($19 Lifetime)**: Simultaneous multi-preset rendering, custom brand watermark overlay hook, and batch queue limit raised from 5 to 500 outputs/run.
 
 ### 3.3 WebLead & Table Extractor (`https://github.com/youthmy11-ai/weblead-extractor`)
@@ -62,57 +62,62 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 - **Capabilities**:
   - Minimal permissions (`activeTab` + on-demand `scripting` only when clicked); zero remote servers, zero persistent background scripts, zero DOM mutation.
   - Extracts standard HTML `<table>` elements (expanding `colspan` and `rowspan` cleanly), modern ARIA `[role="table"]` / `[role="grid"]` widgets, and embedded `<script type="application/ld+json">` Schema.org entities (`Organization`, `LocalBusiness`, `@graph`).
-  - Deduplicates public `mailto:` and plain-text emails (automatically rejecting retina asset false positives like `logo@2x.png`), phone candidates, and social/website links.
-  - Exports strict RFC-4180 CSV (with optional UTF-8 BOM for Excel international text), JSON, and GitHub-Flavored Markdown (`Copy MD`).
+  - Exports strict RFC-4180 CSV, JSON, and GitHub-Flavored Markdown (`Copy MD`).
   - **Pro Unlocks ($15 Lifetime)**: Unlimited exported rows per table (Lite caps at 25 rows), live regex row filtering, and offline key activation (`FS-PRO-WL-...` / `FS-PRO-BUNDLE-...`).
 
 ### 3.4 All-Access Creator & Freelancer Bundle (`https://youthmy11-ai.github.io/#pricing`)
 - **Pricing**: **$35 Lifetime** (Compare at $49 individual total — Save $14, SKU `BUNDLE`).
-- **Scope**: Issues one universal `FS-PRO-BUNDLE-...` key that instantly unlocks CryptoBill Forge Pro in-browser and activates both AutoShorts Studio Pro and WebLead & Table Extractor Pro offline, including v1.x updates and priority email support.
+- **Scope**: Issues one universal `FS-PRO-BUNDLE-...` key that instantly unlocks CryptoBill Forge Pro and TokenGuard 25-Token Batch Watchlist in-browser, and activates both AutoShorts Studio Pro and WebLead & Table Extractor Pro offline, including v1.x updates and priority email support.
 
 ### 3.5 TokenCost Lab (`https://youthmy11-ai.github.io/tokencalc.html`)
 - **Category**: DeveloperApplication (Web — 100% Free)
 - **Capabilities**:
   - Local prompt token estimator (tokens, words, chars, UTF-8 bytes, lines) for English prose, source code, JSON, and Unicode/CJK/Vietnamese text.
-  - Compares per-request and monthly AI agent API costs across 7 frontier models (GPT-5, Claude 4.5, Gemini 2.5, DeepSeek V3, etc.) with configurable prompt-cache hit ratios, daily request volume, and agency margin multipliers.
+  - Compares per-request and monthly AI agent API costs across frontier models (GPT-5, Claude 4.5, Gemini 2.5, DeepSeek V3) with configurable prompt-cache hit ratios, daily request volume, and agency margin multipliers.
   - 1-click export of client quotes directly into CryptoBill Forge (`cryptobill.html#inv=...`).
 
 ### 3.6 JSON2Sheet & PII Masker (`https://youthmy11-ai.github.io/json2sheet.html`)
 - **Category**: DeveloperApplication (Web — 100% Free)
 - **Capabilities**:
   - Automatically unwraps API list containers (`data`, `items`, etc.) and flattens deeply nested JSON objects/arrays via dot notation.
-  - Exports Excel-safe RFC-4180 CSV, Google Sheets-ready TSV, or GitHub Markdown tables.
-  - Built-in **CSV Formula Injection Guard** neutralizes cells beginning with `=`, `+`, `-`, or `@`.
-  - 1-click local **PII & Secret Masking** redacts emails (`[REDACTED_EMAIL]`), IPv4 addresses (`[REDACTED_IP]`), Bearer/API tokens (`[REDACTED_TOKEN]`), and phone numbers (`[REDACTED_PHONE]`) before sharing with clients or AI chats.
+  - Exports Excel-safe RFC-4180 CSV, Google Sheets-ready TSV, or GitHub Markdown tables with CSV Formula Injection Guard (`=`, `+`, `-`, `@`) and 1-click PII & Secret Masking.
 
 ### 3.7 ScopeGuard SOW Builder (`https://youthmy11-ai.github.io/sowbuilder.html`)
 - **Category**: BusinessApplication (Web — 100% Free)
 - **Capabilities**:
-  - Built-in project presets for AI Workflow MVPs, Web3 Smart Contract Audits, and Chrome Extension builds.
-  - Enforces 100%-balanced milestone percentage splits with explicit revision caps, scope change rules, and IP-transfer-upon-settlement clauses.
-  - Generates clean copyable/downloadable Markdown SOW documents and exports any individual milestone straight into a payable CryptoBill Forge invoice (`#inv=`).
+  - Built-in project presets for AI Workflow MVPs, Web3 Smart Contract Audits, and Chrome Extension builds with 100%-balanced milestone percentage splits and 1-click CryptoBill Forge (`#inv=`) export.
 
 ### 3.8 Calldata Lens (`https://youthmy11-ai.github.io/txdecode.html`)
 - **Category**: DeveloperApplication (Web — 100% Free)
 - **Capabilities**:
-  - Decodes raw `0x` Ethereum and BNB Smart Chain hex calldata offline with zero RPC tracking.
-  - Recognizes standard 4-byte selectors and ABI words for ERC-20 `transfer`/`approve`/`transferFrom`, EIP-2612 `permit`, ERC-4626 vaults, AccessControl, and Safe multisig calls.
-  - Automatically flags high-risk unlimited `MAX_UINT256` token approvals and formats 18-decimal / 6-decimal token units clearly.
-  - 1-click handoff to bill a Web3 security review in CryptoBill Forge or draft an audit contract in ScopeGuard SOW.
+  - Decodes raw `0x` Ethereum and BNB Smart Chain hex calldata offline with zero RPC tracking, highlighting unlimited `MAX_UINT256` token approvals and formatting 18-decimal / 6-decimal token units.
 
 ### 3.9 EnvShield Secret Scanner (`https://youthmy11-ai.github.io/envshield.html`)
 - **Category**: SecurityApplication (Web — 100% Free)
 - **Capabilities**:
-  - Scans `.env` files, JSON configs, shell logs, Git diffs, and AI chat transcripts strictly inside browser memory.
-  - Combines 13 deterministic signature detectors (OpenAI, Anthropic, GitHub PATs, AWS keys, Google API keys, Telegram bot tokens, JWTs, database URI credentials, 64-hex EVM private keys, mnemonics) with a Shannon entropy detector.
-  - Produces safely redacted output (`<REDACTED:...>`) for 1-click copy or sanitized file download.
+  - Scans `.env` files, JSON configs, shell logs, Git diffs, and AI chat transcripts strictly inside browser memory using 13 deterministic secret detectors + Shannon entropy analysis, outputting safely redacted text (`<REDACTED:...>`).
 
-### 3.10 ForgeSuite MCP Server (`https://youthmy11-ai.github.io/mcp.html`)
+### 3.10 TokenGuard — EVM & Solana Token/Contract Risk Scanner (`https://youthmy11-ai.github.io/tokenaudit.html`)
+- **Category**: SecurityApplication (Web — Free Single Scans + Pro Batch Watchlist in $35 Bundle)
+- **Reusable Engine**: `https://youthmy11-ai.github.io/assets/tokenaudit.js` (Pure ES Module compatible with Browser & Node.js 22+)
+- **Capabilities**:
+  - **PUSH-Aware EVM Bytecode Disassembler**: Strips trailing Solidity CBOR metadata and skips `PUSH1..PUSH32` immediate operands so embedded bytes are never misclassified as `SELFDESTRUCT` (`0xff`), `DELEGATECALL` (`0xf4`), `CALLCODE` (`0xf2`), or `ORIGIN` (`0x32`).
+  - **Proxy & Implementation Inspection**: Reads EIP-1967 (`implementation`, `admin`, `beacon`), OpenZeppelin/FiatToken (`zeppelinos`), and EIP-1167 minimal clone slots across **Base**, **Ethereum**, **BSC**, and **Arbitrum** via CORS-safe PublicNode primaries (`base-rpc.publicnode.com`, `ethereum-rpc.publicnode.com`, `bsc-rpc.publicnode.com`, `arbitrum-one-rpc.publicnode.com`), then disassembles the underlying implementation bytecode for `mint`, `blacklist`, `pause`, and mutable honeypot `tax` / `maxTx` selectors.
+  - **Solana SPL & Token-2022 Mint Rug Audit**: Queries CORS-safe Solana Mainnet RPCs (`solana-rpc.publicnode.com`, `api.zan.top/solana-mainnet`) to inspect active `mintAuthority`, `freezeAuthority`, dangerous Token-2022 extensions (`permanentDelegate`, `transferFeeConfig`, `mintCloseAuthority`, `transferHook`, `defaultAccountState`, `nonTransferable`), supply, and Top-10 holder concentration.
+  - **Pro Watchlist & Deep Source Audit Funnel**: Unlocks multi-chain **Batch Watchlist Multi-Token Audit (`<= 25` addresses at once + JSON/CSV Risk Dossier export)** with any ForgeSuite Pro / All-Access Bundle (`$35` lifetime), and links directly to **Forge AI Agent** (`$5.00 USDC` via A2A + x402 at `https://market.near.ai/a/forge-ai-agent`) for line-by-line Solidity/Rust source audits.
+
+### 3.11 ForgeSuite MCP Server v1.1.0 (`https://youthmy11-ai.github.io/mcp.html`)
 - **Category**: DeveloperApplication (Windows, macOS, Linux — Node.js 22+, 0 npm dependencies, MIT Free)
 - **Download URL**: `https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs`
 - **Capabilities**:
-  - Single-file zero-dependency JSON-RPC 2.0 Model Context Protocol (MCP) stdio server (`initialize`, `notifications/initialized`, `ping`, `tools/list`, `tools/call`) compatible with Claude Code, Cursor, Antigravity, and Windsurf.
-  - Exposes 4 100% offline tools: `envshield_scan` (secret leak detection & redaction), `calldata_decode` (ERC-20/Permit2/Uniswap/Safe ABI decoding + `MaxUint256` unlimited approval warnings), `tokencost_estimate` (multi-turn LLM cost & retainer estimation across Claude/GPT-5/Gemini/DeepSeek), and `cryptobill_quote` (Markdown/JSON crypto invoice + live serverless `cryptobill.html#inv=` URL).
+  - Single-file zero-dependency JSON-RPC 2.0 Model Context Protocol (MCP) stdio server (`v1.1.0`) compatible with Claude Code, Cursor, Antigravity, and Windsurf.
+  - Exposes **6 tools**:
+    1. `envshield_scan` — offline secret leak detection & redaction
+    2. `calldata_decode` — offline EVM ABI decoding + `MaxUint256` unlimited approval warnings
+    3. `tokencost_estimate` — multi-turn LLM cost & retainer estimation across Claude/GPT-5/Gemini/DeepSeek
+    4. `cryptobill_quote` — Markdown/JSON crypto invoice + live serverless `cryptobill.html#inv=` URL
+    5. `evm_token_risk_scan` — live EVM token/proxy/opcode risk audit across Base/Ethereum/BSC/Arbitrum
+    6. `solana_mint_risk_scan` — live Solana SPL / Token-2022 authority, extension & holder concentration risk audit
 
 ---
 
@@ -124,44 +129,37 @@ ForgeSuite Studio supports **two automatic client-side on-chain auto-unlock rail
    - Chain ID: `56`
    - Official Receiving Address: `0x0a1e9c96755a7962306cf2ca9a80113a61559852`
    - Verified BSC USDT Contract (18 decimals): `0x55d398326f99059fF775485246999027B3197955`
-   - Verification: Browser queries public BSC JSON-RPC nodes (`eth_getTransactionReceipt`) with multi-node fallback, validates `status === "0x1"`, official USDT contract, ERC-20 `Transfer` topic0, recipient address, and amount (0.5% tolerance), and immediately issues a deterministic `FS-PRO-...` license key.
 
 2. **USDC (SPL / Solana Mainnet — Instant Auto-Unlock)**
    - Network: Solana Mainnet (`confirmed` commitment)
    - Official Receiving Wallet: `BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx`
    - Verified SPL USDC Mint (6 decimals): `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
-   - Verification: Browser queries CORS-enabled Solana Mainnet JSON-RPC nodes (`getTransaction` with `encoding: "jsonParsed"`, `commitment: "confirmed"`, `maxSupportedTransactionVersion: 0`) with multi-provider fallback (`solana-rpc.publicnode.com`, `api.zan.top/solana-mainnet`, `api.mainnet-beta.solana.com`), validates `meta.err === null` and net SPL USDC credit across `preTokenBalances`/`postTokenBalances` (including newly initialized destination ATAs), and immediately issues a deterministic `FS-PRO-...` license key.
 
-3. **USDT (TRC20 / TRON)**
-   - Official Receiving Address: `TGVUMYRwTqrCGzrPNW5V2bhrBNtsKgFcn7`
-   - Fulfillment: Submit TxHash via pre-filled `mailto:youthmy11@gmail.com` receipt link.
-
-4. **Binance Pay / Internal Transfer (Zero Fee)**
-   - Binance UID: `1179819899` (Nickname: `vin9`)
-   - Fulfillment: Submit Order ID via pre-filled `mailto:youthmy11@gmail.com` receipt link.
-
-5. **PayPal Direct Checkout**
-   - Official Merchant Account: `min4444st@gmail.com` (`https://www.paypal.com/cgi-bin/webscr?cmd=_xclick...`)
-   - Fulfillment: Submit PayPal Transaction ID via `mailto:youthmy11@gmail.com` for license key & package delivery.
+3. **USDT (TRC20 / TRON)**: `TGVUMYRwTqrCGzrPNW5V2bhrBNtsKgFcn7` (receipt via `mailto:youthmy11@gmail.com`)
+4. **Binance Pay / Internal Transfer (Zero Fee)**: UID `1179819899` (`vin9`)
+5. **PayPal Direct Checkout**: `min4444st@gmail.com`
 
 ---
 
 ## 5. Autonomous Paid A2A + x402 Service Endpoint
 
-ForgeSuite also operates a live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 pay-per-call autonomous engineering agent on NEAR AI Agent Market:
+ForgeSuite operates a live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 pay-per-call autonomous engineering & smart contract auditing agent on NEAR AI Agent Market:
+- **Marketplace Profile**: https://market.near.ai/a/forge-ai-agent
 - **Agent Card**: https://forge-ai-agent.market.near.ai/.well-known/agent-card.json
 - **A2A JSON-RPC 1.0 Endpoint**: https://forge-ai-agent.market.near.ai/a2a/v1
 - **x402 Payment Spec**: https://forge-ai-agent.market.near.ai/.well-known/x402 (`x402Version: 2`, `near:mainnet` USDC)
 - **Pricing & SLA**: `$5.00 USDC` per call (`sla_seconds: 21600`, 6-hour delivery window, escrowed settlement upon delivery)
-- **Capabilities**: Smart contract diff security review (Solidity / Rust / Substrate / Move), EVM calldata & `.env` secret audit, TypeScript/Rust/Python bug fixes with automated tests, and primary-source technical research reports.
+- **Capabilities**: Deep line-by-line smart contract security review (Solidity / Rust / Anchor / Move), EVM calldata & `.env` secret audit, TypeScript/Rust/Python bug fixes with automated tests, and primary-source technical research reports.
 
 ---
 
 ## 6. Contact & Official Links
 
 - **Storefront**: https://youthmy11-ai.github.io/
+- **TokenGuard Scanner**: https://youthmy11-ai.github.io/tokenaudit.html
+- **MCP Server v1.1.0**: https://youthmy11-ai.github.io/mcp.html
 - **Concise LLM Index**: https://youthmy11-ai.github.io/llms.txt
-- **Live A2A + x402 Agent Card**: https://forge-ai-agent.market.near.ai/.well-known/agent-card.json
+- **Live A2A + x402 Agent**: https://market.near.ai/a/forge-ai-agent
 - **GitHub Organization / Developer**: https://github.com/youthmy11-ai
 - **Support & Receipt Verification Email**: youthmy11@gmail.com
 - **License**: MIT License

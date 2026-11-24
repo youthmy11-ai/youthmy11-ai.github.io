@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 /**
- * ForgeSuite MCP Server (v1.0.0)
+ * ForgeSuite MCP Server (v1.1.0)
  * Zero-dependency Node 22+ Model Context Protocol (MCP) stdio JSON-RPC 2.0 server.
  *
- * 100% Offline, Privacy-First Developer & Web3 Tools:
- *   1. envshield_scan     — Scan .env/configs/logs for leaked secrets & return redacted output
- *   2. calldata_decode    — Decode EVM calldata selectors & flag unlimited MaxUint256 approvals
- *   3. tokencost_estimate — Estimate LLM API & multi-turn AI agent run costs (Claude/GPT/Gemini/DeepSeek)
- *   4. cryptobill_quote   — Generate Markdown/JSON crypto invoices + live CryptoBill #inv= links
+ * 6 Developer, FinOps & Web3 Security Tools:
+ *   1. envshield_scan        — Scan .env/configs/logs offline for leaked secrets & return redacted output
+ *   2. calldata_decode       — Decode EVM calldata selectors offline & flag unlimited MaxUint256 approvals
+ *   3. tokencost_estimate    — Estimate LLM API & multi-turn AI agent run costs (Claude/GPT/Gemini/DeepSeek)
+ *   4. cryptobill_quote      — Generate Markdown/JSON crypto invoices + live CryptoBill #inv= links
+ *   5. evm_token_risk_scan   — Live EVM token/proxy/opcode risk audit across Base/Ethereum/BSC/Arbitrum
+ *   6. solana_mint_risk_scan — Live Solana SPL / Token-2022 authority, extension & holder concentration audit
  *
  * Docs & Pro Bundle ($35 Lifetime): https://youthmy11-ai.github.io/mcp.html
  * License: MIT (youthmy11-ai)
@@ -18,7 +20,7 @@ import { fileURLToPath } from "node:url";
 
 export const SERVER_INFO = Object.freeze({
   name: "forgesuite-mcp",
-  version: "1.0.0",
+  version: "1.1.0",
 });
 
 export const SUPPORTED_PROTOCOL_VERSIONS = Object.freeze([
@@ -31,9 +33,11 @@ export const FORGESUITE_LINKS = Object.freeze({
   mcp: "https://youthmy11-ai.github.io/mcp.html",
   envshield: "https://youthmy11-ai.github.io/envshield.html",
   txdecode: "https://youthmy11-ai.github.io/txdecode.html",
+  tokenaudit: "https://youthmy11-ai.github.io/tokenaudit.html",
   tokencalc: "https://youthmy11-ai.github.io/tokencalc.html",
   cryptobill: "https://youthmy11-ai.github.io/cryptobill.html",
   pricing: "https://youthmy11-ai.github.io/#pricing",
+  forgeAgent: "https://market.near.ai/a/forge-ai-agent",
 });
 
 /* ============================================================================
@@ -795,7 +799,6 @@ export function estimateTokenCost(params = {}) {
   const daysPerMonth = Math.max(1, Number(params.daysPerMonth ?? 30) || 30);
   const marginMultiplier = Math.max(1, Number(params.marginMultiplier ?? 1) || 1);
 
-  // Multi-turn agent context accumulation: turn k re-sends baseInput + (k-1)*(output + toolTokens)
   let totalInputTokensPerRun = 0;
   let peakContextTokens = 0;
   const growthPerTurn = outputTokensPerTurn + toolTokensPerTurn;
@@ -972,7 +975,6 @@ export function generateCryptoBillQuote(params = {}) {
   };
   const solanaUsdc = String(pm.solanaUsdc || "").trim();
 
-  // Payload compatible with assets/cryptobill.js decodeInvoicePayload(#inv=...)
   const sharePayload = {
     businessName,
     businessEmail,
@@ -1084,7 +1086,1123 @@ export function generateCryptoBillQuote(params = {}) {
 }
 
 /* ============================================================================
- * 5. MCP Tool Definitions & Dispatch
+ * 5. TokenGuard Live EVM & Solana Token/Contract Risk Scanner (v1.1.0)
+ * ========================================================================== */
+
+export const EVM_CHAIN_CONFIG = Object.freeze({
+  ethereum: {
+    chain: "ethereum",
+    caip2: "eip155:1",
+    chainId: 1,
+    name: "Ethereum Mainnet",
+    rpcs: Object.freeze([
+      "https://ethereum-rpc.publicnode.com",
+      "https://1rpc.io/eth",
+      "https://eth.llamarpc.com",
+    ]),
+  },
+  base: {
+    chain: "base",
+    caip2: "eip155:8453",
+    chainId: 8453,
+    name: "Base Mainnet",
+    rpcs: Object.freeze([
+      "https://base-rpc.publicnode.com",
+      "https://mainnet.base.org",
+      "https://base.llamarpc.com",
+    ]),
+  },
+  bsc: {
+    chain: "bsc",
+    caip2: "eip155:56",
+    chainId: 56,
+    name: "BNB Smart Chain",
+    rpcs: Object.freeze([
+      "https://bsc-rpc.publicnode.com",
+      "https://bsc-dataseed.binance.org",
+      "https://bsc-dataseed1.defibit.io",
+    ]),
+  },
+  arbitrum: {
+    chain: "arbitrum",
+    caip2: "eip155:42161",
+    chainId: 42161,
+    name: "Arbitrum One",
+    rpcs: Object.freeze([
+      "https://arbitrum-one-rpc.publicnode.com",
+      "https://arb1.arbitrum.io/rpc",
+      "https://1rpc.io/arb",
+    ]),
+  },
+});
+
+export const SOLANA_RPC_ENDPOINTS = Object.freeze([
+  "https://solana-rpc.publicnode.com",
+  "https://api.zan.top/solana-mainnet",
+  "https://api.mainnet-beta.solana.com",
+]);
+
+export const SOLANA_INDEXED_RPC_ENDPOINTS = Object.freeze([
+  "https://api.tatum.io/v3/blockchain/node/solana-mainnet",
+  "https://solana.leorpc.com/?api_key=FREE",
+  "https://api.mainnet-beta.solana.com",
+]);
+
+const TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+const TOKEN_2022_PROGRAM_ID = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
+const SOLANA_NETWORK = "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp";
+const BASE58_REGEX = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+const SLOT_EIP1967_IMPL =
+  "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
+const SLOT_EIP1967_ADMIN =
+  "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103";
+const SLOT_EIP1967_BEACON =
+  "0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50";
+const SLOT_ZEPPELINOS_IMPL =
+  "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3";
+const SLOT_ZEPPELINOS_ADMIN =
+  "0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b";
+
+export const RISK_SELECTORS = Object.freeze({
+  mint: [
+    { selector: "0x40c10f19", sig: "mint(address,uint256)" },
+    { selector: "0xa0712d68", sig: "mint(uint256)" },
+    { selector: "0x6a627842", sig: "mint(address)" },
+    { selector: "0xcc872b66", sig: "issue(uint256)" },
+  ],
+  blacklist: [
+    { selector: "0xf9f92be4", sig: "blacklist(address)" },
+    { selector: "0x4579268a", sig: "blacklistAddress(address)" },
+    { selector: "0x16c02129", sig: "setBlacklist(address,bool)" },
+    { selector: "0x0ecb93c0", sig: "addBlackList(address)" },
+    { selector: "0xe724529c", sig: "freezeAccount(address,bool)" },
+    { selector: "0xfe575a87", sig: "isBlacklisted(address)" },
+  ],
+  pause: [
+    { selector: "0x8456cb59", sig: "pause()" },
+    { selector: "0x3f4ba83a", sig: "unpause()" },
+    { selector: "0x5c975abb", sig: "paused()" },
+  ],
+  taxAndLimits: [
+    { selector: "0x061c82d0", sig: "setTaxFeePercent(uint256)" },
+    { selector: "0x8ee88c53", sig: "setLiquidityFeePercent(uint256)" },
+    { selector: "0x8cd4426d", sig: "setBuyTax(uint256)" },
+    { selector: "0xcc1776d3", sig: "setSellTax(uint256)" },
+    { selector: "0x0b78f9c0", sig: "setFees(uint256,uint256)" },
+    { selector: "0x69fe0e2d", sig: "setFee(uint256)" },
+    { selector: "0xd543dbeb", sig: "setMaxTxPercent(uint256)" },
+    { selector: "0x74010ece", sig: "setMaxWalletSize(uint256)" },
+    { selector: "0x8a8c523c", sig: "enableTrading()" },
+    { selector: "0x437823ec", sig: "excludeFromFee(address)" },
+  ],
+  upgrade: [
+    { selector: "0x3659cfe6", sig: "upgradeTo(address)" },
+    { selector: "0x4f1ef286", sig: "upgradeToAndCall(address,bytes)" },
+    { selector: "0x52d1902d", sig: "proxiableUUID()" },
+  ],
+});
+
+function classifyRiskLevel(score) {
+  if (score >= 70) return "CRITICAL";
+  if (score >= 45) return "HIGH";
+  if (score >= 20) return "MODERATE";
+  return "LOW";
+}
+
+function matchSelectorCategories(selectorSet) {
+  const matchList = (entries) =>
+    entries.filter((e) => selectorSet.has(e.selector)).map((e) => e.sig);
+  return {
+    mint: matchList(RISK_SELECTORS.mint),
+    blacklist: matchList(RISK_SELECTORS.blacklist),
+    pause: matchList(RISK_SELECTORS.pause),
+    taxAndLimits: matchList(RISK_SELECTORS.taxAndLimits),
+    upgrade: matchList(RISK_SELECTORS.upgrade),
+  };
+}
+
+function parseAddressFromSlot(slotHex) {
+  if (!slotHex || typeof slotHex !== "string") return null;
+  const clean = slotHex.toLowerCase().replace(/^0x/, "").padStart(64, "0");
+  if (clean.length < 64 || !/^[0-9a-f]+$/.test(clean)) return null;
+  const addrHex = clean.slice(-40);
+  if (/^0+$/.test(addrHex)) return null;
+  return `0x${addrHex}`;
+}
+
+function decodeAbiStringOrBytes32(hexResult) {
+  if (!hexResult || typeof hexResult !== "string" || hexResult === "0x") return null;
+  const clean = hexResult.replace(/^0x/, "");
+  if (clean.length < 64 || !/^[0-9a-fA-F]+$/.test(clean)) return null;
+  try {
+    if (clean.length >= 128) {
+      const offsetBytes = Number(BigInt(`0x${clean.slice(0, 64)}`));
+      if (offsetBytes === 32) {
+        const strLen = Number(BigInt(`0x${clean.slice(64, 128)}`));
+        if (strLen >= 0 && strLen <= 256 && clean.length >= 128 + strLen * 2) {
+          return Buffer.from(clean.slice(128, 128 + strLen * 2), "hex")
+            .toString("utf8")
+            .replace(/\0/g, "")
+            .trim() || null;
+        }
+      }
+    }
+    return Buffer.from(clean.slice(0, 64), "hex")
+      .toString("utf8")
+      .replace(/\0+$/g, "")
+      .trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+function decodeAbiUint(hexResult) {
+  if (!hexResult || typeof hexResult !== "string" || hexResult === "0x") return null;
+  const clean = hexResult.replace(/^0x/, "");
+  if (!clean || !/^[0-9a-fA-F]+$/.test(clean)) return null;
+  try {
+    return BigInt(`0x${clean.slice(0, 64)}`);
+  } catch {
+    return null;
+  }
+}
+
+function formatTokenUnits(rawBigInt, decimals = 18) {
+  if (rawBigInt === null || rawBigInt === undefined) return null;
+  const bigVal = typeof rawBigInt === "bigint" ? rawBigInt : BigInt(String(rawBigInt));
+  const d = Math.max(0, Math.min(36, Number(decimals ?? 18)));
+  if (d === 0) return bigVal.toString();
+  const base = 10n ** BigInt(d);
+  const whole = bigVal / base;
+  const frac = (bigVal % base)
+    .toString()
+    .padStart(d, "0")
+    .slice(0, 6)
+    .replace(/0+$/, "");
+  return frac ? `${whole.toString()}.${frac}` : whole.toString();
+}
+
+function sanitizeCustomRpcUrl(rawUrl) {
+  const trimmed = String(rawUrl || "").trim();
+  if (!trimmed) return null;
+  let parsed;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    throw new Error(`Invalid custom RPC URL "${trimmed}".`);
+  }
+  const isLocal = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+  if (parsed.protocol !== "https:" && !(parsed.protocol === "http:" && isLocal)) {
+    throw new Error("Custom RPC URL must use https:// (or http://localhost).");
+  }
+  return parsed.toString();
+}
+
+export function analyzeEvmBytecodeHex(rawBytecode) {
+  const clean = String(rawBytecode || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^0x/, "");
+
+  if (!clean || clean === "0" || clean.length % 2 !== 0 || !/^[0-9a-f]+$/.test(clean)) {
+    const emptySet = new Set();
+    return {
+      isContract: false,
+      byteLength: 0,
+      hasSelfDestruct: false,
+      hasDelegateCall: false,
+      hasCallCode: false,
+      hasCreate2: false,
+      hasTxOrigin: false,
+      push4Selectors: emptySet,
+      selectors: [],
+      matchedSelectors: matchSelectorCategories(emptySet),
+      eip1167Implementation: null,
+    };
+  }
+
+  let eip1167Implementation = null;
+  const eip1167Match = clean.match(
+    /^363d3d373d3d3d363d73([0-9a-f]{40})5af43d82803e903d91602b57fd5bf3$/
+  );
+  if (eip1167Match) {
+    eip1167Implementation = `0x${eip1167Match[1]}`;
+  }
+
+  let codeHex = clean;
+  if (codeHex.length >= 12) {
+    const metaLenBytes = Number.parseInt(codeHex.slice(-4), 16);
+    const metaHexChars = metaLenBytes * 2 + 4;
+    if (
+      metaLenBytes >= 20 &&
+      metaLenBytes <= 120 &&
+      metaHexChars < codeHex.length &&
+      (codeHex.slice(-metaHexChars).startsWith("a26469706673") ||
+        codeHex.slice(-metaHexChars).startsWith("a265627a7a72") ||
+        codeHex.slice(-metaHexChars).startsWith("a165627a7a72"))
+    ) {
+      codeHex = codeHex.slice(0, -metaHexChars);
+    }
+  }
+
+  const bytes = Buffer.from(codeHex, "hex");
+  let hasSelfDestruct = false;
+  let hasDelegateCall = false;
+  let hasCallCode = false;
+  let hasCreate2 = false;
+  let hasTxOrigin = false;
+  const push4Selectors = new Set();
+
+  for (let pc = 0; pc < bytes.length; pc += 1) {
+    const op = bytes[pc];
+    if (op >= 0x60 && op <= 0x7f) {
+      const pushLen = op - 0x5f;
+      if (op === 0x63 && pc + 4 < bytes.length) {
+        push4Selectors.add(`0x${bytes.subarray(pc + 1, pc + 5).toString("hex")}`);
+      }
+      pc += pushLen;
+      continue;
+    }
+    if (op === 0xff) hasSelfDestruct = true;
+    else if (op === 0xf4) hasDelegateCall = true;
+    else if (op === 0xf2) hasCallCode = true;
+    else if (op === 0xf5) hasCreate2 = true;
+    else if (op === 0x32) hasTxOrigin = true;
+  }
+
+  return {
+    isContract: true,
+    byteLength: clean.length / 2,
+    hasSelfDestruct,
+    hasDelegateCall,
+    hasCallCode,
+    hasCreate2,
+    hasTxOrigin,
+    push4Selectors,
+    selectors: Array.from(push4Selectors).sort(),
+    matchedSelectors: matchSelectorCategories(push4Selectors),
+    eip1167Implementation,
+  };
+}
+
+export function scoreEvmTokenRisk(input = {}) {
+  const outerWalk =
+    input.outerWalk && input.outerWalk.push4Selectors instanceof Set
+      ? input.outerWalk
+      : input.push4Selectors instanceof Set
+        ? input
+        : input.bytecode !== undefined || input.rawBytecode !== undefined
+          ? analyzeEvmBytecodeHex(input.bytecode ?? input.rawBytecode)
+          : null;
+
+  const explicitIsContract =
+    typeof input.isContract === "boolean"
+      ? input.isContract
+      : outerWalk
+        ? outerWalk.byteLength > 0
+        : true;
+
+  if (!explicitIsContract) {
+    return {
+      isContract: false,
+      riskScore: 85,
+      riskLevel: "CRITICAL",
+      flags: [
+        {
+          code: "NO_CONTRACT_BYTECODE",
+          severity: "CRITICAL",
+          points: 85,
+          evidence: "Target address has empty bytecode (EOA or self-destructed contract).",
+        },
+      ],
+      proxyAnalysis: null,
+      bytecodeAnalysis: null,
+      recommendations: [
+        "Do not send funds or approve tokens to an address with no deployed contract code.",
+      ],
+    };
+  }
+
+  const implWalk =
+    input.implWalk && input.implWalk.push4Selectors instanceof Set
+      ? input.implWalk
+      : input.implementationBytecode
+        ? analyzeEvmBytecodeHex(input.implementationBytecode)
+        : null;
+
+  const combinedSelectors = new Set(outerWalk?.push4Selectors || []);
+  if (Array.isArray(input.selectors)) {
+    for (const s of input.selectors) combinedSelectors.add(String(s).toLowerCase());
+  }
+  if (implWalk) {
+    for (const s of implWalk.push4Selectors) combinedSelectors.add(s);
+  }
+
+  const hasSelfDestruct = Boolean(
+    input.hasSelfDestruct || outerWalk?.hasSelfDestruct || implWalk?.hasSelfDestruct
+  );
+  const hasDelegateCall = Boolean(
+    input.hasDelegateCall || outerWalk?.hasDelegateCall || implWalk?.hasDelegateCall
+  );
+  const hasCallCode = Boolean(
+    input.hasCallCode || outerWalk?.hasCallCode || implWalk?.hasCallCode
+  );
+  const hasCreate2 = Boolean(
+    input.hasCreate2 || outerWalk?.hasCreate2 || implWalk?.hasCreate2
+  );
+  const hasTxOrigin = Boolean(
+    input.hasTxOrigin || outerWalk?.hasTxOrigin || implWalk?.hasTxOrigin
+  );
+
+  const eip1167Impl = outerWalk?.eip1167Implementation || null;
+  const implementationAddress =
+    input.implementationAddress || input.proxyAnalysis?.implementationAddress || eip1167Impl || null;
+  const adminAddress = input.adminAddress || input.proxyAnalysis?.adminAddress || null;
+  const beaconAddress = input.beaconAddress || input.proxyAnalysis?.beaconAddress || null;
+  const proxyType =
+    input.proxyType ||
+    input.proxyAnalysis?.proxyType ||
+    (eip1167Impl ? "EIP-1167 Minimal Clone Proxy" : null);
+
+  const matched = matchSelectorCategories(combinedSelectors);
+  const meta = input.tokenMetadata || {};
+  const rawOwner = input.owner !== undefined ? input.owner : meta.owner ?? null;
+  const ownerNormalized =
+    typeof rawOwner === "string" && rawOwner.trim() ? rawOwner.trim().toLowerCase() : null;
+  const hasActiveOwner = Boolean(
+    ownerNormalized && ownerNormalized !== ZERO_ADDRESS && !/^0x0+$/.test(ownerNormalized)
+  );
+  const isPaused = Boolean(input.paused !== undefined ? input.paused : meta.paused);
+
+  const flags = [];
+  let score = 0;
+  const addFlag = (code, severity, points, evidence) => {
+    score += points;
+    flags.push({ code, severity, points, evidence });
+  };
+
+  if (hasSelfDestruct) {
+    addFlag(
+      "OPCODE_SELFDESTRUCT",
+      "CRITICAL",
+      35,
+      "Executable SELFDESTRUCT (0xff) opcode present in contract or implementation bytecode."
+    );
+  }
+  if (hasCallCode) {
+    addFlag(
+      "OPCODE_CALLCODE",
+      "HIGH",
+      15,
+      "Legacy CALLCODE (0xf2) opcode detected in executable bytecode."
+    );
+  }
+  if (proxyType) {
+    addFlag(
+      "UPGRADEABLE_PROXY",
+      "MEDIUM",
+      15,
+      `Contract is an upgradeable proxy (${proxyType})${implementationAddress ? ` pointing to ${implementationAddress}` : ""}.`
+    );
+  } else if (hasDelegateCall) {
+    addFlag(
+      "UNRECOGNIZED_DELEGATECALL",
+      "HIGH",
+      20,
+      "Executable DELEGATECALL (0xf4) present without standard EIP-1967/ZeppelinOS/EIP-1167 proxy slots."
+    );
+  }
+  if (matched.mint.length > 0) {
+    addFlag(
+      "MINT_CAPABILITY_DETECTED",
+      "MEDIUM",
+      15,
+      `Supply-expansion selectors detected: ${matched.mint.join(", ")}.`
+    );
+  }
+  if (matched.blacklist.length > 0) {
+    addFlag(
+      "BLACKLIST_OR_FREEZE_CAPABILITY",
+      "MEDIUM",
+      12,
+      `Address-blocking selectors detected: ${matched.blacklist.join(", ")}.`
+    );
+  }
+  if (matched.taxAndLimits.length > 0) {
+    addFlag(
+      "MUTABLE_TAX_OR_TX_LIMITS",
+      "HIGH",
+      25,
+      `Fee/honeypot/limit selectors detected: ${matched.taxAndLimits.join(", ")}.`
+    );
+  }
+  if (matched.pause.length > 0 || isPaused) {
+    const pauseSigs = matched.pause.length > 0 ? matched.pause.join(", ") : "paused()";
+    addFlag(
+      "PAUSABLE_TRANSFERS",
+      isPaused ? "CRITICAL" : "LOW",
+      isPaused ? 35 : 8,
+      isPaused
+        ? `Token transfers are CURRENTLY PAUSED (${pauseSigs}).`
+        : `Pausable selectors present (${pauseSigs}).`
+    );
+  }
+  if (hasActiveOwner) {
+    addFlag(
+      "ACTIVE_OWNER_PRIVILEGE",
+      "LOW",
+      10,
+      `Contract has non-zero owner ${ownerNormalized} (ownership not renounced).`
+    );
+  }
+  if (hasTxOrigin) {
+    addFlag(
+      "OPCODE_TX_ORIGIN",
+      "MEDIUM",
+      10,
+      "Executable ORIGIN (0x32) opcode detected; verify tx.origin is not used for auth/honeypot gating."
+    );
+  }
+
+  const riskScore = Math.min(100, score);
+  const riskLevel = classifyRiskLevel(riskScore);
+
+  const recommendations = [];
+  if (proxyType && adminAddress) {
+    recommendations.push(
+      `Verify whether proxy admin ${adminAddress} is governed by a multisig + timelock before holding large positions.`
+    );
+  }
+  if (matched.taxAndLimits.length > 0) {
+    recommendations.push(
+      "Simulate both buy and sell swaps before trading; mutable tax/maxTx selectors are common in honeypot tokens."
+    );
+  }
+  if (matched.blacklist.length > 0 || matched.pause.length > 0) {
+    recommendations.push(
+      "Centralized freeze/pause controls exist (standard for regulated stablecoins like USDC/USDT, high risk for meme tokens)."
+    );
+  }
+  if (recommendations.length === 0) {
+    recommendations.push(
+      "No high-risk proxy, mutable tax, blacklist, or self-destruct vectors detected in bytecode."
+    );
+  }
+
+  return {
+    isContract: true,
+    riskScore,
+    riskLevel,
+    flags,
+    proxyAnalysis: {
+      isProxy: Boolean(proxyType),
+      proxyType,
+      implementationAddress,
+      adminAddress,
+      beaconAddress,
+      implementationBytecodeBytes: implWalk ? implWalk.byteLength : null,
+    },
+    bytecodeAnalysis: {
+      contractBytecodeBytes: outerWalk ? outerWalk.byteLength : 0,
+      totalUniqueSelectors: combinedSelectors.size,
+      opcodes: {
+        selfDestruct: hasSelfDestruct,
+        delegateCall: hasDelegateCall,
+        callCode: hasCallCode,
+        create2: hasCreate2,
+        txOrigin: hasTxOrigin,
+      },
+      matchedSelectors: matched,
+    },
+    recommendations,
+  };
+}
+
+export function scoreSolanaMintRisk(input = {}) {
+  const infoSrc = input.mintInfo || input.info || input;
+  const decimals = Number(infoSrc.decimals ?? 0);
+  const supplyAtomicStr = String(infoSrc.supplyAtomic ?? infoSrc.supply ?? "0");
+  const supplyBig = BigInt(supplyAtomicStr);
+  const mintAuthority = infoSrc.mintAuthority ?? null;
+  const freezeAuthority = infoSrc.freezeAuthority ?? null;
+  const isInitialized = infoSrc.isInitialized !== undefined ? Boolean(infoSrc.isInitialized) : true;
+
+  const rawExts = input.extensions ?? infoSrc.extensions;
+  let extensionNames = [];
+  let transferFeeBps = 0;
+  let transferFeeAuthority = null;
+  let permanentDelegate = null;
+  let mintCloseAuthority = null;
+  let transferHookProgramId = null;
+  let defaultAccountState = null;
+  let isNonTransferable = false;
+  let embeddedMetadata = null;
+
+  if (Array.isArray(rawExts)) {
+    extensionNames = rawExts.map((e) => e?.extension).filter(Boolean);
+    for (const ext of rawExts) {
+      const name = ext?.extension;
+      const state = ext?.state || {};
+      if (name === "transferFeeConfig") {
+        const newerBps = Number(state.newerTransferFee?.transferFeeBasisPoints ?? 0);
+        const olderBps = Number(state.olderTransferFee?.transferFeeBasisPoints ?? 0);
+        transferFeeBps = Math.max(newerBps, olderBps);
+        transferFeeAuthority = state.transferFeeConfigAuthority || null;
+      } else if (name === "permanentDelegate") {
+        permanentDelegate = state.delegate || null;
+      } else if (name === "mintCloseAuthority") {
+        mintCloseAuthority = state.closeAuthority || null;
+      } else if (name === "transferHook") {
+        transferHookProgramId = state.programId || null;
+      } else if (name === "defaultAccountState") {
+        defaultAccountState = state.state || null;
+      } else if (name === "nonTransferable") {
+        isNonTransferable = true;
+      } else if (name === "tokenMetadata") {
+        embeddedMetadata = {
+          name: state.name || null,
+          symbol: state.symbol || null,
+          uri: state.uri || null,
+          updateAuthority: state.updateAuthority || null,
+        };
+      }
+    }
+  } else if (rawExts && typeof rawExts === "object") {
+    extensionNames = Array.isArray(rawExts.names) ? [...rawExts.names] : [];
+    transferFeeBps = Number(rawExts.transferFeeBps ?? 0) || 0;
+    transferFeeAuthority = rawExts.transferFeeAuthority || null;
+    permanentDelegate = rawExts.permanentDelegate || null;
+    mintCloseAuthority = rawExts.mintCloseAuthority || null;
+    transferHookProgramId = rawExts.transferHookProgramId || rawExts.transferHook || null;
+    defaultAccountState = rawExts.defaultAccountState || null;
+    isNonTransferable = Boolean(rawExts.isNonTransferable || rawExts.nonTransferable);
+    embeddedMetadata = rawExts.embeddedMetadata || null;
+  }
+
+  let holderConcentration;
+  if (Array.isArray(input.largestAccounts)) {
+    const list = input.largestAccounts;
+    const top10 = list.slice(0, 10).map((item, idx) => {
+      const amtBig = BigInt(String(item.amount ?? item.amountAtomic ?? "0"));
+      const pct = supplyBig > 0n ? Number((amtBig * 10000n) / supplyBig) / 100 : 0;
+      return {
+        rank: idx + 1,
+        tokenAccount: item.address || item.tokenAccount || `account_${idx + 1}`,
+        amountAtomic: amtBig.toString(),
+        uiAmountString: item.uiAmountString ?? formatTokenUnits(amtBig, decimals),
+        pctOfSupply: pct,
+      };
+    });
+    const top10SumBig = list
+      .slice(0, 10)
+      .reduce((acc, item) => acc + BigInt(String(item.amount ?? item.amountAtomic ?? "0")), 0n);
+    holderConcentration = {
+      available: true,
+      rpcUsed: input.indexedRpcUsed || null,
+      top1HolderPct: top10[0]?.pctOfSupply ?? 0,
+      top10HoldersPct: supplyBig > 0n ? Number((top10SumBig * 10000n) / supplyBig) / 100 : 0,
+      topHolders: top10,
+    };
+  } else if (input.holderConcentration && typeof input.holderConcentration === "object") {
+    holderConcentration = { ...input.holderConcentration };
+  } else {
+    holderConcentration = {
+      available: false,
+      reason: "Holder concentration snapshot not available.",
+      top1HolderPct: null,
+      top10HoldersPct: null,
+      topHolders: [],
+    };
+  }
+
+  const flags = [];
+  let score = 0;
+  const addFlag = (code, severity, points, evidence) => {
+    score += points;
+    flags.push({ code, severity, points, evidence });
+  };
+
+  if (mintAuthority) {
+    addFlag(
+      "ACTIVE_MINT_AUTHORITY",
+      "HIGH",
+      30,
+      `Mint authority is NOT revoked (${mintAuthority}); issuer can mint unlimited supply.`
+    );
+  }
+  if (freezeAuthority) {
+    addFlag(
+      "ACTIVE_FREEZE_AUTHORITY",
+      "HIGH",
+      25,
+      `Freeze authority is NOT revoked (${freezeAuthority}); issuer can freeze holder token accounts.`
+    );
+  }
+  if (permanentDelegate) {
+    addFlag(
+      "TOKEN2022_PERMANENT_DELEGATE",
+      "CRITICAL",
+      35,
+      `Token-2022 permanentDelegate (${permanentDelegate}) can transfer or burn tokens from ANY wallet without owner approval.`
+    );
+  }
+  if (transferFeeBps > 0 || transferFeeAuthority) {
+    const highFee = transferFeeBps >= 500;
+    addFlag(
+      "TOKEN2022_TRANSFER_FEE",
+      highFee ? "HIGH" : "MEDIUM",
+      highFee ? 25 : 10,
+      `Token-2022 transferFeeConfig active: ${transferFeeBps} bps (${(transferFeeBps / 100).toFixed(2)}%)${transferFeeAuthority ? `, mutable authority ${transferFeeAuthority}` : ""}.`
+    );
+  }
+  if (transferHookProgramId) {
+    addFlag(
+      "TOKEN2022_TRANSFER_HOOK",
+      "MEDIUM",
+      15,
+      `Token-2022 custom transferHook (${transferHookProgramId}) executes on every transfer.`
+    );
+  }
+  if (mintCloseAuthority) {
+    addFlag(
+      "TOKEN2022_MINT_CLOSE_AUTHORITY",
+      "LOW",
+      8,
+      `Token-2022 mintCloseAuthority (${mintCloseAuthority}) is set.`
+    );
+  }
+  if (defaultAccountState === "frozen") {
+    addFlag(
+      "DEFAULT_ACCOUNT_FROZEN",
+      "CRITICAL",
+      30,
+      "New token accounts default to FROZEN state."
+    );
+  }
+  if (isNonTransferable) {
+    addFlag(
+      "NON_TRANSFERABLE_SOULBOUND",
+      "CRITICAL",
+      40,
+      "Token-2022 nonTransferable extension enabled; tokens cannot be transferred."
+    );
+  }
+
+  if (holderConcentration.available) {
+    const top1 = Number(holderConcentration.top1HolderPct ?? 0);
+    const top10 = Number(holderConcentration.top10HoldersPct ?? 0);
+    if (top1 >= 30) {
+      addFlag("EXTREME_TOP1_CONCENTRATION", "HIGH", 20, `Top-1 account holds ${top1.toFixed(2)}% of supply.`);
+    } else if (top1 >= 15) {
+      addFlag("ELEVATED_TOP1_CONCENTRATION", "MEDIUM", 10, `Top-1 account holds ${top1.toFixed(2)}% of supply.`);
+    }
+    if (top10 >= 75) {
+      addFlag("EXTREME_TOP10_CONCENTRATION", "HIGH", 20, `Top-10 accounts control ${top10.toFixed(2)}% of supply.`);
+    } else if (top10 >= 50) {
+      addFlag("ELEVATED_TOP10_CONCENTRATION", "MEDIUM", 10, `Top-10 accounts control ${top10.toFixed(2)}% of supply.`);
+    }
+  }
+
+  const riskScore = Math.min(100, score);
+  const riskLevel = classifyRiskLevel(riskScore);
+
+  const recommendations = [];
+  if (permanentDelegate) {
+    recommendations.push(
+      "CRITICAL: Avoid holding unverified tokens with permanentDelegate; only regulated issuers (e.g. PYUSD) legitimately use it."
+    );
+  }
+  if (mintAuthority || freezeAuthority) {
+    recommendations.push(
+      "For meme/community SPL tokens, require both mintAuthority === null and freezeAuthority === null before buying."
+    );
+  }
+  if (holderConcentration.available && Number(holderConcentration.top10HoldersPct ?? 0) >= 50) {
+    recommendations.push(
+      "Verify whether top holder accounts belong to locked LP pools, staking vaults, or unlocked insider wallets."
+    );
+  }
+  if (recommendations.length === 0) {
+    recommendations.push(
+      "Mint and freeze authorities are revoked and holder concentration is within normal bounds."
+    );
+  }
+
+  return {
+    isInitialized,
+    riskScore,
+    riskLevel,
+    flags,
+    mintInfo: {
+      decimals,
+      supplyAtomic: supplyAtomicStr,
+      supplyFormatted: formatTokenUnits(supplyBig, decimals),
+      mintAuthority,
+      mintAuthorityRevoked: mintAuthority === null,
+      freezeAuthority,
+      freezeAuthorityRevoked: freezeAuthority === null,
+      embeddedMetadata: embeddedMetadata || infoSrc.embeddedMetadata || null,
+    },
+    extensions: {
+      count: extensionNames.length,
+      names: extensionNames,
+      transferFeeBps,
+      transferFeeAuthority,
+      permanentDelegate,
+      mintCloseAuthority,
+      transferHookProgramId,
+      defaultAccountState,
+      isNonTransferable,
+    },
+    holderConcentration,
+    recommendations,
+  };
+}
+
+async function callJsonRpcWithFailover(urls, method, params, options = {}) {
+  const timeoutMs = options.timeoutMs ?? 7500;
+  const fetchImpl = options.fetchImpl ?? globalThis.fetch;
+  const errors = [];
+
+  for (const url of urls) {
+    try {
+      const res = await fetchImpl(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method,
+          params,
+        }),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      const text = await res.text();
+      let parsed;
+      try {
+        parsed = JSON.parse(text);
+      } catch {
+        errors.push(`${url}: invalid JSON (${res.status})`);
+        continue;
+      }
+      if (parsed && parsed.error) {
+        errors.push(`${url}: RPC error ${parsed.error.code} (${parsed.error.message})`);
+        continue;
+      }
+      if (!res.ok) {
+        errors.push(`${url}: HTTP ${res.status}`);
+        continue;
+      }
+      return { result: parsed.result, rpcUrl: url };
+    } catch (err) {
+      errors.push(`${url}: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  throw new Error(`All RPC endpoints failed for ${method}: ${errors.join(" | ")}`);
+}
+
+export async function scanEvmTokenOnChain(input = {}, options = {}) {
+  const chainKey = String(input?.chain || "base").trim().toLowerCase();
+  const addressRaw = String(input?.address || "").trim();
+
+  if (!EVM_CHAIN_CONFIG[chainKey]) {
+    throw new Error(
+      `Unsupported EVM chain "${input?.chain}". Must be one of: base, ethereum, bsc, arbitrum.`
+    );
+  }
+  if (!/^0x[0-9a-fA-F]{40}$/.test(addressRaw)) {
+    throw new Error(
+      `Invalid EVM contract address "${addressRaw}". Expected 0x-prefixed 20-byte hex address.`
+    );
+  }
+
+  const chainCfg = EVM_CHAIN_CONFIG[chainKey];
+  const customRpc = sanitizeCustomRpcUrl(input?.rpcUrl || options?.rpcUrl);
+  const rpcs = customRpc
+    ? [customRpc, ...chainCfg.rpcs]
+    : Array.isArray(options.rpcs) && options.rpcs.length > 0
+      ? options.rpcs
+      : chainCfg.rpcs;
+  const address = addressRaw.toLowerCase();
+
+  const safeEthCall = async (target, data) => {
+    try {
+      const { result } = await callJsonRpcWithFailover(
+        rpcs,
+        "eth_call",
+        [{ to: target, data }, "latest"],
+        options
+      );
+      return result;
+    } catch {
+      return null;
+    }
+  };
+
+  const safeGetStorage = async (slot) => {
+    try {
+      const { result } = await callJsonRpcWithFailover(
+        rpcs,
+        "eth_getStorageAt",
+        [address, slot, "latest"],
+        options
+      );
+      return result;
+    } catch {
+      return null;
+    }
+  };
+
+  const codeResp = await callJsonRpcWithFailover(rpcs, "eth_getCode", [address, "latest"], options);
+  const outerWalk = analyzeEvmBytecodeHex(codeResp.result || "0x");
+
+  if (!outerWalk.isContract) {
+    const scoredEmpty = scoreEvmTokenRisk({ isContract: false });
+    return {
+      ok: true,
+      auditedAt: new Date().toISOString(),
+      chain: chainCfg.chain,
+      network: chainCfg.caip2,
+      rpcUsed: codeResp.rpcUrl,
+      address,
+      isContract: false,
+      riskScore: scoredEmpty.riskScore,
+      riskLevel: scoredEmpty.riskLevel,
+      flags: scoredEmpty.flags,
+      tokenMetadata: null,
+      proxyAnalysis: null,
+      bytecodeAnalysis: null,
+      recommendations: scoredEmpty.recommendations,
+    };
+  }
+
+  const [
+    eip1967ImplRaw,
+    eip1967AdminRaw,
+    eip1967BeaconRaw,
+    zepImplRaw,
+    zepAdminRaw,
+    nameHex,
+    symbolHex,
+    decimalsHex,
+    totalSupplyHex,
+    ownerHex,
+    pausedHex,
+  ] = await Promise.all([
+    safeGetStorage(SLOT_EIP1967_IMPL),
+    safeGetStorage(SLOT_EIP1967_ADMIN),
+    safeGetStorage(SLOT_EIP1967_BEACON),
+    safeGetStorage(SLOT_ZEPPELINOS_IMPL),
+    safeGetStorage(SLOT_ZEPPELINOS_ADMIN),
+    safeEthCall(address, "0x06fdde03"),
+    safeEthCall(address, "0x95d89b41"),
+    safeEthCall(address, "0x313ce567"),
+    safeEthCall(address, "0x18160ddd"),
+    safeEthCall(address, "0x8da5cb5b"),
+    safeEthCall(address, "0x5c975abb"),
+  ]);
+
+  const eip1967Impl = parseAddressFromSlot(eip1967ImplRaw);
+  const eip1967Admin = parseAddressFromSlot(eip1967AdminRaw);
+  const eip1967Beacon = parseAddressFromSlot(eip1967BeaconRaw);
+  const zepImpl = parseAddressFromSlot(zepImplRaw);
+  const zepAdmin = parseAddressFromSlot(zepAdminRaw);
+
+  let beaconImpl = null;
+  if (!eip1967Impl && eip1967Beacon) {
+    beaconImpl = parseAddressFromSlot(await safeEthCall(eip1967Beacon, "0x5c60da1b"));
+  }
+
+  const implementationAddress =
+    eip1967Impl || beaconImpl || zepImpl || outerWalk.eip1167Implementation || null;
+  const adminAddress = eip1967Admin || zepAdmin || null;
+  const proxyType = eip1967Impl
+    ? "EIP-1967 Transparent/UUPS Proxy"
+    : eip1967Beacon
+      ? "EIP-1967 Beacon Proxy"
+      : zepImpl
+        ? "OpenZeppelin / FiatToken Upgradeable Proxy"
+        : outerWalk.eip1167Implementation
+          ? "EIP-1167 Minimal Clone Proxy"
+          : null;
+
+  let implWalk = null;
+  if (implementationAddress) {
+    try {
+      const implCodeRes = await callJsonRpcWithFailover(
+        rpcs,
+        "eth_getCode",
+        [implementationAddress, "latest"],
+        options
+      );
+      if (implCodeRes.result && implCodeRes.result !== "0x") {
+        implWalk = analyzeEvmBytecodeHex(implCodeRes.result);
+      }
+    } catch {
+      implWalk = null;
+    }
+  }
+
+  const decimalsBig = decodeAbiUint(decimalsHex);
+  const decimals = decimalsBig !== null ? Number(decimalsBig) : null;
+  const totalSupplyBig = decodeAbiUint(totalSupplyHex);
+  const ownerParsed = parseAddressFromSlot(ownerHex);
+  const ownerRenounced =
+    ownerHex !== null &&
+    ownerHex !== "0x" &&
+    ownerHex.replace(/^0x/, "").length >= 64 &&
+    ownerParsed === null;
+  const pausedBig = decodeAbiUint(pausedHex);
+  const isPaused = pausedBig !== null ? pausedBig !== 0n : false;
+
+  const tokenMetadata = {
+    name: decodeAbiStringOrBytes32(nameHex),
+    symbol: decodeAbiStringOrBytes32(symbolHex),
+    decimals,
+    totalSupplyAtomic: totalSupplyBig !== null ? totalSupplyBig.toString() : null,
+    totalSupplyFormatted:
+      totalSupplyBig !== null ? formatTokenUnits(totalSupplyBig, decimals ?? 18) : null,
+    owner: ownerRenounced ? ZERO_ADDRESS : ownerParsed,
+    ownerRenounced,
+    paused: isPaused,
+  };
+
+  const scored = scoreEvmTokenRisk({
+    isContract: true,
+    outerWalk,
+    implWalk,
+    proxyType,
+    implementationAddress,
+    adminAddress,
+    beaconAddress: eip1967Beacon,
+    tokenMetadata,
+  });
+
+  return {
+    ok: true,
+    auditedAt: new Date().toISOString(),
+    chain: chainCfg.chain,
+    network: chainCfg.caip2,
+    rpcUsed: codeResp.rpcUrl,
+    address,
+    isContract: true,
+    riskScore: scored.riskScore,
+    riskLevel: scored.riskLevel,
+    flags: scored.flags,
+    tokenMetadata,
+    proxyAnalysis: scored.proxyAnalysis,
+    bytecodeAnalysis: scored.bytecodeAnalysis,
+    recommendations: scored.recommendations,
+  };
+}
+
+export async function scanSolanaMintOnChain(input = {}, options = {}) {
+  const mint = String(input?.mint || input?.address || "").trim();
+  if (!BASE58_REGEX.test(mint)) {
+    throw new Error(
+      `Invalid Solana mint address "${mint}". Expected 32-44 char Base58 public key.`
+    );
+  }
+
+  const customRpc = sanitizeCustomRpcUrl(input?.rpcUrl || options?.rpcUrl);
+  const accountRpcs = customRpc
+    ? [customRpc, ...SOLANA_RPC_ENDPOINTS]
+    : Array.isArray(options.accountRpcs) && options.accountRpcs.length > 0
+      ? options.accountRpcs
+      : SOLANA_RPC_ENDPOINTS;
+  const indexedRpcs = customRpc
+    ? [customRpc, ...SOLANA_INDEXED_RPC_ENDPOINTS]
+    : Array.isArray(options.indexedRpcs) && options.indexedRpcs.length > 0
+      ? options.indexedRpcs
+      : SOLANA_INDEXED_RPC_ENDPOINTS;
+
+  const acctResp = await callJsonRpcWithFailover(
+    accountRpcs,
+    "getAccountInfo",
+    [mint, { encoding: "jsonParsed", commitment: "confirmed" }],
+    options
+  );
+
+  const acctVal = acctResp.result?.value;
+  if (!acctVal) {
+    throw new Error(`Solana account "${mint}" does not exist on Mainnet.`);
+  }
+
+  const programOwner = acctVal.owner;
+  const tokenStandard =
+    programOwner === TOKEN_PROGRAM_ID
+      ? "SPL Token"
+      : programOwner === TOKEN_2022_PROGRAM_ID
+        ? "Token-2022"
+        : null;
+  const parsedData = acctVal.data?.parsed;
+  if (!tokenStandard || parsedData?.type !== "mint") {
+    throw new Error(
+      `Account "${mint}" is owned by ${programOwner} (type: ${parsedData?.type || "raw"}), not an SPL Token or Token-2022 mint.`
+    );
+  }
+
+  const info = parsedData.info || {};
+  let largestAccounts = null;
+  let indexedRpcUsed = null;
+  let holderFailureReason = null;
+
+  try {
+    const largestResp = await callJsonRpcWithFailover(
+      indexedRpcs,
+      "getTokenLargestAccounts",
+      [mint, { commitment: "confirmed" }],
+      { ...options, timeoutMs: options.indexedTimeoutMs ?? 4500 }
+    );
+    if (Array.isArray(largestResp.result?.value)) {
+      largestAccounts = largestResp.result.value;
+      indexedRpcUsed = largestResp.rpcUrl;
+    }
+  } catch {
+    holderFailureReason =
+      "Mint exceeds public RPC indexed account scan threshold; pass custom rpcUrl for Top-10 holder concentration.";
+  }
+
+  const scored = scoreSolanaMintRisk({
+    info,
+    extensions: info.extensions,
+    ...(largestAccounts
+      ? { largestAccounts, indexedRpcUsed }
+      : {
+          holderConcentration: {
+            available: false,
+            reason: holderFailureReason,
+            top1HolderPct: null,
+            top10HoldersPct: null,
+            topHolders: [],
+          },
+        }),
+  });
+
+  return {
+    ok: true,
+    auditedAt: new Date().toISOString(),
+    network: SOLANA_NETWORK,
+    rpcUsed: acctResp.rpcUrl,
+    mint,
+    tokenStandard,
+    programOwner,
+    isInitialized: scored.isInitialized,
+    riskScore: scored.riskScore,
+    riskLevel: scored.riskLevel,
+    flags: scored.flags,
+    mintInfo: scored.mintInfo,
+    extensions: scored.extensions,
+    holderConcentration: scored.holderConcentration,
+    recommendations: scored.recommendations,
+  };
+}
+
+/* ============================================================================
+ * 6. MCP Tool Definitions & Dispatch (6 Tools)
  * ========================================================================== */
 
 export const TOOLS = Object.freeze([
@@ -1236,9 +2354,53 @@ export const TOOLS = Object.freeze([
       required: ["clientName", "items"],
     },
   },
+  {
+    name: "evm_token_risk_scan",
+    description:
+      "Run a live EVM token and smart contract rug, proxy, and bytecode risk audit across Base, Ethereum, BSC, or Arbitrum via CORS-safe public JSON-RPC. Inspects EIP-1967 / ZeppelinOS / Beacon / EIP-1167 proxy slots, implementation opcodes (SELFDESTRUCT, DELEGATECALL, CALLCODE, ORIGIN), ERC-20 metadata, ownership status, and mint/blacklist/pause/tax selectors.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        chain: {
+          type: "string",
+          enum: ["base", "ethereum", "bsc", "arbitrum"],
+          description: "Target EVM chain (default: base).",
+          default: "base",
+        },
+        address: {
+          type: "string",
+          description: "0x-prefixed 20-byte EVM contract or token address.",
+        },
+        rpcUrl: {
+          type: "string",
+          description: "Optional custom HTTPS EVM JSON-RPC endpoint.",
+        },
+      },
+      required: ["address"],
+    },
+  },
+  {
+    name: "solana_mint_risk_scan",
+    description:
+      "Run a live Solana Mainnet SPL Token and Token-2022 mint risk audit via JSON-RPC. Evaluates active mintAuthority and freezeAuthority, Token-2022 extensions (permanentDelegate, transferFeeConfig, mintCloseAuthority, transferHook, defaultAccountState, nonTransferable), supply, and Top-10 holder concentration.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        mint: {
+          type: "string",
+          description: "32-44 character Base58 Solana SPL or Token-2022 mint address.",
+        },
+        rpcUrl: {
+          type: "string",
+          description: "Optional custom HTTPS Solana JSON-RPC endpoint.",
+        },
+      },
+      required: ["mint"],
+    },
+  },
 ]);
 
-function executeTool(name, args = {}) {
+function executeTool(name, args = {}, options = {}) {
   const safeArgs = args && typeof args === "object" && !Array.isArray(args) ? args : {};
 
   switch (name) {
@@ -1366,13 +2528,119 @@ function executeTool(name, args = {}) {
       };
     }
 
+    case "evm_token_risk_scan": {
+      if (typeof safeArgs.address !== "string" || !safeArgs.address.trim()) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: "Invalid argument: 'address' must be a 0x EVM address string." }],
+        };
+      }
+      return scanEvmTokenOnChain(safeArgs, options)
+        .then((res) => {
+          const lines = [
+            `TokenGuard EVM Risk Scan — ${res.chain.toUpperCase()} (${res.address})`,
+            `Risk Score: ${res.riskScore}/100 (${res.riskLevel}) | Contract: ${res.isContract ? "YES" : "NO"}`,
+          ];
+          if (res.tokenMetadata) {
+            lines.push(
+              `Token: ${res.tokenMetadata.name || "Unknown"} (${res.tokenMetadata.symbol || "N/A"}) | Decimals: ${res.tokenMetadata.decimals ?? "N/A"} | Supply: ${res.tokenMetadata.totalSupplyFormatted ?? "N/A"}`
+            );
+          }
+          if (res.proxyAnalysis?.isProxy) {
+            lines.push(
+              `Proxy: ${res.proxyAnalysis.proxyType} -> Implementation ${res.proxyAnalysis.implementationAddress || "Beacon"}`
+            );
+          }
+          if (res.flags.length > 0) {
+            lines.push("", "Risk Flags:");
+            for (const f of res.flags) {
+              lines.push(`- [${f.severity} +${f.points}] ${f.code}: ${f.evidence}`);
+            }
+          } else {
+            lines.push("", "Risk Flags: CLEAN (0 structural flags triggered).");
+          }
+          lines.push(
+            "",
+            `Interactive Browser Scanner & Pro 25-Token Batch Watchlist: ${FORGESUITE_LINKS.tokenaudit}`,
+            `Deep Solidity/Rust Source Audit ($5 USDC via A2A+x402): ${FORGESUITE_LINKS.forgeAgent}`
+          );
+          return {
+            isError: false,
+            content: [{ type: "text", text: lines.join("\n") }],
+            structuredContent: res,
+          };
+        })
+        .catch((err) => ({
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: `EVM Token Risk Scan Error: ${err instanceof Error ? err.message : String(err)}`,
+            },
+          ],
+        }));
+    }
+
+    case "solana_mint_risk_scan": {
+      if (typeof safeArgs.mint !== "string" || !safeArgs.mint.trim()) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: "Invalid argument: 'mint' must be a Base58 Solana mint string." }],
+        };
+      }
+      return scanSolanaMintOnChain(safeArgs, options)
+        .then((res) => {
+          const lines = [
+            `TokenGuard Solana Mint Scan — ${res.tokenStandard} (${res.mint})`,
+            `Risk Score: ${res.riskScore}/100 (${res.riskLevel})`,
+            `Supply: ${res.mintInfo.supplyFormatted} (Decimals: ${res.mintInfo.decimals})`,
+            `Mint Authority: ${res.mintInfo.mintAuthority || "Revoked ✓"} | Freeze Authority: ${res.mintInfo.freezeAuthority || "Revoked ✓"}`,
+          ];
+          if (res.extensions.count > 0) {
+            lines.push(`Extensions (${res.extensions.count}): ${res.extensions.names.join(", ")}`);
+          }
+          if (res.holderConcentration.available) {
+            lines.push(
+              `Holder Concentration: Top-1 = ${res.holderConcentration.top1HolderPct.toFixed(2)}% | Top-10 = ${res.holderConcentration.top10HoldersPct.toFixed(2)}%`
+            );
+          }
+          if (res.flags.length > 0) {
+            lines.push("", "Risk Flags:");
+            for (const f of res.flags) {
+              lines.push(`- [${f.severity} +${f.points}] ${f.code}: ${f.evidence}`);
+            }
+          } else {
+            lines.push("", "Risk Flags: CLEAN (0 authority/extension/concentration flags triggered).");
+          }
+          lines.push(
+            "",
+            `Interactive Browser Scanner & Pro 25-Token Batch Watchlist: ${FORGESUITE_LINKS.tokenaudit}`,
+            `Deep Rust/Anchor Source Audit ($5 USDC via A2A+x402): ${FORGESUITE_LINKS.forgeAgent}`
+          );
+          return {
+            isError: false,
+            content: [{ type: "text", text: lines.join("\n") }],
+            structuredContent: res,
+          };
+        })
+        .catch((err) => ({
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: `Solana Mint Risk Scan Error: ${err instanceof Error ? err.message : String(err)}`,
+            },
+          ],
+        }));
+    }
+
     default:
       return null;
   }
 }
 
 /* ============================================================================
- * 6. JSON-RPC 2.0 MCP Protocol Router
+ * 7. JSON-RPC 2.0 MCP Protocol Router
  * ========================================================================== */
 
 function rpcResult(id, result) {
@@ -1387,9 +2655,10 @@ function rpcError(id, code, message, data) {
 
 /**
  * Process one parsed JSON-RPC 2.0 message.
- * Returns a response object, or `null` for notifications (no response permitted).
+ * Returns a response object synchronously for offline calls, a Promise for live RPC tools,
+ * or `null` for notifications (no response permitted).
  */
-export function handleJsonRpcMessage(msg) {
+export function handleJsonRpcMessage(msg, options = {}) {
   if (!msg || typeof msg !== "object" || Array.isArray(msg)) {
     return rpcError(null, -32600, "Invalid Request: expected JSON-RPC object.");
   }
@@ -1421,7 +2690,7 @@ export function handleJsonRpcMessage(msg) {
         },
         serverInfo: SERVER_INFO,
         instructions:
-          "ForgeSuite MCP Server provides 4 zero-dependency, 100% offline tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), and cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator). Docs: https://youthmy11-ai.github.io/mcp.html",
+          "ForgeSuite MCP Server (v1.1.0) provides 6 zero-dependency developer, FinOps & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), and solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner). Docs: https://youthmy11-ai.github.io/mcp.html",
       });
     }
 
@@ -1436,9 +2705,12 @@ export function handleJsonRpcMessage(msg) {
       if (typeof toolName !== "string" || !toolName) {
         return rpcError(id, -32602, "Invalid params: missing tool 'name'.");
       }
-      const result = executeTool(toolName, params.arguments);
+      const result = executeTool(toolName, params.arguments, options);
       if (result === null) {
         return rpcError(id, -32602, `Unknown tool: ${toolName}`);
+      }
+      if (result && typeof result.then === "function") {
+        return result.then((resolved) => rpcResult(id, resolved));
       }
       return rpcResult(id, result);
     }
@@ -1449,25 +2721,33 @@ export function handleJsonRpcMessage(msg) {
 }
 
 /* ============================================================================
- * 7. Stdio Transport (Newline-Delimited JSON-RPC + Content-Length Fallback)
+ * 8. Stdio Transport (FIFO Async Queue + Content-Length Fallback)
  * ========================================================================== */
 
 function startStdioServer() {
   let buffer = Buffer.alloc(0);
+  let dispatchChain = Promise.resolve();
 
   function send(payload) {
     if (!payload) return;
     process.stdout.write(`${JSON.stringify(payload)}\n`);
   }
 
-  function dispatchRawJson(rawText) {
+  async function processRawJsonAsync(rawText) {
     const trimmed = rawText.trim();
     if (!trimmed) return;
     let parsed;
     try {
       parsed = JSON.parse(trimmed);
     } catch (err) {
-      send(rpcError(null, -32700, "Parse error: invalid JSON.", err instanceof Error ? err.message : String(err)));
+      send(
+        rpcError(
+          null,
+          -32700,
+          "Parse error: invalid JSON.",
+          err instanceof Error ? err.message : String(err)
+        )
+      );
       return;
     }
     if (Array.isArray(parsed)) {
@@ -1475,17 +2755,33 @@ function startStdioServer() {
         send(rpcError(null, -32600, "Invalid Request: empty batch."));
         return;
       }
-      const responses = parsed.map((item) => handleJsonRpcMessage(item)).filter(Boolean);
+      const responses = (await Promise.all(parsed.map((item) => handleJsonRpcMessage(item)))).filter(
+        Boolean
+      );
       if (responses.length > 0) send(responses);
       return;
     }
-    const response = handleJsonRpcMessage(parsed);
+    const response = await handleJsonRpcMessage(parsed);
     if (response) send(response);
+  }
+
+  function enqueueRawJson(rawText) {
+    dispatchChain = dispatchChain
+      .then(() => processRawJsonAsync(rawText))
+      .catch((err) => {
+        send(
+          rpcError(
+            null,
+            -32603,
+            "Internal error.",
+            err instanceof Error ? err.message : String(err)
+          )
+        );
+      });
   }
 
   function drainBuffer() {
     while (buffer.length > 0) {
-      // Trim leading CR/LF whitespace between messages
       let offset = 0;
       while (offset < buffer.length && (buffer[offset] === 0x0a || buffer[offset] === 0x0d)) {
         offset += 1;
@@ -1495,14 +2791,13 @@ function startStdioServer() {
         if (buffer.length === 0) return;
       }
 
-      // Optional LSP-style Content-Length framing support
       const headPreview = buffer.subarray(0, Math.min(buffer.length, 32)).toString("ascii");
       if (/^Content-Length:/i.test(headPreview)) {
         const headerEnd = buffer.indexOf("\r\n\r\n");
         const altEnd = headerEnd === -1 ? buffer.indexOf("\n\n") : -1;
         const sepIdx = headerEnd !== -1 ? headerEnd : altEnd;
         const sepLen = headerEnd !== -1 ? 4 : 2;
-        if (sepIdx === -1) return; // wait for complete headers
+        if (sepIdx === -1) return;
 
         const headerStr = buffer.subarray(0, sepIdx).toString("ascii");
         const lenMatch = headerStr.match(/Content-Length:\s*(\d+)/i);
@@ -1512,20 +2807,19 @@ function startStdioServer() {
         }
         const contentLen = Number.parseInt(lenMatch[1], 10);
         const bodyStart = sepIdx + sepLen;
-        if (buffer.length < bodyStart + contentLen) return; // wait for full body
+        if (buffer.length < bodyStart + contentLen) return;
 
         const rawJson = buffer.subarray(bodyStart, bodyStart + contentLen).toString("utf8");
         buffer = buffer.subarray(bodyStart + contentLen);
-        dispatchRawJson(rawJson);
+        enqueueRawJson(rawJson);
         continue;
       }
 
-      // Standard MCP stdio newline-delimited JSON-RPC
       const nlIdx = buffer.indexOf(0x0a);
-      if (nlIdx === -1) return; // wait for newline
+      if (nlIdx === -1) return;
       const line = buffer.subarray(0, nlIdx).toString("utf8");
       buffer = buffer.subarray(nlIdx + 1);
-      dispatchRawJson(line);
+      enqueueRawJson(line);
     }
   }
 
@@ -1539,7 +2833,7 @@ function startStdioServer() {
     if (buffer.length > 0) {
       const tail = buffer.toString("utf8").trim();
       buffer = Buffer.alloc(0);
-      if (tail) dispatchRawJson(tail);
+      if (tail) enqueueRawJson(tail);
     }
   });
 

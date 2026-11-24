@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import http from "node:http";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -63,6 +64,24 @@ import {
   verifySolanaUsdcTx,
   verifySolanaUsdcTxOnChain,
 } from "../assets/checkout.js";
+import {
+  analyzeEvmBytecodeHex,
+  buildAuditInvoicePayload,
+  EVM_CHAIN_CONFIG as TOKENGUARD_EVM_CHAINS,
+  exportBatchReportsCsv,
+  parseWatchlistEntries,
+  runBatchWatchlistScan,
+  scanEvmTokenOnChain,
+  scanSolanaMintOnChain,
+  scoreEvmTokenRisk,
+  scoreSolanaMintRisk,
+  SLOT_ZEPPELINOS_ADMIN,
+  SLOT_ZEPPELINOS_IMPL,
+  SOLANA_RPC_ENDPOINTS as TOKENGUARD_SOLANA_RPCS,
+  TOKEN_2022_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+} from "../assets/tokenaudit.js";
+import { SERVER_INFO as MCP_SERVER_INFO } from "../mcp/forgesuite-mcp.mjs";
 
 test("verifySolanaUsdcTx and verifySolanaUsdcTxOnChain validate SPL USDC transfers and issue keys", async () => {
   const sampleTx = {
@@ -1018,8 +1037,11 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsFull, /ScopeGuard SOW Builder/);
   assert.match(llmsFull, /Calldata Lens/);
   assert.match(llmsFull, /EnvShield Secret Scanner/);
+  assert.match(llmsFull, /TokenGuard/);
   assert.match(llmsFull, /ForgeSuite MCP Server/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/mcp\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/tokenaudit\.html/);
+  assert.match(llmsTxt, /https:\/\/market\.near\.ai\/a\/forge-ai-agent/);
   assert.match(llmsFull, /BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx/);
 
   const robots = fs.readFileSync(path.join(repoRoot, "robots.txt"), "utf8");
@@ -1032,6 +1054,7 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
 
   const toolPages = [
     { file: "cryptobill.html", url: "https://youthmy11-ai.github.io/cryptobill.html", category: "BusinessApplication" },
+    { file: "tokenaudit.html", url: "https://youthmy11-ai.github.io/tokenaudit.html", category: "SecurityApplication" },
     { file: "tokencalc.html", url: "https://youthmy11-ai.github.io/tokencalc.html", category: "DeveloperApplication" },
     { file: "json2sheet.html", url: "https://youthmy11-ai.github.io/json2sheet.html", category: "DeveloperApplication" },
     { file: "sowbuilder.html", url: "https://youthmy11-ai.github.io/sowbuilder.html", category: "BusinessApplication" },
@@ -1061,10 +1084,11 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
 
   const indexHtml = fs.readFileSync(path.join(repoRoot, "index.html"), "utf8");
   assert.ok(indexHtml.includes('<link rel="canonical" href="https://youthmy11-ai.github.io/">'));
+  assert.ok(indexHtml.includes('href="tokenaudit.html"'), "index.html must link to tokenaudit.html");
   const indexLdMatch = indexHtml.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
   assert.ok(indexLdMatch, "index.html missing JSON-LD script");
   const indexLd = JSON.parse(indexLdMatch[1]);
-  assert.ok(Array.isArray(indexLd["@graph"]) && indexLd["@graph"].length >= 11, "index.html @graph should list WebSite + all products including MCP Server");
+  assert.ok(Array.isArray(indexLd["@graph"]) && indexLd["@graph"].length >= 12, "index.html @graph should list WebSite + all products including TokenGuard & MCP Server");
 });
 
 /* ============================================================================
@@ -1136,17 +1160,22 @@ test("ForgeSuite MCP stdio server handles initialize, notifications/initialized,
   assert.equal(messages[0].id, 1);
   assert.equal(messages[0].result.protocolVersion, "2024-11-05");
   assert.equal(messages[0].result.serverInfo.name, "forgesuite-mcp");
+  assert.equal(messages[0].result.serverInfo.version, "1.1.0");
+  assert.equal(MCP_SERVER_INFO.version, "1.1.0");
   assert.ok(messages[0].result.capabilities.tools);
 
   assert.equal(messages[1].id, 2);
   assert.deepEqual(messages[1].result, {});
 
   assert.equal(messages[2].id, 3);
+  assert.equal(messages[2].result.tools.length, 6);
   const toolNames = messages[2].result.tools.map((t) => t.name).sort();
   assert.deepEqual(toolNames, [
     "calldata_decode",
     "cryptobill_quote",
     "envshield_scan",
+    "evm_token_risk_scan",
+    "solana_mint_risk_scan",
     "tokencost_estimate",
   ]);
   for (const tool of messages[2].result.tools) {
@@ -1331,8 +1360,420 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
 
   const mcpManifest = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "mcp", "server.json"), "utf8"));
   assert.equal(mcpManifest.name, "io.github.youthmy11-ai/forgesuite-mcp");
+  assert.equal(mcpManifest.version, "1.1.0");
   assert.deepEqual(
     mcpManifest.tools.map((t) => t.name),
-    ["envshield_scan", "calldata_decode", "tokencost_estimate", "cryptobill_quote"]
+    [
+      "envshield_scan",
+      "calldata_decode",
+      "tokencost_estimate",
+      "cryptobill_quote",
+      "evm_token_risk_scan",
+      "solana_mint_risk_scan",
+    ]
   );
+});
+
+/* ============================================================================
+ * 13. TokenGuard Engine (`assets/tokenaudit.js`) & MCP v1.1.0 Scan Tool Tests
+ * ========================================================================== */
+
+test("TokenGuard default RPC lists prioritize CORS-friendly PublicNode & Zan endpoints first", () => {
+  assert.equal(TOKENGUARD_EVM_CHAINS.ethereum.rpcs[0], "https://ethereum-rpc.publicnode.com");
+  assert.equal(TOKENGUARD_EVM_CHAINS.base.rpcs[0], "https://base-rpc.publicnode.com");
+  assert.equal(TOKENGUARD_EVM_CHAINS.bsc.rpcs[0], "https://bsc-rpc.publicnode.com");
+  assert.equal(TOKENGUARD_EVM_CHAINS.arbitrum.rpcs[0], "https://arbitrum-one-rpc.publicnode.com");
+  assert.equal(TOKENGUARD_SOLANA_RPCS[0], "https://solana-rpc.publicnode.com");
+  assert.equal(TOKENGUARD_SOLANA_RPCS[1], "https://api.zan.top/solana-mainnet");
+});
+
+test("analyzeEvmBytecodeHex performs PUSH-aware opcode disassembly, strips CBOR metadata, and detects EIP-1167 clones", () => {
+  assert.equal(analyzeEvmBytecodeHex("0x").isContract, false);
+  assert.equal(analyzeEvmBytecodeHex("").byteLength, 0);
+
+  // PUSH32 containing 0xff, 0xf4, 0xf2, 0x32 data bytes + trailing IPFS CBOR metadata containing 0xff/0xf4
+  // Must NOT trigger false-positive SELFDESTRUCT, DELEGATECALL, CALLCODE, or ORIGIN
+  const push32Data = "ff" + "f4" + "f2" + "32" + "aa".repeat(28);
+  const cborMeta = "a264697066735822" + "ff".repeat(34) + "64736f6c63430008140033"; // 51 bytes (0x0033)
+  const safeBytecode = "0x6080604052" + "7f" + push32Data + "50" + "00" + cborMeta;
+  const safeWalk = analyzeEvmBytecodeHex(safeBytecode);
+  assert.equal(safeWalk.isContract, true);
+  assert.equal(safeWalk.hasSelfDestruct, false);
+  assert.equal(safeWalk.hasDelegateCall, false);
+  assert.equal(safeWalk.hasCallCode, false);
+  assert.equal(safeWalk.hasTxOrigin, false);
+
+  // Real executable opcodes + PUSH4 risk selectors (mint, blacklist, pause, setSellTax)
+  const riskyBytecode =
+    "0x6080" +
+    "6340c10f19" + // mint(address,uint256)
+    "63f9f92be4" + // blacklist(address)
+    "638456cb59" + // pause()
+    "63cc1776d3" + // setSellTax(uint256)
+    "32" + // ORIGIN
+    "f4" + // DELEGATECALL
+    "f2" + // CALLCODE
+    "f5" + // CREATE2
+    "ff"; // SELFDESTRUCT
+  const riskyWalk = analyzeEvmBytecodeHex(riskyBytecode);
+  assert.equal(riskyWalk.hasSelfDestruct, true);
+  assert.equal(riskyWalk.hasDelegateCall, true);
+  assert.equal(riskyWalk.hasCallCode, true);
+  assert.equal(riskyWalk.hasCreate2, true);
+  assert.equal(riskyWalk.hasTxOrigin, true);
+  assert.deepEqual(riskyWalk.matchedSelectors.mint, ["mint(address,uint256)"]);
+  assert.deepEqual(riskyWalk.matchedSelectors.blacklist, ["blacklist(address)"]);
+  assert.deepEqual(riskyWalk.matchedSelectors.pause, ["pause()"]);
+  assert.deepEqual(riskyWalk.matchedSelectors.taxAndLimits, ["setSellTax(uint256)"]);
+
+  // EIP-1167 minimal proxy clone
+  const implAddr = "2ce6311ddae708829bc0784c967b7d77d19fd779";
+  const cloneHex = `0x363d3d373d3d3d363d73${implAddr}5af43d82803e903d91602b57fd5bf3`;
+  const cloneWalk = analyzeEvmBytecodeHex(cloneHex);
+  assert.equal(cloneWalk.eip1167Implementation, `0x${implAddr}`);
+  assert.equal(cloneWalk.hasDelegateCall, true);
+});
+
+test("scoreEvmTokenRisk deterministically scores empty EOAs, clean renounced tokens, and honeypot/proxy contracts", () => {
+  const emptyRes = scoreEvmTokenRisk({ isContract: false });
+  assert.equal(emptyRes.riskScore, 85);
+  assert.equal(emptyRes.riskLevel, "CRITICAL");
+  assert.equal(emptyRes.flags[0].code, "NO_CONTRACT_BYTECODE");
+
+  // Clean contract with renounced owner (0x0) and standard transfer selector only
+  const cleanRes = scoreEvmTokenRisk({
+    bytecode: "0x608060405263a9059cbb60005200",
+    owner: "0x0000000000000000000000000000000000000000",
+    paused: false,
+  });
+  assert.equal(cleanRes.riskScore, 0);
+  assert.equal(cleanRes.riskLevel, "LOW");
+  assert.equal(cleanRes.flags.length, 0);
+
+  // High-risk upgradeable proxy with SELFDESTRUCT, mutable tax, paused transfers, and active owner
+  const critRes = scoreEvmTokenRisk({
+    bytecode: "0x6080f400",
+    implementationBytecode: "0x6340c10f1963cc1776d3638456cb59ff",
+    proxyType: "EIP-1967 Transparent/UUPS Proxy",
+    implementationAddress: "0x2ce6311ddae708829bc0784c967b7d77d19fd779",
+    adminAddress: "0x4fc7850364958d97b4d3f5a08f79db2493f8ca44",
+    owner: "0x1111111111111111111111111111111111111111",
+    paused: true,
+  });
+  assert.equal(critRes.riskScore, 100);
+  assert.equal(critRes.riskLevel, "CRITICAL");
+  const flagCodes = new Set(critRes.flags.map((f) => f.code));
+  assert.ok(flagCodes.has("OPCODE_SELFDESTRUCT"));
+  assert.ok(flagCodes.has("UPGRADEABLE_PROXY"));
+  assert.ok(flagCodes.has("MINT_CAPABILITY_DETECTED"));
+  assert.ok(flagCodes.has("MUTABLE_TAX_OR_TX_LIMITS"));
+  assert.ok(flagCodes.has("PAUSABLE_TRANSFERS"));
+  assert.ok(flagCodes.has("ACTIVE_OWNER_PRIVILEGE"));
+});
+
+test("scoreSolanaMintRisk deterministically scores clean revoked SPL mints vs Token-2022 permanentDelegate & whale concentration", () => {
+  const cleanSpl = scoreSolanaMintRisk({
+    decimals: 6,
+    supply: "1000000000000", // 1,000,000 tokens
+    mintAuthority: null,
+    freezeAuthority: null,
+    extensions: [],
+    largestAccounts: [
+      { address: "Holder1111111111111111111111111111111111111", amount: "50000000000" }, // 5%
+      { address: "Holder2222222222222222222222222222222222222", amount: "40000000000" }, // 4%
+    ],
+  });
+  assert.equal(cleanSpl.riskScore, 0);
+  assert.equal(cleanSpl.riskLevel, "LOW");
+  assert.equal(cleanSpl.flags.length, 0);
+  assert.equal(cleanSpl.mintInfo.mintAuthorityRevoked, true);
+  assert.equal(cleanSpl.mintInfo.freezeAuthorityRevoked, true);
+  assert.equal(cleanSpl.holderConcentration.top1HolderPct, 5);
+  assert.equal(cleanSpl.holderConcentration.top10HoldersPct, 9);
+
+  const risky2022 = scoreSolanaMintRisk({
+    decimals: 6,
+    supply: "1000000000",
+    mintAuthority: "MintAuth11111111111111111111111111111111111",
+    freezeAuthority: "FreezeAuth111111111111111111111111111111111",
+    extensions: [
+      {
+        extension: "permanentDelegate",
+        state: { delegate: "PermDel111111111111111111111111111111111111" },
+      },
+      {
+        extension: "transferFeeConfig",
+        state: {
+          newerTransferFee: { transferFeeBasisPoints: 600 },
+          transferFeeConfigAuthority: "FeeAuth111111111111111111111111111111111111",
+        },
+      },
+      {
+        extension: "transferHook",
+        state: { programId: "HookProg11111111111111111111111111111111111" },
+      },
+      {
+        extension: "mintCloseAuthority",
+        state: { closeAuthority: "CloseAuth1111111111111111111111111111111111" },
+      },
+      {
+        extension: "tokenMetadata",
+        state: { name: "Risky Token 2022", symbol: "RSK22" },
+      },
+    ],
+    largestAccounts: [
+      { address: "Whale11111111111111111111111111111111111111", amount: "450000000" }, // 45%
+      { address: "Whale22222222222222222222222222222222222222", amount: "350000000" }, // 35% -> top10 = 80%
+    ],
+  });
+  assert.equal(risky2022.riskScore, 100);
+  assert.equal(risky2022.riskLevel, "CRITICAL");
+  assert.equal(risky2022.mintInfo.embeddedMetadata.symbol, "RSK22");
+  assert.equal(risky2022.extensions.transferFeeBps, 600);
+  const solCodes = new Set(risky2022.flags.map((f) => f.code));
+  assert.ok(solCodes.has("ACTIVE_MINT_AUTHORITY"));
+  assert.ok(solCodes.has("ACTIVE_FREEZE_AUTHORITY"));
+  assert.ok(solCodes.has("TOKEN2022_PERMANENT_DELEGATE"));
+  assert.ok(solCodes.has("TOKEN2022_TRANSFER_FEE"));
+  assert.ok(solCodes.has("TOKEN2022_TRANSFER_HOOK"));
+  assert.ok(solCodes.has("TOKEN2022_MINT_CLOSE_AUTHORITY"));
+  assert.ok(solCodes.has("EXTREME_TOP1_CONCENTRATION"));
+  assert.ok(solCodes.has("EXTREME_TOP10_CONCENTRATION"));
+});
+
+function encodeAbiStringHex(str) {
+  const hex = Buffer.from(str, "utf8").toString("hex");
+  const lenHex = str.length.toString(16).padStart(64, "0");
+  const paddedData = hex.padEnd(Math.ceil(Math.max(1, hex.length) / 64) * 64, "0");
+  return "0x" + "20".padStart(64, "0") + lenHex + paddedData;
+}
+
+test("scanEvmTokenOnChain, scanSolanaMintOnChain, runBatchWatchlistScan, CSV dossier & CryptoBill handoff work end-to-end", async () => {
+  const proxyAddr = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913";
+  const implAddr = "0x2ce6311ddae708829bc0784c967b7d77d19fd779";
+  const adminAddr = "0x4fc7850364958d97b4d3f5a08f79db2493f8ca44";
+  const pyusdMint = "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo";
+
+  const mockRpcHandler = (body) => {
+    const { method, params } = body;
+    if (method === "eth_getCode") {
+      if (params[0] === proxyAddr) return "0x6080604052f400";
+      if (params[0] === implAddr) return "0x60806340c10f1963f9f92be4638456cb5900";
+      return "0x";
+    }
+    if (method === "eth_getStorageAt") {
+      if (params[1] === SLOT_ZEPPELINOS_IMPL) return "0x" + implAddr.slice(2).padStart(64, "0");
+      if (params[1] === SLOT_ZEPPELINOS_ADMIN) return "0x" + adminAddr.slice(2).padStart(64, "0");
+      return "0x" + "0".repeat(64);
+    }
+    if (method === "eth_call") {
+      const data = params[0]?.data;
+      if (data === "0x06fdde03") return encodeAbiStringHex("USD Coin");
+      if (data === "0x95d89b41") return encodeAbiStringHex("USDC");
+      if (data === "0x313ce567") return "0x" + (6).toString(16).padStart(64, "0");
+      if (data === "0x18160ddd") return "0x" + (5000000000000n).toString(16).padStart(64, "0");
+      if (data === "0x8da5cb5b") return "0x" + adminAddr.slice(2).padStart(64, "0");
+      if (data === "0x5c975abb") return "0x" + "0".repeat(64);
+    }
+    if (method === "getAccountInfo") {
+      return {
+        value: {
+          owner: TOKEN_2022_PROGRAM_ID,
+          data: {
+            parsed: {
+              type: "mint",
+              info: {
+                decimals: 6,
+                supply: "800000000000000",
+                isInitialized: true,
+                mintAuthority: "PyusdMintAuth111111111111111111111111111111",
+                freezeAuthority: "PyusdFreezeAuth1111111111111111111111111111",
+                extensions: [
+                  {
+                    extension: "permanentDelegate",
+                    state: { delegate: "PyusdPermDel1111111111111111111111111111111" },
+                  },
+                  {
+                    extension: "tokenMetadata",
+                    state: { name: "PayPal USD", symbol: "PYUSD" },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      };
+    }
+    if (method === "getTokenLargestAccounts") {
+      return {
+        value: [
+          { address: "SolVault11111111111111111111111111111111111", amount: "160000000000000" }, // 20%
+        ],
+      };
+    }
+    return null;
+  };
+
+  const mockFetch = async (_url, init) => {
+    const body = JSON.parse(init.body);
+    return {
+      ok: true,
+      status: 200,
+      text: async () => JSON.stringify({ jsonrpc: "2.0", id: body.id, result: mockRpcHandler(body) }),
+    };
+  };
+
+  const evmReport = await scanEvmTokenOnChain(
+    { chain: "base", address: proxyAddr },
+    { fetchImpl: mockFetch }
+  );
+  assert.equal(evmReport.ok, true);
+  assert.equal(evmReport.tokenMetadata.name, "USD Coin");
+  assert.equal(evmReport.tokenMetadata.symbol, "USDC");
+  assert.equal(evmReport.tokenMetadata.decimals, 6);
+  assert.equal(evmReport.proxyAnalysis.isProxy, true);
+  assert.equal(evmReport.proxyAnalysis.implementationAddress, implAddr);
+  assert.match(evmReport.markdownSummary, /TokenGuard Risk Dossier/);
+
+  const solReport = await scanSolanaMintOnChain(
+    { mint: pyusdMint },
+    { fetchImpl: mockFetch }
+  );
+  assert.equal(solReport.ok, true);
+  assert.equal(solReport.tokenStandard, "Token-2022");
+  assert.equal(solReport.riskLevel, "CRITICAL");
+  assert.equal(solReport.holderConcentration.available, true);
+  assert.equal(solReport.holderConcentration.top1HolderPct, 20);
+
+  // Batch Watchlist + 25-address guard + CSV/Invoice handoff
+  const parsedList = parseWatchlistEntries(`base:${proxyAddr}\nsolana:${pyusdMint}\n`);
+  assert.equal(parsedList.length, 2);
+
+  const batchReports = await runBatchWatchlistScan(parsedList, { fetchImpl: mockFetch });
+  assert.equal(batchReports.length, 2);
+  const csv = exportBatchReportsCsv(batchReports);
+  assert.match(csv, /USDC/);
+  assert.match(csv, /PYUSD/);
+
+  const tooMany = Array.from({ length: 26 }, (_, i) => ({
+    chain: "base",
+    address: `0x${(i + 1).toString(16).padStart(40, "0")}`,
+  }));
+  await assert.rejects(() => runBatchWatchlistScan(tooMany, { fetchImpl: mockFetch }), /up to 25/i);
+
+  const singleInv = buildAuditInvoicePayload(evmReport);
+  const decodedInv = decodeInvoicePayload(encodeInvoicePayload(singleInv));
+  assert.equal(decodedInv.items[0].unitPrice, 185);
+});
+
+test("ForgeSuite MCP v1.1.0 executes evm_token_risk_scan and solana_mint_risk_scan end-to-end over stdio", async () => {
+  const tokenAddr = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913";
+  const solMint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+
+  const mockRpcServer = http.createServer((req, res) => {
+    let raw = "";
+    req.on("data", (chunk) => {
+      raw += chunk;
+    });
+    req.on("end", () => {
+      const body = JSON.parse(raw);
+      let result = null;
+      if (body.method === "eth_getCode") {
+        result = "0x60806340c10f1900";
+      } else if (body.method === "eth_getStorageAt") {
+        result = "0x" + "0".repeat(64);
+      } else if (body.method === "eth_call") {
+        const sel = body.params[0]?.data;
+        if (sel === "0x06fdde03") result = encodeAbiStringHex("Mock Base Token");
+        else if (sel === "0x95d89b41") result = encodeAbiStringHex("MBT");
+        else if (sel === "0x313ce567") result = "0x" + (18).toString(16).padStart(64, "0");
+        else if (sel === "0x18160ddd") result = "0x" + (1000000000000000000000n).toString(16).padStart(64, "0");
+        else result = "0x" + "0".repeat(64);
+      } else if (body.method === "getAccountInfo") {
+        result = {
+          value: {
+            owner: TOKEN_PROGRAM_ID,
+            data: {
+              parsed: {
+                type: "mint",
+                info: {
+                  decimals: 6,
+                  supply: "1000000000",
+                  isInitialized: true,
+                  mintAuthority: null,
+                  freezeAuthority: null,
+                },
+              },
+            },
+          },
+        };
+      } else if (body.method === "getTokenLargestAccounts") {
+        result = {
+          value: [{ address: "HolderAcct111111111111111111111111111111111", amount: "100000000" }],
+        };
+      }
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ jsonrpc: "2.0", id: body.id, result }));
+    });
+  });
+
+  await new Promise((resolve) => mockRpcServer.listen(0, "127.0.0.1", resolve));
+  const port = mockRpcServer.address().port;
+  const localRpcUrl = `http://127.0.0.1:${port}`;
+
+  try {
+    const reqs = [
+      {
+        jsonrpc: "2.0",
+        id: "evm-scan",
+        method: "tools/call",
+        params: {
+          name: "evm_token_risk_scan",
+          arguments: { chain: "base", address: tokenAddr, rpcUrl: localRpcUrl },
+        },
+      },
+      {
+        jsonrpc: "2.0",
+        id: "sol-scan",
+        method: "tools/call",
+        params: {
+          name: "solana_mint_risk_scan",
+          arguments: { mint: solMint, rpcUrl: localRpcUrl },
+        },
+      },
+      {
+        jsonrpc: "2.0",
+        id: "evm-bad",
+        method: "tools/call",
+        params: {
+          name: "evm_token_risk_scan",
+          arguments: { chain: "base", address: "not-an-address" },
+        },
+      },
+    ];
+
+    const { code, stderr, messages } = await runMcpStdioSession(
+      reqs.map((r) => JSON.stringify(r) + "\n")
+    );
+    assert.equal(code, 0);
+    assert.equal(stderr, "");
+    assert.equal(messages.length, 3);
+
+    assert.equal(messages[0].id, "evm-scan");
+    assert.equal(messages[0].result.isError, false);
+    assert.equal(messages[0].result.structuredContent.tokenMetadata.symbol, "MBT");
+    assert.equal(messages[0].result.structuredContent.riskScore, 15);
+    assert.match(messages[0].result.content[0].text, /MINT_CAPABILITY_DETECTED/);
+
+    assert.equal(messages[1].id, "sol-scan");
+    assert.equal(messages[1].result.isError, false);
+    assert.equal(messages[1].result.structuredContent.tokenStandard, "SPL Token");
+    assert.equal(messages[1].result.structuredContent.riskScore, 0);
+    assert.equal(messages[1].result.structuredContent.holderConcentration.top1HolderPct, 10);
+
+    assert.equal(messages[2].id, "evm-bad");
+    assert.equal(messages[2].result.isError, true);
+  } finally {
+    await new Promise((resolve) => mockRpcServer.close(resolve));
+  }
 });
