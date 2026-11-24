@@ -1,25 +1,28 @@
 # ForgeSuite Studio (`youthmy11-ai.github.io`)
 
-[![Official MCP Registry: io.github.youthmy11-ai/forgesuite-mcp · v1.5.0 Active](https://img.shields.io/badge/MCP_Registry-io.github.youthmy11--ai%2Fforgesuite--mcp_·_v1.5.0_Active-10b981?style=for-the-badge)](https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite)
+[![Official MCP Registry: io.github.youthmy11-ai/forgesuite-mcp · v1.6.0 Active](https://img.shields.io/badge/MCP_Registry-io.github.youthmy11--ai%2Fforgesuite--mcp_·_v1.6.0_Active-10b981?style=for-the-badge)](https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite)
 
-Zero-backend, privacy-first static GitHub Pages storefront (`11` client-side web apps + `7` technical deep-dive guides), Official Registry-verified MCP Server (`v1.5.0`, `10` tools), `8` live 24/7 A2A + x402 autonomous cloud agents (`$440 USDC` active marketplace bids), and Micro-SaaS / Creator Media / Web3 Security developer toolkit by **youthmy11-ai**.
+Zero-backend, privacy-first static GitHub Pages storefront (`11` client-side web apps + `7` technical deep-dive guides), Official Registry-verified MCP Server (`v1.6.0`, `11` tools — Zero-Install Remote Streamable-HTTP + Node 20+ Stdio), `8` live 24/7 A2A + x402 autonomous cloud agents (`$440 USDC` active marketplace bids), and Micro-SaaS / Creator Media / Web3 Security developer toolkit by **youthmy11-ai**.
 
 - **Live Storefront:** **`https://youthmy11-ai.github.io/`**
-- **Official MCP Registry Landing Page:** **`https://youthmy11-ai.github.io/mcp.html`** (`io.github.youthmy11-ai/forgesuite-mcp · v1.5.0 Active` — [View on Official MCP Registry ↗](https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite))
+- **Official MCP Registry Landing Page:** **`https://youthmy11-ai.github.io/mcp.html`** (`io.github.youthmy11-ai/forgesuite-mcp · v1.6.0 Active` — [View on Official MCP Registry ↗](https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite))
+- **Zero-Install Remote Streamable-HTTP MCP:** **`https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp`**
 
 ![ForgeSuite Studio Storefront](assets/og-banner.png)
 ![CryptoBill Forge Workspace](assets/cryptobill-preview.png)
 
-## ForgeSuite MCP Server (`io.github.youthmy11-ai/forgesuite-mcp` · v1.5.0 Active · 10 Tools · Zero Dependencies)
+## ForgeSuite MCP Server (`io.github.youthmy11-ai/forgesuite-mcp` · v1.6.0 Active · 11 Tools · Zero-Install Remote HTTP + Stdio)
 
-Verified on the **Official Anthropic / Linux Foundation MCP Registry** (`https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite`). Connect VS Code, Claude Code, Cursor, Antigravity, or Windsurf in **one click or one command** (`< 2s`, Node 20+, zero npm dependencies) to **10 developer, FinOps, creator media, multi-chain wallet, brand launch & Web3 security tools** (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, `brand_domain_handle_scan`, `multi_chain_wallet_scan`, `subtitle_caption_audit`, `media_brief_audit`) — full docs at **[mcp.html](https://youthmy11-ai.github.io/mcp.html)**:
+Verified on the **Official Anthropic / Linux Foundation MCP Registry** (`https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite`). Connect Claude Desktop, Claude Code, VS Code, Cursor, Antigravity, or Windsurf instantly over **Zero-Install Cloudflare Edge Streamable-HTTP (`https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp`)** or in **one command** (`< 2s`, Node 20+, zero npm dependencies) to **11 developer, FinOps, clean web extraction, creator media, multi-chain wallet, brand launch & Web3 security tools** (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, `brand_domain_handle_scan`, `multi_chain_wallet_scan`, `subtitle_caption_audit`, `media_brief_audit`, `web_clean_extract`) — full docs at **[mcp.html](https://youthmy11-ai.github.io/mcp.html)**:
 
+- **🌐 Zero-Install Remote Streamable-HTTP:** `https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp` ([Server Card](https://youthmy11-ai.github.io/.well-known/mcp.json))
 - **⚡ Install in VS Code:** [`vscode:mcp/install?{"name":"forgesuite",...}`](vscode:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D)
 - **⚡ Install in VS Code Insiders:** [`vscode-insiders:mcp/install?{"name":"forgesuite",...}`](vscode-insiders:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D)
-- **📦 Download `.mcpb` Bundle (`v1.5.0`):** [`forgesuite-mcp.mcpb`](https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.5.0/forgesuite-mcp.mcpb)
+- **📦 Download `.mcpb` Bundle (`v1.6.0`):** [`forgesuite-mcp.mcpb`](https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.6.0/forgesuite-mcp.mcpb)
 
 ```bash
-# Run directly or register with Claude Code in 1 command:
+# Connect Zero-Install Remote Streamable-HTTP or local stdio in 1 command:
+claude mcp add --transport http forgesuite-remote https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp
 npx --yes github:youthmy11-ai/youthmy11-ai.github.io
 claude mcp add forgesuite -- npx --yes github:youthmy11-ai/youthmy11-ai.github.io
 ```

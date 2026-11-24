@@ -114,7 +114,7 @@ export function buildMcpbManifest(version) {
     display_name: "ForgeSuite Web3, FinOps, Brand & Media MCP",
     version,
     description:
-      "Zero-dependency Node 20+ MCP server with 10 tools for multi-chain EVM/Solana wallet & portfolio inspection, token risk scanning, calldata decoding, .env secret redaction, SRT/VTT 9:16 caption auditing, AI voiceover script pacing & media brief compliance, LLM cost estimation, crypto invoicing, and brand availability.",
+      "Zero-dependency Node 20+ MCP server with 11 tools (plus remote Streamable-HTTP at https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp) for multi-chain EVM/Solana wallet & portfolio inspection, token risk scanning, calldata decoding, .env secret redaction, SSRF-safe clean web-to-Markdown extraction, SRT/VTT 9:16 caption auditing, AI voiceover script pacing & media brief compliance, LLM cost estimation, crypto invoicing, and brand availability.",
     author: {
       name: "ForgeSuite Studio (youthmy11-ai)",
       email: "youthmy11@gmail.com",
@@ -175,6 +175,10 @@ export function buildMcpbManifest(version) {
       {
         name: "media_brief_audit",
         description: "Audit AI voiceover scripts & briefs offline for Latin/CJK WPM pacing, FFmpeg atempo distortion, likeness/IP safety & 1:1/9:16/16:9/4:5 specs.",
+      },
+      {
+        name: "web_clean_extract",
+        description: "SSRF-hardened clean web-to-Markdown, JSON-LD/OpenGraph, HTML-to-CSV table & LLM token-savings extractor.",
       },
     ],
   };

@@ -89,6 +89,7 @@ import {
   auditSubtitleCaptions,
   classifyWalletEvmBytecode,
   deriveSolanaAssociatedTokenAddress,
+  extractCleanWebPage,
   handleJsonRpcMessage,
   normalizeBrandCandidate,
   scanBrandDomainAndHandles,
@@ -1307,15 +1308,15 @@ test("ForgeSuite MCP stdio server handles initialize, notifications/initialized,
   assert.equal(messages[0].id, 1);
   assert.equal(messages[0].result.protocolVersion, "2024-11-05");
   assert.equal(messages[0].result.serverInfo.name, "forgesuite-mcp");
-  assert.equal(messages[0].result.serverInfo.version, "1.5.0");
-  assert.equal(MCP_SERVER_INFO.version, "1.5.0");
+  assert.equal(messages[0].result.serverInfo.version, "1.6.0");
+  assert.equal(MCP_SERVER_INFO.version, "1.6.0");
   assert.ok(messages[0].result.capabilities.tools);
 
   assert.equal(messages[1].id, 2);
   assert.deepEqual(messages[1].result, {});
 
   assert.equal(messages[2].id, 3);
-  assert.equal(messages[2].result.tools.length, 10);
+  assert.equal(messages[2].result.tools.length, 11);
   const toolNames = messages[2].result.tools.map((t) => t.name).sort();
   assert.deepEqual(toolNames, [
     "brand_domain_handle_scan",
@@ -1328,6 +1329,7 @@ test("ForgeSuite MCP stdio server handles initialize, notifications/initialized,
     "solana_mint_risk_scan",
     "subtitle_caption_audit",
     "tokencost_estimate",
+    "web_clean_extract",
   ]);
   for (const tool of messages[2].result.tools) {
     assert.equal(tool.inputSchema.type, "object");
@@ -1525,24 +1527,37 @@ test(".nojekyll, A2A /.well-known/agent-card.json, and MCP /.well-known/mcp/serv
     "agent-card.json missing pay-per-use-media-gen skill"
   );
 
-  const mcpManifest = JSON.parse(fs.readFileSync(path.join(rootDir, ".well-known", "mcp", "server.json"), "utf8"));
-  assert.equal(mcpManifest.name, "io.github.youthmy11-ai/forgesuite-mcp");
-  assert.equal(mcpManifest.version, "1.5.0");
-  assert.deepEqual(
-    mcpManifest.tools.map((t) => t.name),
-    [
-      "envshield_scan",
-      "calldata_decode",
-      "tokencost_estimate",
-      "cryptobill_quote",
-      "evm_token_risk_scan",
-      "solana_mint_risk_scan",
-      "brand_domain_handle_scan",
-      "multi_chain_wallet_scan",
-      "subtitle_caption_audit",
-      "media_brief_audit",
-    ]
-  );
+  for (const relMcpPath of [
+    path.join(rootDir, ".well-known", "mcp", "server.json"),
+    path.join(rootDir, ".well-known", "mcp", "server-card.json"),
+    path.join(rootDir, ".well-known", "mcp.json"),
+  ]) {
+    const mcpManifest = JSON.parse(fs.readFileSync(relMcpPath, "utf8"));
+    assert.equal(mcpManifest.name, "io.github.youthmy11-ai/forgesuite-mcp");
+    assert.equal(mcpManifest.version, "1.6.0");
+    assert.deepEqual(mcpManifest.remotes, [
+      {
+        type: "streamable-http",
+        url: "https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp",
+      },
+    ]);
+    assert.deepEqual(
+      mcpManifest.tools.map((t) => t.name),
+      [
+        "envshield_scan",
+        "calldata_decode",
+        "tokencost_estimate",
+        "cryptobill_quote",
+        "evm_token_risk_scan",
+        "solana_mint_risk_scan",
+        "brand_domain_handle_scan",
+        "multi_chain_wallet_scan",
+        "subtitle_caption_audit",
+        "media_brief_audit",
+        "web_clean_extract",
+      ]
+    );
+  }
 });
 
 /* ============================================================================
@@ -1962,7 +1977,7 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.5.0 npx
   assert.ok(fs.existsSync(pkgPath), "root package.json must exist for npx github:... execution");
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
   assert.equal(pkg.name, "forgesuite-mcp");
-  assert.equal(pkg.version, "1.5.0");
+  assert.equal(pkg.version, "1.6.0");
   assert.equal(pkg.type, "module");
   assert.deepEqual(pkg.bin, { "forgesuite-mcp": "./mcp/forgesuite-mcp.mjs" });
   assert.equal(pkg.engines?.node, ">=20.0.0");
@@ -1986,9 +2001,12 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.5.0 npx
     "mcp/forgesuite-mcp.mjs must use strict LF (\\n) with zero CR (\\r) bytes"
   );
 
-  // Check v1.4.0 and 1-command npx across discovery & storefront files
+  // Check v1.6.0, Remote Streamable-HTTP URL, and 1-command npx across discovery & storefront files
   const npxCmd = "npx --yes github:youthmy11-ai/youthmy11-ai.github.io";
+  const remoteHttpUrl = "https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp";
   for (const rel of [
+    ".well-known/mcp.json",
+    ".well-known/mcp/server-card.json",
     ".well-known/mcp/server.json",
     ".well-known/agent-card.json",
     "mcp.html",
@@ -1999,11 +2017,13 @@ test("root package.json, .gitattributes, shebang LF line-endings, and v1.5.0 npx
   ]) {
     const content = fs.readFileSync(path.join(rootDir, rel), "utf8");
     assert.ok(content.includes(npxCmd), `${rel} must showcase ${npxCmd}`);
+    assert.ok(content.includes(remoteHttpUrl), `${rel} must showcase ${remoteHttpUrl}`);
     assert.ok(content.includes("brand_domain_handle_scan"), `${rel} must list brand_domain_handle_scan`);
     assert.ok(content.includes("multi_chain_wallet_scan"), `${rel} must list multi_chain_wallet_scan`);
     assert.ok(content.includes("subtitle_caption_audit"), `${rel} must list subtitle_caption_audit`);
     assert.ok(content.includes("media_brief_audit"), `${rel} must list media_brief_audit`);
-    assert.ok(content.includes("1.5.0"), `${rel} must reference v1.5.0`);
+    assert.ok(content.includes("web_clean_extract"), `${rel} must list web_clean_extract`);
+    assert.ok(content.includes("1.6.0"), `${rel} must reference v1.6.0`);
   }
 });
 
@@ -2456,6 +2476,12 @@ test("root server.json, deterministic .mcpb packer, and GitHub OIDC MCP Registry
   assert.equal(mcpbPkg.fileSha256, fileSha256);
   assert.equal(mcpbPkg.transport.type, "stdio");
   assert.equal(mcpbPkg.registryBaseUrl, undefined);
+  assert.deepEqual(serverJson.remotes, [
+    {
+      type: "streamable-http",
+      url: "https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp",
+    },
+  ]);
   assert.equal(archiveBuffer.readUInt32LE(0), 0x04034b50, "MCPB bundle must start with PKZIP signature");
 
   const wf = fs.readFileSync(
@@ -2520,7 +2546,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   const vscodeInsidersLink =
     "vscode-insiders:mcp/install?%7B%22name%22%3A%22forgesuite%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Ayouthmy11-ai%2Fyouthmy11-ai.github.io%22%5D%7D";
   const mcpbAssetUrl =
-    "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.5.0/forgesuite-mcp.mcpb";
+    "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.6.0/forgesuite-mcp.mcpb";
 
   // Verify encoded VS Code deep-link payload decodes cleanly to valid JSON
   const decodedPayload = JSON.parse(decodeURIComponent(vscodeLink.split("?")[1]));
@@ -2551,7 +2577,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   ]) {
     assert.ok(doc.includes(registryUrl), `${label} missing Official MCP Registry URL`);
     assert.ok(doc.includes("io.github.youthmy11-ai/forgesuite-mcp"), `${label} missing registry name`);
-    assert.ok(doc.includes("v1.5.0 Active"), `${label} missing v1.5.0 Active badge`);
+    assert.ok(doc.includes("v1.6.0 Active"), `${label} missing v1.6.0 Active badge`);
     assert.ok(doc.includes(vscodeLink), `${label} missing 1-click VS Code MCP install link`);
     assert.ok(doc.includes(vscodeInsidersLink), `${label} missing 1-click VS Code Insiders MCP install link`);
     assert.ok(doc.includes(mcpbAssetUrl), `${label} missing .mcpb release bundle download link`);
@@ -2561,7 +2587,7 @@ test("mcp.html, index.html, and READMEs showcase Official MCP Registry Verified 
   }
 
   assert.ok(indexHtml.includes(registryUrl), "index.html missing Official MCP Registry URL");
-  assert.ok(indexHtml.includes("v1.5.0 Active"), "index.html missing v1.5.0 Active badge");
+  assert.ok(indexHtml.includes("v1.6.0 Active"), "index.html missing v1.6.0 Active badge");
   for (const agentUrl of fleetAgents) {
     assert.ok(indexHtml.includes(agentUrl), `index.html missing A2A fleet agent ${agentUrl}`);
   }
@@ -3995,4 +4021,61 @@ test("mediastudio.html and ai-voiceover-script-duration-calculator-compliance-ch
 
   verifyInternalRelativeHtmlLinks(repoRoot, appFile, appHtml);
   verifyInternalRelativeHtmlLinks(repoRoot, seoFile, seoHtml);
+});
+
+test("ForgeSuite MCP v1.6.0 Tool #11 (web_clean_extract) enforces SSRF guard, extracts Markdown/CSV tables & tokenSavings, and supports prompts/list & resources/list", async () => {
+  const sampleHtml = `<!doctype html><html><head><title>ForgeSuite Docs</title><meta name="description" content="Clean web extractor test"><meta property="og:title" content="ForgeSuite OG"><script type="application/ld+json">{"@type":"TechArticle","headline":"Clean Extract"}</script></head><body><nav>Navigation links 1 2 3 4 5</nav><script>window.BIG_BLOB="${"z".repeat(800)}";</script><h1>Clean Web Extractor</h1><p>Email support@example.com for enterprise quotes.</p><table><tr><th>Plan</th><th>Price</th></tr><tr><td>=Injected</td><td>$35</td></tr></table></body></html>`;
+
+  const mockOpts = {
+    lookupImpl: async () => [{ address: "93.184.216.34", family: 4 }],
+    fetchImpl: async () => ({
+      status: 200,
+      headers: { get: () => null },
+      text: async () => sampleHtml,
+    }),
+  };
+
+  const extracted = await extractCleanWebPage(
+    { url: "https://example.com/docs", maskPii: true },
+    mockOpts
+  );
+  assert.equal(extracted.ok, true);
+  assert.equal(extracted.metadata.title, "ForgeSuite Docs");
+  assert.equal(extracted.metadata.jsonLd.length, 1);
+  assert.match(extracted.markdown, /Clean Web Extractor/);
+  assert.match(extracted.markdown, /\[REDACTED_EMAIL\]/);
+  assert.equal(extracted.tables.length, 1);
+  assert.match(extracted.tables[0].csv, /'=Injected/);
+  assert.ok(extracted.tokenSavings.estimatedTokensSaved > 0);
+
+  // SSRF blocks localhost, private IPv4/IPv6, and DNS rebinding to private IP
+  await assert.rejects(() => extractCleanWebPage({ url: "http://127.0.0.1:8080" }), /Blocked/i);
+  await assert.rejects(() => extractCleanWebPage({ url: "http://[::1]/" }), /Blocked/i);
+  await assert.rejects(
+    () =>
+      extractCleanWebPage(
+        { url: "https://rebind.example.com" },
+        { lookupImpl: async () => [{ address: "10.0.0.5", family: 4 }] }
+      ),
+    /non-public IP/i
+  );
+
+  // JSON-RPC prompts/list, resources/list, and tools/call web_clean_extract
+  const prRes = handleJsonRpcMessage({ jsonrpc: "2.0", id: "pr-1", method: "prompts/list" });
+  assert.deepEqual(prRes.result, { prompts: [] });
+  const rsRes = handleJsonRpcMessage({ jsonrpc: "2.0", id: "rs-1", method: "resources/list" });
+  assert.deepEqual(rsRes.result, { resources: [] });
+
+  const rpcWeb = await handleJsonRpcMessage(
+    {
+      jsonrpc: "2.0",
+      id: "web-1",
+      method: "tools/call",
+      params: { name: "web_clean_extract", arguments: { url: "https://example.com/docs" } },
+    },
+    mockOpts
+  );
+  assert.equal(rpcWeb.result.isError, false);
+  assert.equal(rpcWeb.result.structuredContent.tables.length, 1);
+  assert.match(rpcWeb.result.content[0].text, /Token Savings:/);
 });

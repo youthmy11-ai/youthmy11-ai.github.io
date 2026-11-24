@@ -1,7 +1,7 @@
 {
   "name": "forgesuite-mcp",
-  "version": "1.5.0",
-  "description": "Zero-dependency MCP server (10 tools) for multi-chain EVM/Solana wallet & portfolio inspection, token risk scanning, calldata decoding, .env secret auditing, SRT/VTT 9:16 subtitle caption auditing, AI voiceover script pacing & media compliance checking, LLM FinOps cost estimation, crypto invoicing, and brand domain/handle availability.",
+  "version": "1.6.0",
+  "description": "Zero-dependency MCP server (11 tools, stdio + remote Streamable-HTTP at https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp) for multi-chain EVM/Solana wallet & portfolio inspection, token risk scanning, calldata decoding, .env secret auditing, SSRF-hardened clean web-to-Markdown extraction, SRT/VTT 9:16 subtitle caption auditing, AI voiceover script pacing & media compliance checking, LLM FinOps cost estimation, crypto invoicing, and brand domain/handle availability.",
   "type": "module",
   "bin": {
     "forgesuite-mcp": "./mcp/forgesuite-mcp.mjs"

@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
- * ForgeSuite MCP Server (v1.5.0)
- * Zero-dependency Node 20+ Model Context Protocol (MCP) stdio JSON-RPC 2.0 server.
+ * ForgeSuite MCP Server (v1.6.0)
+ * Zero-dependency Node 20+ Model Context Protocol (MCP) stdio JSON-RPC 2.0 server
+ * + Zero-Install Cloudflare Edge Remote Streamable-HTTP MCP (`https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp`).
  *
  * 1-Command Global Run:
  *   npx --yes github:youthmy11-ai/youthmy11-ai.github.io
  *
- * 10 Developer, FinOps, Creator Media, Brand Launch & Web3 Security Tools:
+ * 11 Developer, FinOps, Clean Web Extract, Creator Media, Brand Launch & Web3 Security Tools:
  *   1. envshield_scan           — Scan .env/configs/logs offline for leaked secrets & return redacted output
  *   2. calldata_decode          — Decode EVM calldata selectors offline & flag unlimited MaxUint256 approvals
  *   3. tokencost_estimate       — Estimate LLM API & multi-turn AI agent run costs (Claude/GPT/Gemini/DeepSeek)
@@ -17,21 +18,27 @@
  *   8. multi_chain_wallet_scan  — Live 6-chain EVM & Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector
  *   9. subtitle_caption_audit   — Audit .srt/.vtt captions offline for overlaps, CPS reading speed, 9:16 mobile safe zones, mid-sentence cuts & brand terms + return normalized .srt/.vtt & 0-100 quality score
  *  10. media_brief_audit        — Audit AI voiceover scripts & creative briefs offline: Latin/CJK WPM pacing (135/150/165 WPM vs targetSec), FFmpeg atempo distortion check, likeness/copyright/trademark pre-flight score (0-100) & 1:1/9:16/16:9/4:5 agent JSON specs
+ *  11. web_clean_extract        — SSRF-hardened clean web-to-Markdown, JSON-LD/OpenGraph, HTML-to-CSV table & LLM token-savings extractor
  *
  * Docs & Pro Bundle ($35 Lifetime): https://youthmy11-ai.github.io/mcp.html
  * License: MIT (youthmy11-ai)
  */
 
 import crypto from "node:crypto";
+import dns from "node:dns";
 import fs from "node:fs";
+import net from "node:net";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 
 export const SERVER_INFO = Object.freeze({
   name: "forgesuite-mcp",
-  version: "1.5.0",
+  version: "1.6.0",
 });
+
+export const REMOTE_MCP_ENDPOINT =
+  "https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp";
 
 export const SUPPORTED_PROTOCOL_VERSIONS = Object.freeze([
   "2025-03-26",
@@ -5373,7 +5380,386 @@ export function auditMediaBrief(params = {}) {
 }
 
 /* ============================================================================
- * 11. MCP Tool Definitions & Dispatch (10 Tools)
+ * 11. SSRF-Hardened Clean Web-to-Markdown, Table CSV & Token-Savings Extractor
+ * ========================================================================== */
+
+const WEB_EXTRACT_BLOCKED_HOSTS = new Set([
+  "localhost",
+  "localhost.localdomain",
+  "ip6-localhost",
+  "ip6-loopback",
+  "metadata",
+  "metadata.google.internal",
+  "metadata.goog",
+  "instance-data",
+  "kubernetes.default",
+  "kubernetes.default.svc",
+]);
+
+const WEB_EXTRACT_BLOCKED_SUFFIXES = [
+  ".localhost",
+  ".local",
+  ".internal",
+  ".home.arpa",
+  ".lan",
+  ".intranet",
+  ".corp",
+];
+
+export function isBlockedWebIpv4(ip) {
+  const parts = String(ip || "").trim().split(".");
+  if (parts.length !== 4) return true;
+  const octets = parts.map((p) => (/^\d{1,3}$/.test(p) ? Number(p) : NaN));
+  if (octets.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return true;
+  const [a, b, c] = octets;
+  if (a === 0 || a === 10 || a === 127) return true;
+  if (a === 100 && b >= 64 && b <= 127) return true;
+  if (a === 169 && b === 254) return true;
+  if (a === 172 && b >= 16 && b <= 31) return true;
+  if (a === 192 && (b === 168 || (b === 0 && (c === 0 || c === 2)) || (b === 88 && c === 99))) {
+    return true;
+  }
+  if (a === 198 && (b === 18 || b === 19 || (b === 51 && c === 100))) return true;
+  if (a === 203 && b === 0 && c === 113) return true;
+  if (a >= 224) return true;
+  return false;
+}
+
+export function isBlockedWebIpv6(rawIp) {
+  let ip = String(rawIp || "").trim().replace(/^\[|\]$/g, "").toLowerCase();
+  if (!ip || ip.includes("%")) return true;
+  if (ip.includes(".")) {
+    const lastColon = ip.lastIndexOf(":");
+    if (lastColon === -1) return true;
+    const v4Part = ip.slice(lastColon + 1);
+    if (isBlockedWebIpv4(v4Part)) return true;
+    const octs = v4Part.split(".").map(Number);
+    const hi = ((octs[0] << 8) | octs[1]).toString(16);
+    const lo = ((octs[2] << 8) | octs[3]).toString(16);
+    ip = `${ip.slice(0, lastColon)}:${hi}:${lo}`;
+  }
+  const halves = ip.split("::");
+  if (halves.length > 2) return true;
+  const left = halves[0] ? halves[0].split(":") : [];
+  const right = halves.length === 2 && halves[1] ? halves[1].split(":") : [];
+  const missing = 8 - (left.length + right.length);
+  if ((halves.length === 1 && missing !== 0) || missing < 0) return true;
+  const groups = [
+    ...left,
+    ...(halves.length === 2 ? Array(missing).fill("0") : []),
+    ...right,
+  ].map((g) => (/^[0-9a-f]{1,4}$/.test(g) ? Number.parseInt(g, 16) : NaN));
+  if (groups.length !== 8 || groups.some((n) => Number.isNaN(n))) return true;
+  if (groups.every((g) => g === 0)) return true;
+  if (groups.slice(0, 7).every((g) => g === 0) && groups[7] === 1) return true;
+  if (
+    groups.slice(0, 5).every((g) => g === 0) &&
+    (groups[5] === 0xffff || groups[5] === 0)
+  ) {
+    const a = (groups[6] >> 8) & 0xff;
+    const b = groups[6] & 0xff;
+    const c = (groups[7] >> 8) & 0xff;
+    const d = groups[7] & 0xff;
+    return isBlockedWebIpv4(`${a}.${b}.${c}.${d}`);
+  }
+  if ((groups[0] & 0xfe00) === 0xfc00) return true;
+  if ((groups[0] & 0xffc0) === 0xfe80) return true;
+  if ((groups[0] & 0xff00) === 0xff00) return true;
+  if (groups[0] === 0x2001 && (groups[1] === 0x0db8 || groups[1] === 0x0000)) return true;
+  return false;
+}
+
+export async function validateSafePublicUrl(rawUrl, options = {}) {
+  const lookupImpl = options.lookupImpl ?? dns.promises.lookup;
+  let parsed;
+  try {
+    parsed = new URL(String(rawUrl || "").trim());
+  } catch {
+    throw new Error(`Invalid URL "${rawUrl}". Provide a public http:// or https:// URL.`);
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error(`Blocked protocol "${parsed.protocol}" (only http:// and https:// are permitted).`);
+  }
+  if (parsed.username || parsed.password) {
+    throw new Error("Blocked URL containing embedded credentials.");
+  }
+  if (parsed.port && !["80", "443", "8080", "8443"].includes(parsed.port)) {
+    throw new Error(
+      `Blocked non-standard port ":${parsed.port}" (only standard web ports 80/443/8080/8443 are permitted).`
+    );
+  }
+  const host = parsed.hostname.replace(/^\[|\]$/g, "").toLowerCase().replace(/\.$/, "");
+  if (
+    !host ||
+    WEB_EXTRACT_BLOCKED_HOSTS.has(host) ||
+    WEB_EXTRACT_BLOCKED_SUFFIXES.some((s) => host.endsWith(s)) ||
+    /^(?:0x[0-9a-f]+|\d+)$/i.test(host)
+  ) {
+    throw new Error(`Blocked private or loopback target host "${host}" (SSRF guard).`);
+  }
+  const ipVer = net.isIP(host);
+  if (ipVer === 4) {
+    if (isBlockedWebIpv4(host)) {
+      throw new Error(`Blocked private/loopback IPv4 literal "${host}" (SSRF guard).`);
+    }
+    return parsed.href;
+  }
+  if (ipVer === 6) {
+    if (isBlockedWebIpv6(host)) {
+      throw new Error(`Blocked private/loopback IPv6 literal "${host}" (SSRF guard).`);
+    }
+    return parsed.href;
+  }
+  if (!host.includes(".")) {
+    throw new Error(`Blocked single-label internal hostname "${host}" (SSRF guard).`);
+  }
+  const records = await lookupImpl(host, { all: true, verbatim: true });
+  const list = Array.isArray(records) ? records : records ? [records] : [];
+  if (list.length === 0) {
+    throw new Error(`No DNS A/AAAA records resolved for "${host}".`);
+  }
+  for (const rec of list) {
+    const addr = typeof rec === "string" ? rec : rec?.address;
+    const ver = net.isIP(String(addr || ""));
+    const blocked =
+      ver === 4 ? isBlockedWebIpv4(addr) : ver === 6 ? isBlockedWebIpv6(addr) : true;
+    if (blocked) {
+      throw new Error(`Blocked hostname "${host}" resolving to non-public IP "${addr}" (SSRF guard).`);
+    }
+  }
+  return parsed.href;
+}
+
+function decodeWebHtmlEntities(str) {
+  if (!str) return "";
+  const map = {
+    amp: "&",
+    lt: "<",
+    gt: ">",
+    quot: '"',
+    apos: "'",
+    nbsp: " ",
+    ndash: "-",
+    mdash: "--",
+    hellip: "...",
+    copy: "(c)",
+  };
+  return String(str).replace(/&(#x?[0-9a-fA-F]+|[a-zA-Z]+);/g, (full, ent) => {
+    if (ent[0] === "#") {
+      const code =
+        ent[1] === "x" || ent[1] === "X"
+          ? Number.parseInt(ent.slice(2), 16)
+          : Number.parseInt(ent.slice(1), 10);
+      if (Number.isFinite(code) && code > 0 && code <= 0x10ffff) {
+        try {
+          return String.fromCodePoint(code);
+        } catch {
+          return full;
+        }
+      }
+      return full;
+    }
+    const lower = ent.toLowerCase();
+    return lower in map ? map[lower] : full;
+  });
+}
+
+function escapeWebCsvCell(val) {
+  let s = String(val ?? "").replace(/\r?\n/g, " ").trim();
+  if (/^[=+\-@]/.test(s)) s = `'${s}`;
+  if (/[",]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+export async function extractCleanWebPage(input = {}, options = {}) {
+  const fetchImpl = options.fetchImpl ?? globalThis.fetch;
+  const timeoutMs = options.timeoutMs ?? 7000;
+  const rawUrl = String(input?.url || "").trim();
+  if (!rawUrl) {
+    throw new Error("Missing required argument 'url'.");
+  }
+
+  let currentUrl = await validateSafePublicUrl(rawUrl, options);
+  let res = null;
+  for (let hop = 0; hop < 4; hop += 1) {
+    currentUrl = await validateSafePublicUrl(currentUrl, options);
+    res = await fetchImpl(currentUrl, {
+      method: "GET",
+      redirect: "manual",
+      headers: {
+        "User-Agent": "ForgeSuite-MCP/1.6 (+https://youthmy11-ai.github.io/mcp.html)",
+        Accept: "text/html,application/xhtml+xml,application/json,text/plain;q=0.9",
+      },
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    if ([301, 302, 303, 307, 308].includes(res.status)) {
+      const loc = res.headers?.get ? res.headers.get("location") : null;
+      if (!loc) break;
+      currentUrl = new URL(loc, currentUrl).href;
+      continue;
+    }
+    break;
+  }
+
+  if (!res) {
+    throw new Error("No HTTP response received from target URL.");
+  }
+
+  const html = (await res.text()).slice(0, 500_000);
+  const parsedFinal = new URL(currentUrl);
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  const descMatch =
+    html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i) ||
+    html.match(/<meta[^>]+content=["']([^"']*)["'][^>]+name=["']description["']/i);
+  const canonicalMatch =
+    html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i) ||
+    html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["']/i);
+
+  const title = titleMatch
+    ? decodeWebHtmlEntities(titleMatch[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
+    : parsedFinal.hostname;
+  const description = descMatch ? decodeWebHtmlEntities(descMatch[1]).trim() : null;
+  let canonicalUrl = currentUrl;
+  if (canonicalMatch?.[1]) {
+    try {
+      canonicalUrl = new URL(decodeWebHtmlEntities(canonicalMatch[1]), currentUrl).href;
+    } catch {
+      canonicalUrl = currentUrl;
+    }
+  }
+
+  const openGraph = {};
+  const ogRx =
+    /<meta[^>]+property=["']og:([a-zA-Z0-9_:-]+)["'][^>]+content=["']([^"']*)["'][^>]*>/gi;
+  let ogm;
+  while ((ogm = ogRx.exec(html)) !== null) {
+    openGraph[ogm[1].toLowerCase()] = decodeWebHtmlEntities(ogm[2]).trim();
+  }
+
+  const jsonLd = [];
+  const ldRx = /<script[^>]+type=["']?application\/ld\+json["']?[^>]*>([\s\S]*?)<\/script>/gi;
+  let ldm;
+  while ((ldm = ldRx.exec(html)) !== null && jsonLd.length < 10) {
+    try {
+      const parsedLd = JSON.parse(decodeWebHtmlEntities(ldm[1]).trim());
+      if (parsedLd && typeof parsedLd === "object") jsonLd.push(parsedLd);
+    } catch {
+      // Ignore invalid JSON-LD
+    }
+  }
+
+  const maskPii = Boolean(input?.maskPii);
+  const cleanedTableSrc = html
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<(?:script|style|noscript|svg)[\s\S]*?<\/(?:script|style|noscript|svg)>/gi, "");
+  const tables = [];
+  const tableRx = /<table\b[^>]*>([\s\S]*?)<\/table>/gi;
+  let tm;
+  while ((tm = tableRx.exec(cleanedTableSrc)) !== null && tables.length < 10) {
+    const trRx = /<tr\b[^>]*>([\s\S]*?)<\/tr>/gi;
+    const rows = [];
+    let trm;
+    while ((trm = trRx.exec(tm[1])) !== null && rows.length < 60) {
+      const cells = [];
+      const cellRx = /<(?:th|td)\b[^>]*>([\s\S]*?)<\/(?:th|td)>/gi;
+      let cm;
+      while ((cm = cellRx.exec(trm[1])) !== null) {
+        let cellTxt = decodeWebHtmlEntities(cm[1].replace(/<[^>]+>/g, " "))
+          .replace(/\s+/g, " ")
+          .trim();
+        if (maskPii) {
+          cellTxt = cellTxt.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[REDACTED_EMAIL]");
+        }
+        cells.push(cellTxt);
+      }
+      if (cells.length > 0 && cells.some((c) => c.length > 0)) rows.push(cells);
+    }
+    if (rows.length < 2) continue;
+    const colCount = Math.max(...rows.map((r) => r.length));
+    const header = Array.from({ length: colCount }, (_, i) => rows[0][i] || `column_${i + 1}`);
+    const bodyRows = rows.slice(1);
+    const csvLines = [
+      header.map(escapeWebCsvCell).join(","),
+      ...bodyRows.map((r) =>
+        Array.from({ length: colCount }, (_, i) => escapeWebCsvCell(r[i] ?? "")).join(",")
+      ),
+    ];
+    const mdLines = [
+      `| ${header.map((h) => h.replace(/\|/g, "\\|")).join(" | ")} |`,
+      `| ${header.map(() => "---").join(" | ")} |`,
+      ...bodyRows.slice(0, 25).map(
+        (r) =>
+          `| ${Array.from({ length: colCount }, (_, i) => String(r[i] ?? "").replace(/\|/g, "\\|")).join(" | ")} |`
+      ),
+    ];
+    tables.push({
+      tableIndex: tables.length + 1,
+      rowCount: bodyRows.length,
+      columnCount: colCount,
+      columns: header,
+      csv: csvLines.join("\n"),
+      markdownTable: mdLines.join("\n"),
+    });
+  }
+
+  const maxChars = Math.max(500, Math.min(80_000, Number(input?.maxChars) || 40_000));
+  let md = decodeWebHtmlEntities(
+    html
+      .replace(/<!--[\s\S]*?-->/g, "")
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[\s\S]*?<\/style>/gi, "")
+      .replace(/<noscript[\s\S]*?<\/noscript>/gi, "")
+      .replace(/<svg[\s\S]*?<\/svg>/gi, "")
+      .replace(/<nav[\s\S]*?<\/nav>/gi, "")
+      .replace(/<footer[\s\S]*?<\/footer>/gi, "")
+      .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, "\n# $1\n")
+      .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, "\n## $1\n")
+      .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, "\n### $1\n")
+      .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, "\n- $1")
+      .replace(/<(?:p|div|br|section|article|tr)[^>]*>/gi, "\n")
+      .replace(/<[^>]+>/g, " ")
+  )
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n[ \t]+/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, maxChars);
+
+  if (maskPii) {
+    md = md.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[REDACTED_EMAIL]");
+  }
+
+  const rawStats = estimateTokenCount(html);
+  const cleanStats = estimateTokenCount(md);
+  const estimatedTokensSaved = Math.max(0, rawStats.tokens - cleanStats.tokens);
+  const savingsPct =
+    rawStats.tokens > 0
+      ? Number(((estimatedTokensSaved / rawStats.tokens) * 100).toFixed(2))
+      : 0;
+
+  return {
+    ok: res.status >= 200 && res.status < 400,
+    inputUrl: rawUrl,
+    finalUrl: currentUrl,
+    fetchedAtUtc: new Date().toISOString(),
+    httpStatus: res.status,
+    metadata: { title, description, canonicalUrl, openGraph, jsonLd },
+    markdown: md,
+    wordCount: md ? md.split(/\s+/).filter(Boolean).length : 0,
+    tables,
+    tokenSavings: {
+      rawHtmlChars: rawStats.chars,
+      cleanMarkdownChars: cleanStats.chars,
+      estimatedRawHtmlTokens: rawStats.tokens,
+      estimatedCleanMarkdownTokens: cleanStats.tokens,
+      estimatedTokensSaved,
+      savingsPct,
+    },
+  };
+}
+
+/* ============================================================================
+ * 12. MCP Tool Definitions & Dispatch (11 Tools)
  * ========================================================================== */
 
 export const TOOLS = Object.freeze([
@@ -5732,7 +6118,50 @@ export const TOOLS = Object.freeze([
       },
     },
   },
-]);
+  {
+    name: "web_clean_extract",
+    title: "SSRF-Hardened Clean Web-to-Markdown, JSON-LD, CSV Table & Token-Savings Extractor",
+    description:
+      "Fetch a public HTTP/HTTPS web page with strict IPv4/IPv6 & DNS SSRF protection and extract clean LLM-ready Markdown, canonical/OpenGraph/JSON-LD metadata, HTML tables converted to RFC-4180 CSV + Markdown, and estimated LLM token savings versus raw HTML.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: {
+          type: "string",
+          format: "uri",
+          description: "Public http:// or https:// URL to fetch and extract.",
+        },
+        maskPii: {
+          type: "boolean",
+          description: "Redact detected email addresses in extracted Markdown and tables (default: false).",
+          default: false,
+        },
+        maxChars: {
+          type: "number",
+          description: "Maximum clean Markdown output length in characters (500-80000, default: 40000).",
+          default: 40000,
+        },
+      },
+      required: ["url"],
+    },
+    annotations: {
+      title: "Clean Web-to-Markdown Extractor",
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    },
+  },
+].map((t) => ({
+  ...t,
+  title: t.title || t.name,
+  annotations: t.annotations || {
+    title: t.title || t.name,
+    readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+  },
+})));
 
 function executeTool(name, args = {}, options = {}) {
   const safeArgs = args && typeof args === "object" && !Array.isArray(args) ? args : {};
@@ -6275,6 +6704,48 @@ function executeTool(name, args = {}, options = {}) {
       };
     }
 
+    case "web_clean_extract": {
+      if (typeof safeArgs.url !== "string" || !safeArgs.url.trim()) {
+        return {
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: "Invalid argument: 'url' must be a non-empty public http:// or https:// URL string.",
+            },
+          ],
+        };
+      }
+      return extractCleanWebPage(safeArgs, options)
+        .then((res) => {
+          const ts = res.tokenSavings;
+          const lines = [
+            `Clean Web-to-Markdown Extract — HTTP ${res.httpStatus} (${res.finalUrl})`,
+            `Title: ${res.metadata.title || "Untitled"}${res.metadata.description ? ` — ${res.metadata.description}` : ""}`,
+            `Token Savings: ${ts.estimatedRawHtmlTokens.toLocaleString("en-US")} raw HTML tokens -> ${ts.estimatedCleanMarkdownTokens.toLocaleString("en-US")} clean Markdown tokens (saved ${ts.estimatedTokensSaved.toLocaleString("en-US")} tokens / ${ts.savingsPct}%) | Tables Extracted: ${res.tables.length}`,
+            "",
+            res.markdown || "(No visible text extracted)",
+            "",
+            `Zero-Install Remote Streamable-HTTP MCP: ${REMOTE_MCP_ENDPOINT}`,
+            `Autonomous Cloud Extractor & FinOps Agent ($0.15 USDC/call): ${FORGESUITE_LINKS.forgeDataFinops}`,
+          ];
+          return {
+            isError: false,
+            content: [{ type: "text", text: lines.join("\n") }],
+            structuredContent: res,
+          };
+        })
+        .catch((err) => ({
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: `Clean Web Extract Error: ${err instanceof Error ? err.message : String(err)}`,
+            },
+          ],
+        }));
+    }
+
     default:
       return null;
   }
@@ -6331,12 +6802,21 @@ export function handleJsonRpcMessage(msg, options = {}) {
         },
         serverInfo: SERVER_INFO,
         instructions:
-          "ForgeSuite MCP Server (v1.5.0) provides 10 zero-dependency developer, FinOps, creator media, brand launch & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner), brand_domain_handle_scan (authoritative RDAP + Google DoH .com/.io/.ai/.dev/.app/.org domains, npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability scanner), multi_chain_wallet_scan (live 6-chain Ethereum/Base/Arbitrum/BSC/Polygon/Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector), subtitle_caption_audit (offline .srt/.vtt timing overlap, CPS reading speed, 9:16 vertical safe-zone, mid-sentence cut & brand keyword auditor + normalizer), and media_brief_audit (offline Latin/CJK voiceover WPM duration calculator, FFmpeg atempo distortion checker, likeness/copyright/trademark pre-flight scanner & 1:1/9:16/16:9/4:5 agent JSON spec builder). Global run: npx --yes github:youthmy11-ai/youthmy11-ai.github.io | Docs: https://youthmy11-ai.github.io/mcp.html",
+          "ForgeSuite MCP Server (v1.6.0) provides 11 zero-dependency developer, FinOps, clean web extraction, creator media, brand launch & Web3 security tools: envshield_scan (.env/secret leak redactor), calldata_decode (EVM ABI & unlimited approval risk detector), tokencost_estimate (LLM & multi-turn agent cost estimator), cryptobill_quote (Markdown/JSON crypto invoice & live CryptoBill #inv= generator), evm_token_risk_scan (live EVM contract bytecode/proxy/rug scanner), solana_mint_risk_scan (live Solana SPL/Token-2022 mint & authority risk scanner), brand_domain_handle_scan (authoritative RDAP + Google DoH .com/.io/.ai/.dev/.app/.org domains, npm/PyPI/GitHub, Bluesky/Reddit & iOS App Store availability scanner), multi_chain_wallet_scan (live 6-chain Ethereum/Base/Arbitrum/BSC/Polygon/Solana wallet portfolio, nonce, EIP-7702 delegation, Gnosis Safe M-of-N multisig, SPL/Token-2022 & tx signature inspector), subtitle_caption_audit (offline .srt/.vtt timing overlap, CPS reading speed, 9:16 vertical safe-zone, mid-sentence cut & brand keyword auditor + normalizer), media_brief_audit (offline Latin/CJK voiceover WPM duration calculator, FFmpeg atempo distortion checker, likeness/copyright/trademark pre-flight scanner & 1:1/9:16/16:9/4:5 agent JSON spec builder), and web_clean_extract (SSRF-hardened clean web-to-Markdown, JSON-LD/OpenGraph, HTML-to-CSV table & LLM token-savings extractor). Zero-install Remote Streamable-HTTP: https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp | Global CLI: npx --yes github:youthmy11-ai/youthmy11-ai.github.io | Docs: https://youthmy11-ai.github.io/mcp.html",
       });
     }
 
     case "ping":
       return rpcResult(id, {});
+
+    case "prompts/list":
+      return rpcResult(id, { prompts: [] });
+
+    case "resources/list":
+      return rpcResult(id, { resources: [] });
+
+    case "resources/templates/list":
+      return rpcResult(id, { resourceTemplates: [] });
 
     case "tools/list":
       return rpcResult(id, { tools: TOOLS });

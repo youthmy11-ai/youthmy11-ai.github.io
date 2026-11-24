@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.youthmy11-ai/forgesuite-mcp",
   "title": "ForgeSuite Web3, FinOps, Brand & Media MCP",
-  "description": "Web3 wallet/token audit, calldata, .env scan, SRT/VTT & media brief QC, LLM cost, invoice & brand.",
-  "version": "1.5.0",
+  "description": "Web3 wallet/token audit, calldata, .env, web extract, SRT/media QC, LLM cost, invoice & brand.",
+  "version": "1.6.0",
   "websiteUrl": "https://youthmy11-ai.github.io/mcp.html",
   "repository": {
     "url": "https://github.com/youthmy11-ai/youthmy11-ai.github.io",
@@ -16,12 +16,18 @@
       "mimeType": "image/png"
     }
   ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp"
+    }
+  ],
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.5.0/forgesuite-mcp.mcpb",
-      "version": "1.5.0",
-      "fileSha256": "4fe27ca3a0420a1502eea54c0a3bc1b0680358862d62cb0b7f56555595370bd2",
+      "identifier": "https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.6.0/forgesuite-mcp.mcpb",
+      "version": "1.6.0",
+      "fileSha256": "7f5f154947d8f98584bfe42487408dbc1712dc3767283d46b9fbcae15d0763b5",
       "transport": {
         "type": "stdio"
       }

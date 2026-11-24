@@ -1,0 +1,84 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.youthmy11-ai/forgesuite-mcp",
+  "title": "ForgeSuite Web3, FinOps, Brand, Web Extract & Media MCP",
+  "description": "Zero-install Remote Streamable-HTTP (https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp) and Node 20+ stdio MCP server (v1.6.0, 11 tools — run locally via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`): envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote, evm_token_risk_scan, solana_mint_risk_scan, brand_domain_handle_scan, multi_chain_wallet_scan, subtitle_caption_audit, media_brief_audit, and web_clean_extract.",
+  "version": "1.6.0",
+  "protocolVersions": [
+    "2025-03-26",
+    "2024-11-05"
+  ],
+  "websiteUrl": "https://youthmy11-ai.github.io/mcp.html",
+  "repository": {
+    "url": "https://github.com/youthmy11-ai/youthmy11-ai.github.io",
+    "source": "github",
+    "id": "1459070715"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp"
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "github:youthmy11-ai/youthmy11-ai.github.io",
+      "version": "1.6.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ],
+  "tools": [
+    {
+      "name": "envshield_scan",
+      "description": "Scan .env, JSON, YAML, or code snippets offline for leaked API keys, private keys, mnemonics, JWTs, and webhook secrets."
+    },
+    {
+      "name": "calldata_decode",
+      "description": "Decode raw hexadecimal EVM transaction calldata (ERC-20, Permit2, Uniswap, Multisend) and flag unlimited approvals."
+    },
+    {
+      "name": "tokencost_estimate",
+      "description": "Calculate per-call and monthly LLM/agent token spend across frontier models with prompt-caching discounts."
+    },
+    {
+      "name": "cryptobill_quote",
+      "description": "Generate deterministic self-custody crypto invoice links and Solana Pay SPL-USDC / EIP-681 BEP20 / TRON payment URIs."
+    },
+    {
+      "name": "evm_token_risk_scan",
+      "description": "Live EVM token and smart contract bytecode, EIP-1967/1167 proxy, opcode (SELFDESTRUCT/DELEGATECALL), and rug/honeypot selector audit across Base, Ethereum, BSC, and Arbitrum."
+    },
+    {
+      "name": "solana_mint_risk_scan",
+      "description": "Live Solana Mainnet SPL Token and Token-2022 mintAuthority, freezeAuthority, permanentDelegate, transferFeeConfig, transferHook, and Top-10 holder concentration risk audit."
+    },
+    {
+      "name": "brand_domain_handle_scan",
+      "description": "Check candidate brand/project names across authoritative RDAP + Google DoH domains (.com, .io, .ai, .dev, .app, .org), npm/PyPI/GitHub registries, Bluesky/Reddit handles, and Apple iOS App Store."
+    },
+    {
+      "name": "multi_chain_wallet_scan",
+      "description": "Inspect 1 to 5 EVM (0x...) and/or Solana (Base58) wallets across Ethereum, Base, Arbitrum, BSC, Polygon, and Solana Mainnet for native & stablecoin balances, nonces, EIP-7702 delegations, Gnosis Safe M-of-N signers, SPL/Token-2022 holdings, and recent Solana signatures."
+    },
+    {
+      "name": "subtitle_caption_audit",
+      "description": "Audit .srt and .vtt subtitle tracks offline for timestamp overlaps, CPS > 20 reading speed, 9:16 vertical safe-zone line width, mid-sentence cuts, and brand term fidelity — returning a 0–100 quality score plus normalized .srt/.vtt output."
+    },
+    {
+      "name": "media_brief_audit",
+      "description": "Audit AI media briefs and spoken voiceover scripts offline: counts Latin & CJK words/syllables, computes 135/150/165 WPM durations vs target seconds, flags FFmpeg atempo > 1.20x distortion or < 0.85x drag, checks likeness consent, copyright & trademark safety (0–100), and outputs 1:1, 9:16, 16:9, and 4:5 agent JSON specs."
+    },
+    {
+      "name": "web_clean_extract",
+      "description": "Fetch any public HTTP/HTTPS web page with strict IPv4/IPv6 SSRF protection and extract clean LLM-ready Markdown, OpenGraph/JSON-LD metadata, HTML tables converted to CSV, and estimated LLM token savings versus raw HTML."
+    }
+  ],
+  "commercialEndpoints": {
+    "x402Gateway": "https://forgeaudit-x402.forgesuite-x402-edge.workers.dev",
+    "wurkStore": "https://wurk.fun/user/forge-ai-studio",
+    "proBundle": "https://youthmy11-ai.github.io/#pricing"
+  }
+}

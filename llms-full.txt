@@ -1,6 +1,6 @@
 # ForgeSuite Studio — Full Portfolio Reference (`llms-full.txt`)
 
-> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 15 catalog offerings (11 live client-side web apps including MediaBrief Studio AI Voiceover Script Duration Calculator & Rights Pre-Flight Checker, ClipCaption Lab 9:16 Subtitle Auditor/Time-Shifter/Converter, WalletLens 6-Chain Portfolio & EIP-7702/Safe Inspector, TokenGuard EVM & Solana Risk Scanner, and BrandGuard 8-TLD Domain & Handle Checker, 2 open-core packaged GitHub tools, 1 zero-dependency Node 20+ MCP Server v1.5.0 with 10 tools executable via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`, and 1 All-Access Lifetime Bundle), 8 autonomous 24/7 A2A + x402 cloud agents ($440 USDC active marketplace bids), transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict client-side privacy guarantees, and zero-backend crypto + PayPal checkout.
+> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 15 catalog offerings (11 live client-side web apps including MediaBrief Studio AI Voiceover Script Duration Calculator & Rights Pre-Flight Checker, ClipCaption Lab 9:16 Subtitle Auditor/Time-Shifter/Converter, WalletLens 6-Chain Portfolio & EIP-7702/Safe Inspector, TokenGuard EVM & Solana Risk Scanner, and BrandGuard 8-TLD Domain & Handle Checker, 2 open-core packaged GitHub tools, 1 Zero-Install Remote Streamable-HTTP (`https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp`) & zero-dependency Node 20+ MCP Server v1.6.0 with 11 tools executable via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`, and 1 All-Access Lifetime Bundle), 8 autonomous 24/7 A2A + x402 cloud agents ($440 USDC active marketplace bids), transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict client-side privacy guarantees, and zero-backend crypto + PayPal checkout.
 
 ---
 
@@ -33,7 +33,7 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 | 12 | **Calldata Lens** | Live Web App (`txdecode.html`) | 100% Free ($0) — offline EVM ABI decoder & `MAX_UINT256` approval risk alerts | **$0** | Free |
 | 13 | **EnvShield Secret Scanner** | Live Web App (`envshield.html`) | 100% Free ($0) — 13 secret detectors + Shannon entropy scanner & 1-click redactor | **$0** | Free |
 | 14 | **MediaBrief Studio** | Live Web App (`mediastudio.html`) | Free Latin/CJK script-to-duration pacing (`135/150/165 WPM`), `FFmpeg atempo` guard, likeness/IP scanner & `1:1/9:16/16:9/4:5` specs | **Included in $15 Pro / $19 AS / $35 Bundle** *(<= 25-Asset Campaign Batch Matrix + CSV/JSON Manifest)* | `CB` / `AS` / `BUNDLE` |
-| 15 | **ForgeSuite MCP Server (v1.5.0)** | Node 20+ Stdio MCP (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io` / `mcp.html`) | 100% Free ($0, MIT) — zero-dep MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, `brand_domain_handle_scan`, `multi_chain_wallet_scan`, `subtitle_caption_audit`, `media_brief_audit`) | **$0** | Free |
+| 15 | **ForgeSuite MCP Server (v1.6.0)** | Remote Streamable-HTTP (`https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp`) + Node 20+ Stdio (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io` / `mcp.html`) | 100% Free ($0, MIT) — 11-tool MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, `brand_domain_handle_scan`, `multi_chain_wallet_scan`, `subtitle_caption_audit`, `media_brief_audit`, `web_clean_extract`) | **$0** | Free |
 
 ---
 
@@ -109,15 +109,16 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 - **URL Deep-Link Parameters**: Pre-fills and auto-triggers live scans via `?chain=solana&mint=<base58>` or `?chain=<base|ethereum|bsc|arbitrum>&address=<0x...>`.
 - **Reusable Engine**: `https://youthmy11-ai.github.io/assets/tokenaudit.js` (Pure ES Module compatible with Browser & Node.js 22+)
 
-### 3.11 ForgeSuite MCP Server v1.5.0 (`https://youthmy11-ai.github.io/mcp.html`)
-- **Category**: DeveloperApplication (Windows, macOS, Linux — Node.js 20+, 0 npm dependencies, MIT Free)
-- **Official MCP Registry Listing**: `io.github.youthmy11-ai/forgesuite-mcp` (`v1.5.0` Active — `https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite`)
+### 3.11 ForgeSuite MCP Server v1.6.0 (`https://youthmy11-ai.github.io/mcp.html`)
+- **Category**: DeveloperApplication (Cloudflare Global Edge Streamable-HTTP + Windows, macOS, Linux Node.js 20+, 0 npm dependencies, MIT Free)
+- **Official MCP Registry Listing**: `io.github.youthmy11-ai/forgesuite-mcp` (`v1.6.0` Active — `https://registry.modelcontextprotocol.io/v0.1/servers?search=forgesuite`)
+- **Zero-Install Remote Streamable-HTTP Endpoint**: `https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp` (Server Card: `https://youthmy11-ai.github.io/.well-known/mcp.json`)
 - **1-Command Global Install**: `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`
-- **Verified `.mcpb` Release Bundle**: `https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.5.0/forgesuite-mcp.mcpb`
+- **Verified `.mcpb` Release Bundle**: `https://github.com/youthmy11-ai/youthmy11-ai.github.io/releases/download/v1.6.0/forgesuite-mcp.mcpb`
 - **Direct Single-File URL**: `https://youthmy11-ai.github.io/mcp/forgesuite-mcp.mjs`
 - **Capabilities**:
-  - Single-file zero-dependency JSON-RPC 2.0 Model Context Protocol (MCP) stdio server (`v1.5.0`) compatible with Claude Code, Cursor, Antigravity, and Windsurf.
-  - Exposes **10 tools**:
+  - Dual-transport Model Context Protocol (MCP) JSON-RPC 2.0 server (`v1.6.0` — stateless Remote Streamable-HTTP on Cloudflare Edge + local Node 20+ stdio) compatible with Claude Desktop, Claude Code, VS Code, Cursor, Antigravity, and Windsurf.
+  - Exposes **11 tools**:
     1. `envshield_scan` — offline secret leak detection & redaction
     2. `calldata_decode` — offline EVM ABI decoding + `MaxUint256` unlimited approval warnings
     3. `tokencost_estimate` — multi-turn LLM cost & retainer estimation across Claude/GPT-5/Gemini/DeepSeek
@@ -128,6 +129,7 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
     8. `multi_chain_wallet_scan` — live 6-chain EVM (`Ethereum`, `Base`, `Arbitrum`, `BSC`, `Polygon`) & `Solana Mainnet` wallet portfolio, nonce, EIP-7702 (`0xef0100...`) delegation, Gnosis Safe `M-of-N` multisig, SPL/Token-2022 holdings, and Solana signature inspector
     9. `subtitle_caption_audit` — offline `.srt`/`.vtt` timing overlap, `CPS > 20` reading speed, `9:16` vertical safe-zone width, mid-sentence cut & brand term auditor returning `0–100` quality score + normalized `.srt`/`.vtt`
     10. `media_brief_audit` — offline Latin & CJK voiceover script duration calculator (`135 / 150 / 165 WPM` vs `targetSec`), `FFmpeg atempo` distortion/underrun checker, likeness/copyright/trademark pre-flight compliance scanner (`0–100`), and `1:1` / `9:16` / `16:9` / `4:5` agent JSON spec builder
+    11. `web_clean_extract` — SSRF-hardened clean web-to-Markdown, JSON-LD/OpenGraph, HTML-to-CSV table & LLM token-savings extractor
 
 ### 3.12 BrandGuard — 8-TLD Domain, Developer Registry & App Store Scanner (`https://youthmy11-ai.github.io/brandcheck.html`)
 - **Category**: BusinessApplication (Web — Free Single + 4 Variations + Pro 25-Brand Agency Matrix in `$15` Pro / `$35` Bundle)
@@ -224,7 +226,7 @@ ForgeSuite operates 8 live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 
 - **EVM Proxy & Honeypot Scanner**: https://youthmy11-ai.github.io/evm-proxy-honeypot-scanner.html
 - **BrandGuard Scanner**: https://youthmy11-ai.github.io/brandcheck.html
 - **USPTO Trademark & 8-TLD Brand Guide**: https://youthmy11-ai.github.io/uspto-trademark-domain-brand-checker.html
-- **MCP Server v1.5.0**: https://youthmy11-ai.github.io/mcp.html
+- **MCP Server v1.6.0**: https://youthmy11-ai.github.io/mcp.html (`https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp`)
 - **Concise LLM Index**: https://youthmy11-ai.github.io/llms.txt
 - **Live A2A + x402 Agent**: https://market.near.ai/a/forge-ai-agent
 - **GitHub Organization / Developer**: https://github.com/youthmy11-ai
