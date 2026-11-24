@@ -7,7 +7,7 @@ Live Site: **`https://youthmy11-ai.github.io/`**
 ![ForgeSuite Studio Storefront](assets/og-banner.png)
 ![CryptoBill Forge Workspace](assets/cryptobill-preview.png)
 
-## Live Web Tools (`7` Client-Side Utilities)
+## Live Web Tools (`8` Client-Side Utilities)
 
 All web tools execute **100% inside local browser memory** with zero ForgeSuite backend servers or telemetry:
 
@@ -15,15 +15,17 @@ All web tools execute **100% inside local browser memory** with zero ForgeSuite 
    - Serverless freelance crypto & PayPal invoice builder with A4 print-to-PDF layout (`@media print`), offline QR codes (`assets/qr.js`), and `#inv=<base64url>` shareable links.
 2. **[TokenGuard Risk Scanner](https://youthmy11-ai.github.io/tokenaudit.html)** (`tokenaudit.html`) — **Free Single Scans + Pro Batch Watchlist ($35 Bundle)**
    - Live browser EVM (`Base`, `Ethereum`, `BSC`, `Arbitrum`) & Solana (`SPL Token` & `Token-2022`) token/contract scanner with PUSH-aware opcode disassembler (`SELFDESTRUCT`, `DELEGATECALL`), EIP-1967/1167 proxy inspection, honeypot tax checks, Token-2022 `permanentDelegate` / `transferFeeConfig` detection, and Pro `<= 25` Batch Watchlist JSON/CSV Risk Dossier export.
-3. **[TokenCost Lab](https://youthmy11-ai.github.io/tokencalc.html)** (`tokencalc.html`) — **Free**
+3. **[BrandGuard Launch Scanner](https://youthmy11-ai.github.io/brandcheck.html)** (`brandcheck.html`) — **Free Single + 4 Variations + Pro 25-Brand Agency Matrix ($15 Pro / $35 Bundle)**
+   - 100% CORS-clean browser brand checker across 8 domain TLDs (`.com`, `.io`, `.ai`, `.dev`, `.app`, `.org`, `.net`, `.xyz`) via Google DoH (`NS` + `A`) + CORS RDAP, `npm`, `PyPI`, `GitHub`, `Bluesky`, and US Apple iOS App Store with `0–100` readiness scoring, CSV/JSON exports, ScopeGuard/CryptoBill handoffs, and `$0.35 USDC` USPTO A2A escalation.
+4. **[TokenCost Lab](https://youthmy11-ai.github.io/tokencalc.html)** (`tokencalc.html`) — **Free**
    - Multi-turn AI agent & LLM token cost, prompt-cache savings, and SaaS API pricing estimator with 1-click export to CryptoBill invoices.
-4. **[JSON2Sheet & PII Masker](https://youthmy11-ai.github.io/json2sheet.html)** (`json2sheet.html`) — **Free**
+5. **[JSON2Sheet & PII Masker](https://youthmy11-ai.github.io/json2sheet.html)** (`json2sheet.html`) — **Free**
    - Flattens nested JSON arrays cleanly into RFC-4180 CSV spreadsheets while masking sensitive emails, phones, and tokens locally.
-5. **[ScopeGuard SOW Builder](https://youthmy11-ai.github.io/sowbuilder.html)** (`sowbuilder.html`) — **Free**
+6. **[ScopeGuard SOW Builder](https://youthmy11-ai.github.io/sowbuilder.html)** (`sowbuilder.html`) — **Free**
    - Interactive Statement of Work & milestone payment split generator with instant 1-click handoff into CryptoBill Forge (`#inv=`).
-6. **[Calldata Lens](https://youthmy11-ai.github.io/txdecode.html)** (`txdecode.html`) — **Free**
+7. **[Calldata Lens](https://youthmy11-ai.github.io/txdecode.html)** (`txdecode.html`) — **Free**
    - Offline Ethereum & BSC EVM hex calldata decoder (`ERC-20`, `MAX_UINT256` infinite approval risk warnings, `EIP-2612` permits, `ERC-4626`, `Safe` multisig) with zero RPC logging.
-7. **[EnvShield Secret Scanner](https://youthmy11-ai.github.io/envshield.html)** (`envshield.html`) — **Free**
+8. **[EnvShield Secret Scanner](https://youthmy11-ai.github.io/envshield.html)** (`envshield.html`) — **Free**
    - Instant client-side `.env`, JSON, and transcript secret scanner & safe redactor covering OpenAI, Anthropic, GitHub, AWS, Google, Telegram, EVM private keys, JWTs, DB URIs, and high-entropy credentials.
 
 ## ForgeSuite MCP Server (`mcp/forgesuite-mcp.mjs` · v1.2.0 · 7 Tools · Zero Dependencies)

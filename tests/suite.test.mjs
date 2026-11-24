@@ -45,6 +45,7 @@ import {
 import {
   buildMilestoneInvoicePayload,
   computeSowTotals,
+  decodeSowHandoffPayload,
   renderSowMarkdown,
   SOW_PRESETS,
 } from "../assets/sowbuilder.js";
@@ -87,6 +88,26 @@ import {
   normalizeBrandCandidate,
   scanBrandDomainAndHandles,
 } from "../mcp/forgesuite-mcp.mjs";
+import {
+  BRANDGUARD_DEFAULT_TLDS,
+  CORS_RDAP_BY_TLD,
+  FREE_VARIATION_LIMIT,
+  MAX_BATCH_BRANDS,
+  NEAR_BRAND_CHECKER_URL,
+  buildBrandAuditInvoicePayload,
+  buildBrandSowState,
+  checkDomainBrowserCors,
+  encodeSowHandoffPayload,
+  exportBrandMatrixCsv,
+  generateBrandVariations,
+  normalizeBrandName,
+  parseBatchBrandList,
+  runBatchBrandScan,
+  scanBrandVariations,
+  scanSingleBrand,
+  scoreBrandReadiness,
+  validateLicenseKeyFormat as brandGuardValidateKey,
+} from "../assets/brandcheck.js";
 
 test("verifySolanaUsdcTx and verifySolanaUsdcTxOnChain validate SPL USDC transfers and issue keys", async () => {
   const sampleTx = {
@@ -1043,9 +1064,12 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   assert.match(llmsFull, /Calldata Lens/);
   assert.match(llmsFull, /EnvShield Secret Scanner/);
   assert.match(llmsFull, /TokenGuard/);
+  assert.match(llmsFull, /BrandGuard/);
   assert.match(llmsFull, /ForgeSuite MCP Server/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/mcp\.html/);
   assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/tokenaudit\.html/);
+  assert.match(llmsTxt, /https:\/\/youthmy11-ai\.github\.io\/brandcheck\.html/);
+  assert.match(llmsTxt, /https:\/\/market\.near\.ai\/agents\/forge-brand-checker/);
   assert.match(llmsTxt, /https:\/\/market\.near\.ai\/a\/forge-ai-agent/);
   assert.match(llmsFull, /BSdWMAHHsygetguA1ioynXQcgYMYeJHstEqAk7fNpJSx/);
 
@@ -1060,6 +1084,7 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   const toolPages = [
     { file: "cryptobill.html", url: "https://youthmy11-ai.github.io/cryptobill.html", category: "BusinessApplication" },
     { file: "tokenaudit.html", url: "https://youthmy11-ai.github.io/tokenaudit.html", category: "SecurityApplication" },
+    { file: "brandcheck.html", url: "https://youthmy11-ai.github.io/brandcheck.html", category: "BusinessApplication" },
     { file: "tokencalc.html", url: "https://youthmy11-ai.github.io/tokencalc.html", category: "DeveloperApplication" },
     { file: "json2sheet.html", url: "https://youthmy11-ai.github.io/json2sheet.html", category: "DeveloperApplication" },
     { file: "sowbuilder.html", url: "https://youthmy11-ai.github.io/sowbuilder.html", category: "BusinessApplication" },
@@ -1090,10 +1115,11 @@ test("llms.txt, llms-full.txt, robots.txt, sitemap.xml and all HTML pages carry 
   const indexHtml = fs.readFileSync(path.join(repoRoot, "index.html"), "utf8");
   assert.ok(indexHtml.includes('<link rel="canonical" href="https://youthmy11-ai.github.io/">'));
   assert.ok(indexHtml.includes('href="tokenaudit.html"'), "index.html must link to tokenaudit.html");
+  assert.ok(indexHtml.includes('href="brandcheck.html"'), "index.html must link to brandcheck.html");
   const indexLdMatch = indexHtml.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
   assert.ok(indexLdMatch, "index.html missing JSON-LD script");
   const indexLd = JSON.parse(indexLdMatch[1]);
-  assert.ok(Array.isArray(indexLd["@graph"]) && indexLd["@graph"].length >= 12, "index.html @graph should list WebSite + all products including TokenGuard & MCP Server");
+  assert.ok(Array.isArray(indexLd["@graph"]) && indexLd["@graph"].length >= 13, "index.html @graph should list WebSite + all products including TokenGuard, BrandGuard & MCP Server");
 });
 
 /* ============================================================================
@@ -2015,4 +2041,250 @@ test("brand_domain_handle_scan (Tool #7) audits RDAP+DoH domains, npm/PyPI/GitHu
   ]);
   assert.equal(stdioErr.code, 0);
   assert.equal(stdioErr.messages[0].result.isError, true);
+});
+
+/* ============================================================================
+ * 15. BrandGuard Web App #8 (`assets/brandcheck.js` & `brandcheck.html`) Tests
+ * ========================================================================== */
+
+test("BrandGuard normalizes brand names, generates 6 smart variations, configures 8 CORS TLDs, and exposes Pro key validator", () => {
+  assert.deepEqual(BRANDGUARD_DEFAULT_TLDS, [
+    "com",
+    "io",
+    "ai",
+    "dev",
+    "app",
+    "org",
+    "net",
+    "xyz",
+  ]);
+  for (const tld of BRANDGUARD_DEFAULT_TLDS) {
+    assert.ok(CORS_RDAP_BY_TLD[tld]?.startsWith("https://"), `Missing CORS RDAP endpoint for .${tld}`);
+  }
+
+  const norm = normalizeBrandName("https://@Orbit-Ledger.xyz/docs");
+  assert.equal(norm.domainLabel, "orbit-ledger");
+  assert.equal(norm.packageSlug, "orbit-ledger");
+  assert.equal(norm.githubHandle, "orbit-ledger");
+  assert.equal(norm.blueskyHandle, "orbit-ledger.bsky.social");
+  assert.equal(norm.compactKey, "orbitledger");
+  assert.throws(() => normalizeBrandName("a"), /at least 2 alphanumeric/i);
+
+  const vars = generateBrandVariations("NovaForge");
+  assert.deepEqual(vars, [
+    "getnovaforge",
+    "usenovaforge",
+    "novaforgehq",
+    "novaforgelabs",
+    "novaforgeai",
+    "trynovaforge",
+  ]);
+
+  const sampleProKey = generateLicenseKey("BUNDLE", "brandguard-pro-test");
+  assert.equal(brandGuardValidateKey(sampleProKey), true);
+  assert.equal(brandGuardValidateKey("FS-PRO-BUNDLE-BADKEY00-0000"), false);
+});
+
+test("BrandGuard executes CORS-clean Simple GETs (no custom headers), handles RDAP CORS fallback to Google DoH, and scores 0-100 deterministically", async () => {
+  const seenInits = [];
+  const mockCorsFetch = async (rawUrl, init = {}) => {
+    seenInits.push({ url: String(rawUrl), init });
+    const u = String(rawUrl);
+    const jsonResp = (status, obj) => ({
+      ok: status >= 200 && status < 300,
+      status,
+      text: async () => (obj === null ? "" : JSON.stringify(obj)),
+    });
+
+    // Simulate non-CORS redirect failure on rdap.org + .xyz RDAP to verify clean DoH fallback
+    if (u.includes("rdap.org/domain/") || u.includes("rdap.centralnic.com/xyz/")) {
+      throw new TypeError("Failed to fetch (simulated non-CORS RDAP redirect)");
+    }
+
+    const isTaken = u.toLowerCase().includes("vercel");
+
+    // Authoritative RDAP for remaining 7 TLDs
+    if (
+      u.includes("rdap.verisign.com") ||
+      u.includes("pubapi.registry.google") ||
+      u.includes("rdap.publicinterestregistry.org") ||
+      u.includes("rdap.identitydigital.services")
+    ) {
+      if (isTaken) {
+        return jsonResp(200, {
+          objectClassName: "domain",
+          events: [{ eventAction: "expiration", eventDate: "2029-10-15T00:00:00Z" }],
+        });
+      }
+      return jsonResp(404, { errorCode: 404 });
+    }
+
+    // Google DoH NS + A
+    if (u.includes("dns.google/resolve")) {
+      if (isTaken) {
+        return jsonResp(200, {
+          Status: 0,
+          Answer: [{ name: "vercel.", type: u.includes("type=A") ? 1 : 2, data: "76.76.21.21" }],
+        });
+      }
+      return jsonResp(200, { Status: 3 }); // NXDOMAIN
+    }
+
+    if (u.includes("registry.npmjs.org/")) {
+      return isTaken
+        ? jsonResp(200, { "dist-tags": { latest: "39.1.0" } })
+        : jsonResp(404, { error: "Not found" });
+    }
+    if (u.includes("pypi.org/pypi/")) {
+      return isTaken
+        ? jsonResp(200, { info: { version: "2.0.1" } })
+        : jsonResp(404, { message: "Not Found" });
+    }
+    if (u.includes("api.github.com/users/")) {
+      return isTaken
+        ? jsonResp(200, { login: "vercel", type: "Organization" })
+        : jsonResp(404, { message: "Not Found" });
+    }
+    if (u.includes("public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle")) {
+      return isTaken
+        ? jsonResp(200, { did: "did:plc:vercelofficial123" })
+        : jsonResp(400, { error: "InvalidRequest", message: "Unable to resolve handle" });
+    }
+    if (u.includes("itunes.apple.com/search")) {
+      return isTaken
+        ? jsonResp(200, {
+            resultCount: 1,
+            results: [
+              {
+                trackName: "Vercel: Deploy & Preview",
+                sellerName: "Vercel Inc.",
+                bundleId: "com.vercel.mobile",
+                trackViewUrl: "https://apps.apple.com/us/app/vercel/id111111",
+              },
+            ],
+          })
+        : jsonResp(200, {
+            resultCount: 1,
+            results: [{ trackName: "Unrelated Timer", sellerName: "Other LLC" }],
+          });
+    }
+
+    throw new Error(`Unexpected BrandGuard fetch URL: ${u}`);
+  };
+
+  // Verify custom/non-CORS RDAP fallback directly on .xyz
+  const xyzDomain = await checkDomainBrowserCors("novaforgex", "xyz", {
+    fetchImpl: mockCorsFetch,
+  });
+  assert.equal(xyzDomain.available, true);
+  assert.equal(xyzDomain.status, "likely_available");
+  assert.equal(xyzDomain.statusLabel, "Likely Available (NXDOMAIN)");
+  assert.equal(xyzDomain.rdapFallbackToDoh, true);
+  assert.equal(xyzDomain.source, "doh");
+
+  // Full greenlight scan across 8 TLDs + 5 registries
+  const green = await scanSingleBrand("NovaForgeX", { fetchImpl: mockCorsFetch });
+  assert.equal(green.ok, true);
+  assert.equal(green.domains.length, 8);
+  assert.equal(green.summary.readinessScore, 100);
+  assert.equal(green.summary.verdict, "LAUNCH_READY");
+  assert.equal(green.summary.availableCount, 13);
+  assert.equal(green.summary.comAvailable, true);
+  assert.equal(green.summary.allDevRegistriesClear, true);
+  assert.match(green.checkedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+  assert.match(green.markdownSummary, /BrandGuard Launch Readiness Dossier/);
+
+  const comEntry = green.domains.find((d) => d.tld === "com");
+  assert.equal(comEntry.statusLabel, "Likely Available (NXDOMAIN + RDAP 404)");
+
+  // Full collision scan
+  const red = await scanSingleBrand("Vercel", { fetchImpl: mockCorsFetch });
+  assert.equal(red.summary.readinessScore, 0);
+  assert.equal(red.summary.verdict, "HIGH_COLLISION");
+  assert.equal(red.domains.find((d) => d.tld === "com").statusLabel, "Registered (Active DNS/RDAP)");
+  assert.equal(red.registries.npm.latestVersion, "39.1.0");
+  assert.equal(red.registries.github.accountType, "Organization");
+  assert.equal(red.registries.iosAppStore.exactMatchFound, true);
+
+  // Ensure zero custom headers were attached (so browsers send preflight-free Simple GETs)
+  for (const call of seenInits) {
+    assert.equal(call.init.headers, undefined, `Must not pass custom headers on ${call.url}`);
+  }
+});
+
+test("BrandGuard supports Free 4-variation vs Pro 6-variation scans, 25-brand Batch Matrix, CSV formula guard, ScopeGuard/CryptoBill handoffs, and USPTO A2A CTA", async () => {
+  const fastAvailableFetch = async (rawUrl) => {
+    const u = String(rawUrl);
+    const jsonResp = (status, obj) => ({
+      ok: status >= 200 && status < 300,
+      status,
+      text: async () => JSON.stringify(obj),
+    });
+    if (u.includes("dns.google/resolve")) return jsonResp(200, { Status: 3 });
+    if (u.includes("itunes.apple.com/search")) return jsonResp(200, { resultCount: 0, results: [] });
+    if (u.includes("public.api.bsky.app")) {
+      return jsonResp(400, { message: "Unable to resolve handle" });
+    }
+    return jsonResp(404, {});
+  };
+
+  const freeVars = await scanBrandVariations("Kestrel", {
+    isPro: false,
+    fetchImpl: fastAvailableFetch,
+  });
+  assert.equal(freeVars.scannedCount, FREE_VARIATION_LIMIT);
+  assert.equal(freeVars.results.length, 4);
+  assert.equal(freeVars.isProUnlocked, false);
+
+  const proVars = await scanBrandVariations("Kestrel", {
+    isPro: true,
+    fetchImpl: fastAvailableFetch,
+  });
+  assert.equal(proVars.scannedCount, 6);
+  assert.equal(proVars.results.length, 6);
+  assert.equal(proVars.isProUnlocked, true);
+
+  // Batch 25-Brand Agency Matrix + >25 enforcement
+  const list = parseBatchBrandList("AlphaForge\nBetaForge, alphaforge\n=InjectedBrand");
+  assert.deepEqual(list, ["AlphaForge", "BetaForge", "=InjectedBrand"]);
+
+  const batchReports = await runBatchBrandScan(list, { fetchImpl: fastAvailableFetch });
+  assert.equal(batchReports.length, 3);
+  assert.equal(batchReports[0].ok, true);
+  assert.equal(batchReports[2].ok, true);
+
+  const csv = exportBrandMatrixCsv(batchReports);
+  assert.match(csv, /candidate,slug,readiness_score,verdict,com,io,ai,dev,app,org,net,xyz/);
+  assert.match(csv, /'=InjectedBrand/, "CSV export must neutralize spreadsheet formula injection");
+
+  const overLimit = Array.from({ length: MAX_BATCH_BRANDS + 1 }, (_, i) => `BrandCandidate${i + 1}`);
+  await assert.rejects(
+    () => runBatchBrandScan(overLimit, { fetchImpl: fastAvailableFetch }),
+    /up to 25/i
+  );
+
+  // CryptoBill & ScopeGuard SOW 1-click handoff roundtrips
+  const singleInv = buildBrandAuditInvoicePayload(batchReports[0]);
+  const decodedSingleInv = decodeInvoicePayload(encodeInvoicePayload(singleInv));
+  assert.equal(decodedSingleInv.items[0].unitPrice, 145);
+
+  const batchInv = buildBrandAuditInvoicePayload(batchReports);
+  const decodedBatchInv = decodeInvoicePayload(encodeInvoicePayload(batchInv));
+  assert.equal(decodedBatchInv.items[0].unitPrice, 195);
+
+  const sowState = buildBrandSowState(batchReports);
+  const sowToken = encodeSowHandoffPayload(sowState);
+  const decodedSow = decodeSowHandoffPayload(`#sow=${sowToken}`);
+  assert.equal(decodedSow.totalBudget, 650);
+  assert.equal(computeSowTotals(decodedSow).isBalanced, true);
+
+  // Verify brandcheck.html prominent $0.35 USDC NEAR AI A2A CTA & Pro license controls
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const brandHtml = fs.readFileSync(path.join(repoRoot, "brandcheck.html"), "utf8");
+  assert.ok(brandHtml.includes(NEAR_BRAND_CHECKER_URL), "brandcheck.html must link to forge-brand-checker on NEAR AI Market");
+  assert.match(brandHtml, /\$0\.35 USDC/);
+  assert.match(brandHtml, /USPTO/);
+  assert.match(brandHtml, /Google Play/);
+  assert.match(brandHtml, /data-checkout-sku="BUNDLE"/);
+  assert.match(brandHtml, /data-checkout-sku="CB"/);
 });

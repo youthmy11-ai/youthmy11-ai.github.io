@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrandGuard — Instant 8-TLD Domain, Developer Registry &amp; App Store Brand Checker</title>
+  <meta name="description" content="Free client-side brand name, 8-TLD domain (.com, .io, .ai, .dev, .app, .org, .net, .xyz), npm, PyPI, GitHub, Bluesky, and Apple iOS App Store availability scanner with Smart Name Variations and Agency Batch Matrix.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="canonical" href="https://youthmy11-ai.github.io/brandcheck.html">
+  <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://youthmy11-ai.github.io/llms.txt">
+  <meta property="og:site_name" content="ForgeSuite Studio">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://youthmy11-ai.github.io/brandcheck.html">
+  <meta property="og:title" content="BrandGuard — Live 8-TLD Domain, GitHub/npm/PyPI &amp; iOS App Store Brand Scanner">
+  <meta property="og:description" content="Check .com/.io/.ai/.dev/.app/.org/.net/.xyz domains via Google DoH + CORS RDAP alongside npm, PyPI, GitHub, Bluesky, and Apple iOS App Store collisions directly in your browser.">
+  <meta property="og:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BrandGuard — Browser 8-TLD Domain &amp; Handle Availability Scanner">
+  <meta name="twitter:description" content="Zero-backend brand launch readiness scorer (0–100), smart name variations generator, and 25-brand agency CSV/JSON matrix.">
+  <meta name="twitter:image" content="https://youthmy11-ai.github.io/assets/og-banner.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2306b6d4'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='22' font-weight='800'%3EBG%3C/text%3E%3C/svg%3E">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "BrandGuard",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "url": "https://youthmy11-ai.github.io/brandcheck.html",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Organization",
+      "name": "ForgeSuite Studio (youthmy11-ai)",
+      "url": "https://youthmy11-ai.github.io/"
+    },
+    "offers": [
+      { "@type": "Offer", "name": "Free Single-Brand + 4 Smart Variations Scanner", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Pro Single-Tool Unlock (25-Brand Agency Matrix + CSV/JSON)", "price": "15", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "All-Access Pro Bundle (Batch 25-Brand Matrix + All Pro Tools)", "price": "35", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+    ],
+    "featureList": [
+      "Live 8-TLD domain check (.com, .io, .ai, .dev, .app, .org, .net, .xyz) via Google DNS-over-HTTPS (NS + A) and CORS-enabled RDAP",
+      "Real-time developer and social namespace verification across npm, PyPI, GitHub, Bluesky, and US Apple iOS App Store",
+      "Deterministic Brand Launch Readiness Score (0–100) with exact UTC timestamp and Smart Name Variations (get, use, hq, labs, ai, try)",
+      "Pro 25-Brand Agency Matrix with client-ready CSV/JSON report export and 1-click ScopeGuard SOW / CryptoBill invoice handoff",
+      "Direct $0.35 USDC A2A handoff to Brand Name Availability Checker on NEAR AI Market for USPTO Serial/Registration trademark screening"
+    ],
+    "description": "Zero-backend browser brand name, 8-TLD domain, developer package registry, social handle, and iOS App Store availability scanner."
+  }
+  </script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="brandcheck">
+  <header class="fs-nav">
+    <div class="fs-container fs-nav-inner">
+      <a class="fs-brand" href="./">
+        <span class="fs-brand-mark">BG</span>
+        <span>BrandGuard</span>
+      </a>
+      <div class="fs-nav-actions">
+        <a href="./" class="fs-btn fs-btn-sm fs-btn-ghost">← Storefront</a>
+        <a href="tokenaudit.html" class="fs-btn fs-btn-sm fs-btn-secondary">TokenGuard</a>
+        <a href="sowbuilder.html" class="fs-btn fs-btn-sm fs-btn-secondary">ScopeGuard</a>
+        <a href="mcp.html" class="fs-btn fs-btn-sm fs-btn-secondary">MCP Server</a>
+        <a href="cryptobill.html" class="fs-btn fs-btn-sm fs-btn-secondary">CryptoBill</a>
+        <button type="button" id="bgBundleBtn" class="fs-btn fs-btn-sm fs-btn-primary">Bundle ($35)</button>
+        <button type="button" id="themeToggleBtn" class="fs-btn fs-btn-sm fs-btn-ghost">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="fs-container" style="padding:28px 0 60px;">
+    <div class="fs-section-head" style="margin-bottom:20px;">
+      <div>
+        <span class="fs-badge fs-badge-accent">8-TLD DOH + RDAP · NPM / PYPI / GITHUB · BLUESKY &amp; IOS APP STORE</span>
+        <h1 style="margin-top:10px;">Instant Brand, Domain &amp; Developer Handle Scanner</h1>
+        <p class="fs-lead" style="margin-top:6px;">
+          Audit candidate startup, SaaS, AI agent, or open-source package names live across <strong>8 domain TLDs</strong> (<code>.com</code>, <code>.io</code>, <code>.ai</code>, <code>.dev</code>, <code>.app</code>, <code>.org</code>, <code>.net</code>, <code>.xyz</code>), <strong>npm</strong>, <strong>PyPI</strong>, <strong>GitHub</strong>, <strong>Bluesky</strong>, and the <strong>Apple iOS App Store</strong> — 100% client-side with zero backend telemetry.
+        </p>
+      </div>
+    </div>
+
+    <div class="cb-workspace">
+      <!-- LEFT COLUMN: FREE SINGLE + VARIATIONS SCANNER, PRO 25-BRAND MATRIX & USPTO A2A CTA -->
+      <section class="cb-editor-pane" aria-label="Brand Target & Agency Batch Controls">
+        <!-- 1. FREE SINGLE-BRAND + SMART VARIATIONS SCANNER -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>1. Single-Brand &amp; Smart Variations Scan (Free)</h2>
+            <span class="fs-badge fs-badge-success">FREE · 8 TLDS + 5 REGISTRIES</span>
+          </div>
+
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-bg-sample="kestrelquant">KestrelQuant (Greenlight)</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-bg-sample="novaforgex">NovaForgeX</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-bg-sample="forgesuite">ForgeSuite</button>
+            <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-bg-sample="vercel">Vercel (Taken)</button>
+          </div>
+
+          <label class="fs-field">
+            <span class="fs-field-label">Candidate Brand, Product, or SDK Name</span>
+            <div class="fs-input-row">
+              <input id="bgNameInput" type="text" class="fs-input" placeholder="e.g. NovaForgeX, OrbitLedger, or @forgesuite.ai" spellcheck="false" autocomplete="off">
+              <button type="button" id="bgScanBtn" class="fs-btn fs-btn-primary">Scan Brand Availability</button>
+            </div>
+          </label>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px;">
+            <span class="fs-field-label" style="margin:0;">1-Click Smart Name Variations (<code>get</code> / <code>use</code> / <code>hq</code> / <code>labs</code> / <code>ai</code> / <code>try</code>)</span>
+            <button type="button" id="bgScanVariationsBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Check 4 Free Variations</button>
+          </div>
+          <div id="bgVariationsChips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+
+          <div id="bgVariationsTableWrap" style="overflow-x:auto;" hidden>
+            <table class="fs-table">
+              <thead>
+                <tr>
+                  <th>Variation</th>
+                  <th>Score</th>
+                  <th>.com &amp; Signals</th>
+                  <th>Inspect</th>
+                </tr>
+              </thead>
+              <tbody id="bgVariationsBody"></tbody>
+            </table>
+          </div>
+
+          <div id="bgStatusMsg" class="fs-status-msg" aria-live="polite"></div>
+        </div>
+
+        <!-- 2. DEEP USPTO TRADEMARK & 10-PLATFORM A2A CTA ($0.35 USDC) -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h3>Need Official USPTO Trademark &amp; 10-Platform Handle Screening?</h3>
+            <span class="fs-badge fs-badge-accent">A2A + X402 · $0.35 USDC</span>
+          </div>
+          <p class="inv-muted" style="margin:4px 0 12px;">
+            Browser CORS checks cover DNS/RDAP + 5 developer registries, while federal trademark databases and social networks block cross-origin browser requests. Run our live autonomous agent <strong>Brand Name Availability Checker</strong> on NEAR AI Market (<strong>$0.35 USDC/call</strong>, &lt;12s SLA) for official <strong>USPTO Registration &amp; Serial Number</strong> trademark screening + <strong>Google Play</strong> + <strong>Reddit, YouTube, Telegram, TikTok, Instagram &amp; X</strong> verification!
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="https://market.near.ai/agents/forge-brand-checker" target="_blank" rel="noopener noreferrer" class="fs-btn fs-btn-primary">Run USPTO + 10-Platform Agent ($0.35 USDC) ↗</a>
+            <button type="button" id="bgSendInvoiceBtn" class="fs-btn fs-btn-secondary">Invoice Naming Audit ($145) →</button>
+            <button type="button" id="bgSendSowBtn" class="fs-btn fs-btn-ghost">1-Click ScopeGuard SOW →</button>
+          </div>
+        </div>
+
+        <!-- 3. PRO TIER: BATCH 25-BRAND AGENCY MATRIX + CSV/JSON EXPORT -->
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <h2>2. Batch 25-Brand Agency Matrix</h2>
+            <span id="bgProStatusBadge" class="fs-badge fs-badge-warn">PRO FEATURE · $15 PRO / $35 BUNDLE</span>
+          </div>
+
+          <div id="bgProLockBanner" class="cb-pro-lock">
+            <strong>Agency Naming &amp; Venture Studio Mode:</strong> Screen up to <strong>25 candidate brand names</strong> in one parallel matrix, unlock all 6 parallel variation checks, and export client-ready <strong>CSV &amp; JSON Brand Dossiers</strong> with <strong>ForgeSuite Single Pro ($15)</strong> or the <strong>All-Access Bundle ($35 lifetime)</strong> — instant auto-unlock via BSC USDT, Solana SPL-USDC, or PayPal.
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-primary" data-checkout-sku="BUNDLE">Unlock All-Access Bundle ($35)</button>
+              <button type="button" class="fs-btn fs-btn-sm fs-btn-secondary" data-checkout-sku="CB">Single Tool Pro ($15)</button>
+              <button type="button" id="bgActivateKeyBtn" class="fs-btn fs-btn-sm fs-btn-ghost">Activate Existing Pro Key</button>
+            </div>
+          </div>
+
+          <label class="fs-field">
+            <span class="fs-field-label">Candidate Brand Shortlist (one per line or comma-separated — max 25)</span>
+            <textarea id="bgBatchInput" class="fs-textarea" rows="5" spellcheck="false" placeholder="NovaForgeX&#10;ZephyrPilot&#10;KestrelQuant&#10;OrbitLedger"></textarea>
+          </label>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="bgBatchRunBtn" class="fs-btn fs-btn-primary">Unlock 25-Brand Matrix — Bundle ($35)</button>
+            <button type="button" id="bgExportCsvBtn" class="fs-btn fs-btn-secondary" disabled>Export Client CSV</button>
+            <button type="button" id="bgExportJsonBtn" class="fs-btn fs-btn-secondary" disabled>Export JSON Report</button>
+          </div>
+          <div id="bgBatchStatusMsg" class="fs-status-msg" aria-live="polite"></div>
+
+          <div style="overflow-x:auto;">
+            <table class="fs-table">
+              <thead>
+                <tr>
+                  <th>Brand</th>
+                  <th>Readiness</th>
+                  <th>Core Domains</th>
+                  <th>Registries</th>
+                  <th>View</th>
+                </tr>
+              </thead>
+              <tbody id="bgBatchBody">
+                <tr>
+                  <td colspan="5" class="inv-muted">Run a Pro 25-Brand Matrix scan to rank candidate names and export CSV/JSON client reports.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: LIVE BRAND LAUNCH READINESS DOSSIER -->
+      <section class="cb-preview-pane" aria-label="Live Brand Launch Readiness Dossier">
+        <div class="cb-panel">
+          <div class="cb-panel-head">
+            <div>
+              <h2>Brand Launch Readiness Dossier</h2>
+              <div id="bgScoreSummary" style="margin-top:4px;font-size:0.88rem;" class="inv-muted">Enter a candidate brand name to check live DNS/RDAP &amp; developer registries.</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span id="bgScoreBadge" class="fs-badge fs-badge-muted">READY</span>
+              <button type="button" id="bgCopyMdBtn" class="fs-btn fs-btn-sm fs-btn-secondary">Copy Markdown Dossier</button>
+            </div>
+          </div>
+
+          <div id="bgMetaGrid" class="cb-grid-2"></div>
+
+          <div>
+            <h3 style="margin:6px 0 10px;font-size:0.95rem;">8-TLD Domain Matrix (Google DoH <code>NS</code> + <code>A</code> &amp; Authoritative RDAP)</h3>
+            <div style="overflow-x:auto;">
+              <table class="fs-table">
+                <thead>
+                  <tr>
+                    <th>Domain</th>
+                    <th>Status</th>
+                    <th>Classification</th>
+                    <th>Protocol Evidence</th>
+                  </tr>
+                </thead>
+                <tbody id="bgDomainsBody">
+                  <tr>
+                    <td colspan="4" class="inv-muted">Waiting for live DoH + RDAP domain scan...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="margin:6px 0 10px;font-size:0.95rem;">Developer, Social &amp; Mobile App Store Registries</h3>
+            <div style="overflow-x:auto;">
+              <table class="fs-table">
+                <thead>
+                  <tr>
+                    <th>Registry</th>
+                    <th>Handle / Slug</th>
+                    <th>Status</th>
+                    <th>Live Registry Evidence</th>
+                  </tr>
+                </thead>
+                <tbody id="bgRegistriesBody">
+                  <tr>
+                    <td colspan="4" class="inv-muted">Waiting for npm, PyPI, GitHub, Bluesky &amp; Apple App Store checks...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="margin:6px 0 8px;font-size:0.95rem;">Launch &amp; Trademark Action Plan</h3>
+            <ul id="bgRecsList" class="fs-feature-list">
+              <li>Verify primary domain NXDOMAIN + RDAP 404, claim developer package namespaces early, and screen USPTO trademarks before launch.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fs-footer">
+    <div class="fs-container fs-footer-grid">
+      <div>
+        <strong>ForgeSuite Studio</strong> by <a href="https://github.com/youthmy11-ai" target="_blank" rel="noopener noreferrer">youthmy11-ai</a> · MIT Licensed Open Storefront
+      </div>
+      <div class="fs-footer-links">
+        <a href="./">Storefront</a>
+        <a href="mcp.html">MCP Server</a>
+        <a href="brandcheck.html">BrandGuard</a>
+        <a href="tokenaudit.html">TokenGuard</a>
+        <a href="txdecode.html">Calldata Lens</a>
+        <a href="envshield.html">EnvShield</a>
+        <a href="cryptobill.html">CryptoBill Forge</a>
+        <a href="tokencalc.html">TokenCost Lab</a>
+        <a href="json2sheet.html">JSON2Sheet Lab</a>
+        <a href="sowbuilder.html">ScopeGuard SOW</a>
+        <a href="https://market.near.ai/agents/forge-brand-checker" target="_blank" rel="noopener noreferrer">Brand Checker Agent ($0.35 USDC)</a>
+        <a href="mailto:youthmy11@gmail.com">Support: youthmy11@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/brandcheck.js"></script>
+</body>
+</html>

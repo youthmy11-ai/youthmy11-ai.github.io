@@ -1,6 +1,6 @@
 # ForgeSuite Studio — Full Portfolio Reference (`llms-full.txt`)
 
-> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 10 catalog offerings (7 live client-side web apps including TokenGuard EVM & Solana Risk Scanner, 2 open-core packaged GitHub tools, 1 zero-dependency Node 20+ MCP Server v1.2.0 with 7 tools executable via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`, and 1 All-Access Lifetime Bundle), transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict client-side privacy guarantees, and zero-backend crypto + PayPal checkout.
+> Complete machine-readable documentation for ForgeSuite Studio by `youthmy11-ai` (`https://youthmy11-ai.github.io/`): 11 catalog offerings (8 live client-side web apps including TokenGuard EVM & Solana Risk Scanner and BrandGuard 8-TLD Domain & Handle Checker, 2 open-core packaged GitHub tools, 1 zero-dependency Node 20+ MCP Server v1.2.0 with 7 tools executable via `npx --yes github:youthmy11-ai/youthmy11-ai.github.io`, and 1 All-Access Lifetime Bundle), transparent one-time pricing ($0 free tiers, $15–$49 lifetime Pro pricing), strict client-side privacy guarantees, and zero-backend crypto + PayPal checkout.
 
 ---
 
@@ -24,12 +24,13 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
 | 3 | **WebLead & Table Extractor** | Chrome/Edge/Brave MV3 Extension | MIT Lite Edition (HTML/ARIA/JSON-LD tables, emails, Markdown, up to 25 rows/table) | **$15** | `WL` |
 | 4 | **All-Access Creator & Freelancer Bundle** | Universal Lifetime Key (`CB + AS + WL + TokenGuard Batch`) | Access all Free & Community releases | **$35** *(Compare at $49 · Save $14)* | `BUNDLE` |
 | 5 | **TokenGuard Risk Scanner** | Live Web App (`tokenaudit.html`) | Free unlimited single-token EVM & Solana live scans + Markdown copy | **Included in $35 Bundle** *(<= 25 Batch Watchlist + JSON/CSV Dossier)* | `BUNDLE` |
-| 6 | **TokenCost Lab** | Live Web App (`tokencalc.html`) | 100% Free ($0) — frontier models, prompt-cache math, CryptoBill quote handoff | **$0** | Free |
-| 7 | **JSON2Sheet & PII Masker** | Live Web App (`json2sheet.html`) | 100% Free ($0) — nested JSON to CSV/TSV/Markdown, formula guard, PII redaction | **$0** | Free |
-| 8 | **ScopeGuard SOW Builder** | Live Web App (`sowbuilder.html`) | 100% Free ($0) — AI/Web3/Chrome SOW templates, milestone splits, CryptoBill export | **$0** | Free |
-| 9 | **Calldata Lens** | Live Web App (`txdecode.html`) | 100% Free ($0) — offline EVM ABI decoder & `MAX_UINT256` approval risk alerts | **$0** | Free |
-| 10 | **EnvShield Secret Scanner** | Live Web App (`envshield.html`) | 100% Free ($0) — 13 secret detectors + Shannon entropy scanner & 1-click redactor | **$0** | Free |
-| 11 | **ForgeSuite MCP Server (v1.2.0)** | Node 20+ Stdio MCP (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io` / `mcp.html`) | 100% Free ($0, MIT) — zero-dep MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, `brand_domain_handle_scan`) | **$0** | Free |
+| 6 | **BrandGuard Launch Scanner** | Live Web App (`brandcheck.html`) | Free instant single-brand + 4 Smart Variations across 8 TLDs & 5 registries | **Included in $15 Pro / $35 Bundle** *(<= 25-Brand Agency Matrix + CSV/JSON)* | `CB` / `BUNDLE` |
+| 7 | **TokenCost Lab** | Live Web App (`tokencalc.html`) | 100% Free ($0) — frontier models, prompt-cache math, CryptoBill quote handoff | **$0** | Free |
+| 8 | **JSON2Sheet & PII Masker** | Live Web App (`json2sheet.html`) | 100% Free ($0) — nested JSON to CSV/TSV/Markdown, formula guard, PII redaction | **$0** | Free |
+| 9 | **ScopeGuard SOW Builder** | Live Web App (`sowbuilder.html`) | 100% Free ($0) — AI/Web3/Chrome SOW templates, milestone splits, CryptoBill export | **$0** | Free |
+| 10 | **Calldata Lens** | Live Web App (`txdecode.html`) | 100% Free ($0) — offline EVM ABI decoder & `MAX_UINT256` approval risk alerts | **$0** | Free |
+| 11 | **EnvShield Secret Scanner** | Live Web App (`envshield.html`) | 100% Free ($0) — 13 secret detectors + Shannon entropy scanner & 1-click redactor | **$0** | Free |
+| 12 | **ForgeSuite MCP Server (v1.2.0)** | Node 20+ Stdio MCP (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io` / `mcp.html`) | 100% Free ($0, MIT) — zero-dep MCP server (`envshield_scan`, `calldata_decode`, `tokencost_estimate`, `cryptobill_quote`, `evm_token_risk_scan`, `solana_mint_risk_scan`, `brand_domain_handle_scan`) | **$0** | Free |
 
 ---
 
@@ -121,6 +122,14 @@ ForgeSuite Studio is engineered as a **zero-backend, local-first software suite*
     6. `solana_mint_risk_scan` — live Solana SPL / Token-2022 authority, extension & holder concentration risk audit
     7. `brand_domain_handle_scan` — live authoritative RDAP + Google DoH domain (`.com`, `.io`, `.ai`, `.dev`, `.app`, `.org`), developer registry (`npm`, `PyPI`, `GitHub`), social (`Bluesky`, `Reddit`), and Apple iOS App Store availability scanner
 
+### 3.12 BrandGuard — 8-TLD Domain, Developer Registry & App Store Scanner (`https://youthmy11-ai.github.io/brandcheck.html`)
+- **Category**: BusinessApplication (Web — Free Single + 4 Variations + Pro 25-Brand Agency Matrix in `$15` Pro / `$35` Bundle)
+- **Reusable Engine**: `https://youthmy11-ai.github.io/assets/brandcheck.js` (Pure ES Module compatible with Browser & Node.js 20+)
+- **Capabilities**:
+  - **100% CORS-Clean 8-TLD Domain Verification**: Queries Google DNS-over-HTTPS (`NS` + `A` records at `dns.google/resolve`) and CORS-enabled authoritative RDAP endpoints across `.com`, `.io`, `.ai`, `.dev`, `.app`, `.org`, `.net`, and `.xyz` (with automatic clean fallback to DoH if `rdap.org` redirects to a non-CORS registry), distinguishing `Likely Available (NXDOMAIN)` from `Registered (Active DNS/RDAP)`.
+  - **5 Developer, Social & App Store Registries**: Live browser checks across `npm` (`registry.npmjs.org`), `PyPI` (`pypi.org/pypi/<name>/json`), `GitHub` (`api.github.com/users/<name>`), `Bluesky` (`public.api.bsky.app` ATProto handle resolution), and the US **Apple iOS App Store** (`itunes.apple.com/search`).
+  - **Readiness Scoring, Variations & Agency Matrix**: Computes a deterministic `0–100` Brand Launch Readiness Score with UTC timestamps, generates 6 Smart Name Variations (`get`, `use`, `hq`, `labs`, `ai`, `try` — 4 parallel checks free, all 6 + `<= 25` Batch Agency Matrix + CSV/JSON exports in Pro), provides 1-click **ScopeGuard SOW** (`sowbuilder.html#sow=...`) and **CryptoBill** (`cryptobill.html#inv=...`) handoffs, and links directly to our `$0.35 USDC` autonomous agent **Brand Name Availability Checker** (`https://market.near.ai/agents/forge-brand-checker`) for official USPTO Registration/Serial Number trademark screening + Google Play + Reddit/YouTube/Telegram/TikTok/Instagram/X verification.
+
 ---
 
 ## 4. Instant Crypto & PayPal Checkout Channels (`assets/checkout.js`)
@@ -159,6 +168,7 @@ ForgeSuite operates a live, zero-KYC, escrow-backed Agent-to-Agent (A2A) + x402 
 
 - **Storefront**: https://youthmy11-ai.github.io/
 - **TokenGuard Scanner**: https://youthmy11-ai.github.io/tokenaudit.html
+- **BrandGuard Scanner**: https://youthmy11-ai.github.io/brandcheck.html
 - **MCP Server v1.2.0**: https://youthmy11-ai.github.io/mcp.html
 - **Concise LLM Index**: https://youthmy11-ai.github.io/llms.txt
 - **Live A2A + x402 Agent**: https://market.near.ai/a/forge-ai-agent

@@ -198,6 +198,31 @@ export function buildMilestoneInvoicePayload(state, milestoneIndex = 0) {
   return inv;
 }
 
+export function decodeSowHandoffPayload(rawHashOrToken) {
+  const token = String(rawHashOrToken || "")
+    .trim()
+    .replace(/^#?sow=/i, "");
+  if (!token || !/^[A-Za-z0-9\-_]+$/.test(token)) return null;
+  try {
+    const b64 = token.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
+    let jsonStr;
+    if (typeof atob === "function") {
+      const bin = atob(padded);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
+      jsonStr = new TextDecoder().decode(bytes);
+    } else {
+      jsonStr = Buffer.from(padded, "base64").toString("utf8");
+    }
+    const obj = JSON.parse(jsonStr);
+    if (!obj || typeof obj !== "object" || !Array.isArray(obj.milestones)) return null;
+    return obj;
+  } catch {
+    return null;
+  }
+}
+
 function initSowApp() {
   if (typeof document === "undefined" || document.body?.dataset?.page !== "sowbuilder") {
     return;
@@ -307,20 +332,25 @@ function initSowApp() {
     }
   }
 
+  function applySowState(p) {
+    if (!p) return;
+    if (fields.projectTitle) fields.projectTitle.value = p.projectTitle || "";
+    if (fields.providerName) fields.providerName.value = p.providerName || "";
+    if (fields.clientName) fields.clientName.value = p.clientName || "";
+    if (fields.totalBudget) fields.totalBudget.value = String(p.totalBudget ?? 0);
+    if (fields.revisionsIncluded) fields.revisionsIncluded.value = String(p.revisionsIncluded ?? 2);
+    if (fields.noticeDays) fields.noticeDays.value = String(p.noticeDays ?? 5);
+    if (fields.settlementRail) fields.settlementRail.value = p.settlementRail || "usdt-bep20";
+    if (fields.deliverables) fields.deliverables.value = p.deliverables || "";
+    milestones = structuredClone(p.milestones || []);
+    renderMilestoneInputs();
+    refreshOutput();
+  }
+
   function loadPreset(key) {
     const p = SOW_PRESETS[key];
     if (!p) return;
-    if (fields.projectTitle) fields.projectTitle.value = p.projectTitle;
-    if (fields.providerName) fields.providerName.value = p.providerName;
-    if (fields.clientName) fields.clientName.value = p.clientName;
-    if (fields.totalBudget) fields.totalBudget.value = String(p.totalBudget);
-    if (fields.revisionsIncluded) fields.revisionsIncluded.value = String(p.revisionsIncluded);
-    if (fields.noticeDays) fields.noticeDays.value = String(p.noticeDays);
-    if (fields.settlementRail) fields.settlementRail.value = p.settlementRail;
-    if (fields.deliverables) fields.deliverables.value = p.deliverables;
-    milestones = structuredClone(p.milestones);
-    renderMilestoneInputs();
-    refreshOutput();
+    applySowState(p);
   }
 
   document.querySelectorAll("[data-sow-preset]").forEach((btn) => {
@@ -376,7 +406,12 @@ function initSowApp() {
     });
   }
 
-  loadPreset("ai_mvp");
+  const incomingSow = decodeSowHandoffPayload(window.location.hash);
+  if (incomingSow) {
+    applySowState(incomingSow);
+  } else {
+    loadPreset("ai_mvp");
+  }
 }
 
 if (typeof window !== "undefined") {
