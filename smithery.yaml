@@ -1,0 +1,21 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+# Server: io.github.youthmy11-ai/forgesuite-mcp (forgesuite-mcp v1.6.0 — 11 tools)
+# Remote Streamable-HTTP: https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp
+# Tools (11): envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote,
+#   evm_token_risk_scan, solana_mint_risk_scan, brand_domain_handle_scan,
+#   multi_chain_wallet_scan, subtitle_caption_audit, media_brief_audit, web_clean_extract
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    additionalProperties: false
+    description: Zero-configuration required. Launches ForgeSuite MCP Server v1.6.0 (11 tools) directly via Node.js >=20 over stdio.
+    properties: {}
+  commandFunction: |-
+    (config) => ({
+      command: 'node',
+      args: ['mcp/forgesuite-mcp.mjs'],
+      env: {}
+    })
+  exampleConfig: {}

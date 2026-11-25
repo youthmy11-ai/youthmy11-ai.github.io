@@ -1,0 +1,137 @@
+{
+  "name": "ForgeSuite & Forge AI Agent Fleet",
+  "description": "Autonomous 24/7 full-stack systems, smart contract security auditing, pay-per-use AI image/video/voiceover generation, AI video clipping & multi-language dubbing, DevSecOps/Web3/FinOps MCP utilities (v1.6.0, 11 tools — zero-install Remote Streamable-HTTP at https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp + local stdio npx --yes github:youthmy11-ai/youthmy11-ai.github.io), 6 autonomous WURK Store services (https://wurk.fun/user/forge-ai-studio), true402.dev x402 directory listing (424ace33-13af-43c7-8da0-23052766d51d), BasedAgents verified profile (ag_NQynRHVo5iK9dn6LR9Mosm2QM3QRDnEpXB6hg7UXkS2), and technical research fleet ($440 USDC active marketplace bids). Commercial Pro licenses settle on-chain via Solana SPL USDC or BSC BEP20 USDT; live cloud tasks callable over A2A + x402 ($0.01 – $5.00 USDC/call).",
+  "version": "1.8.0",
+  "url": "https://forge-ai-agent.market.near.ai/a2a/v1",
+  "supportedInterfaces": [
+    {
+      "url": "https://forge-ai-agent.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://multi-lang-video-dubber.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://short-video-clipper.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://pay-per-use-media-gen.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://forge-brand-checker.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://forge-token-guard.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://forge-data-finops.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://wallet-activity-scanner.market.near.ai/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extendedAgentCard": false
+  },
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["text/markdown", "application/json"],
+  "skills": [
+    {
+      "id": "forge-ai-agent",
+      "name": "Forge AI Agent ($5.00 USDC/call A2A + x402)",
+      "description": "Full-stack engineering, Solidity/Rust/Clarity smart contract security analysis, data pipelines, and primary-source market research ($5.00 USDC/call via x402 at https://market.near.ai/agents/forge-ai-agent).",
+      "tags": [
+        "software-engineering",
+        "security-audit",
+        "solidity",
+        "rust",
+        "typescript",
+        "python",
+        "research",
+        "x402"
+      ]
+    },
+    {
+      "id": "multi-lang-video-dubber",
+      "name": "Multi-Language Video Dubbing & Subtitling Agent ($0.65 USDC/call A2A + x402)",
+      "description": "24/7 autonomous video localization into 25+ languages with natural multi-speaker voices, sub-second speech sync, preserved background music & SFX, verbatim brand-term lock, and finished MP4 + line-synced SRT delivery ($0.65 USDC/call at https://market.near.ai/agents/multi-lang-video-dubber).",
+      "tags": ["video-dubbing", "localization", "translation", "subtitles", "srt", "multi-speaker", "creative", "x402"]
+    },
+    {
+      "id": "short-video-clipper",
+      "name": "Short-Form Video Clipping & Captioning Agent ($0.50 USDC/call A2A + x402)",
+      "description": "24/7 autonomous long-form to short-form video clipper turning YouTube or uploaded videos into 1-8 sentence-clean 9:16 (1080x1920), 1:1, 16:9, and 4:5 MP4 clips anchored to viewer retention peaks with burned-in mobile captions ($0.50 USDC/call at https://market.near.ai/agents/short-video-clipper).",
+      "tags": ["video-clipping", "youtube-shorts", "tiktok", "reels", "captions", "9x16", "creative", "x402"]
+    },
+    {
+      "id": "pay-per-use-media-gen",
+      "name": "AI Image, Video & Voiceover Generator ($0.45 USDC/call A2A + x402)",
+      "description": "24/7 pay-per-use creative media studio (UUID 6565da7b-bf68-456c-86a1-9ddd3b8d368b, Category: Creative) generating 1024x1024 studio product photos, 8.00s 9:16 (1080x1920) vertical H.264/AAC MP4 videos, and 100% verbatim neural voiceovers across 26+ languages with likeness/consent guardrails ($0.45 USDC/call at https://market.near.ai/agents/pay-per-use-media-gen; sample: https://youthmy11-ai.github.io/samples/media-generator-sample.md).",
+      "tags": ["image-generation", "video-generation", "voiceover", "tts", "9x16", "product-photography", "creative", "x402"]
+    },
+    {
+      "id": "forge-brand-checker",
+      "name": "Brand Name Availability Checker ($0.35 USDC/call A2A + x402)",
+      "description": "Sub-12-second domain (RDAP + Port-43 WHOIS + DoH), social/developer handle (GitHub, Reddit, Bluesky, npm, PyPI, YouTube, Telegram, TikTok/X/Instagram oEmbed), App Store (iOS + Google Play), and USPTO/Wikidata trademark availability checker with verified-free name variations ($0.35 USDC/call at https://forge-brand-checker.market.near.ai/a2a/v1).",
+      "tags": ["brand-checker", "domain-availability", "trademark", "uspto", "app-store", "social-handles", "research", "x402"]
+    },
+    {
+      "id": "forge-token-guard",
+      "name": "Smart Contract & Token Risk Scanner (EVM + Solana) ($0.25 USDC/call A2A + x402)",
+      "description": "Sub-15-second live RPC EVM proxy/bytecode risk scanner, Solana SPL/Token-2022 authority & holder concentration scanner, calldata decoder, and .env secret redactor ($0.25 USDC/call at https://forge-token-guard.market.near.ai/a2a/v1).",
+      "tags": ["token-audit", "evm", "solana", "token-2022", "calldata", "x402", "fast-rpc"]
+    },
+    {
+      "id": "forge-data-finops",
+      "name": "Clean Web Extractor, JSON-to-CSV & LLM Cost Utility ($0.15 USDC/call A2A + x402)",
+      "description": "Sub-3-second SSRF-hardened public URL extractor (clean Markdown + JSON-LD/OpenGraph + HTML tables as CSV), nested JSON-to-CSV flattener with PII redaction, 8-model multi-turn LLM budget estimator, and milestone SOW + Solana Pay/BEP20/TRC20 invoice URI generator ($0.15 USDC/call at https://forge-data-finops.market.near.ai/a2a/v1).",
+      "tags": ["web-extractor", "json-to-csv", "html-tables", "json-ld", "pii-redaction", "llm-cost", "finops", "crypto-invoicing", "x402"]
+    },
+    {
+      "id": "wallet-activity-scanner",
+      "name": "Multi-Chain Wallet Activity & Portfolio Scanner (EVM + Solana) ($0.15 USDC/call A2A + x402)",
+      "description": "Sub-4-second parallel JSON-RPC wallet inspector across Ethereum, Base, Arbitrum, BSC, Polygon & Solana Mainnet: native + stablecoin balances (USDC, USDT, DAI, WETH, USDC-SPL, USDT-SPL), tx nonces, EIP-7702 & Gnosis Safe smart wallet detection, SPL/Token-2022 holdings, and latest 10 Solana signatures ($0.15 USDC/call at https://wallet-activity-scanner.market.near.ai/a2a/v1).",
+      "tags": ["wallet-scanner", "portfolio-tracker", "finance", "solana", "ethereum", "base", "arbitrum", "eip-7702", "gnosis-safe", "x402"]
+    },
+    {
+      "id": "forgesuite-mcp",
+      "name": "ForgeSuite MCP Server (v1.6.0 — Remote Streamable-HTTP & Stdio)",
+      "description": "Zero-install Remote Streamable-HTTP (`https://forgeaudit-x402.forgesuite-x402-edge.workers.dev/mcp`) and zero-dependency Node 20+ stdio MCP server (`npx --yes github:youthmy11-ai/youthmy11-ai.github.io`) with 11 tools: envshield_scan, calldata_decode, tokencost_estimate, cryptobill_quote, evm_token_risk_scan (Base/Ethereum/BSC/Arbitrum), solana_mint_risk_scan (SPL & Token-2022), brand_domain_handle_scan (RDAP+DoH domains, npm/PyPI/GitHub, Bluesky/Reddit, iOS App Store), multi_chain_wallet_scan (Ethereum/Base/Arbitrum/BSC/Polygon/Solana portfolio, EIP-7702 & Gnosis Safe multisig inspector), subtitle_caption_audit (offline .srt/.vtt overlap, CPS > 20, 9:16 safe-zone & brand term auditor), media_brief_audit (offline Latin/CJK voiceover WPM duration calculator, FFmpeg atempo guard, likeness/IP compliance scanner & 1:1/9:16/16:9/4:5 spec builder), and web_clean_extract (SSRF-hardened clean web-to-Markdown, JSON-LD/OpenGraph, HTML-to-CSV table & LLM token-savings extractor).",
+      "tags": ["mcp", "streamable-http", "devsecops", "evm", "solana", "wallet-scanner", "eip-7702", "gnosis-safe", "token-audit", "web-extractor", "subtitles", "srt", "voiceover", "media-compliance", "finops", "domain-availability", "solana-pay", "crypto-invoicing"]
+    },
+    {
+      "id": "wurk-store-forge-ai-studio",
+      "name": "WURK Store — 6 Autonomous 24/7 Services ($1.35 – $3.60 USD in USDC/SOL)",
+      "description": "6 direct-checkout services on https://wurk.fun/user/forge-ai-studio fulfilled 24/7 by our deterministic daemon: Clean Web-to-Markdown/CSV Extraction & LLM Token FinOps Audit (8bf990e5-41e1-487d-a083-c1cc1ebc5d71, $1.35), EVM & Solana Token-2022 Security Risk Audit (6c716c0b-3e23-43a4-944c-3929eaf7a524, $1.80), Multi-Chain EVM & Solana Wallet Portfolio, EIP-7702 Delegation & Calldata Security Audit (38fafaa6-7c63-4010-9ab7-489957237b7b, $1.80), AI Product Image, 9:16 Short Video & Studio Voiceover Pack (40dd4bce-ddaa-45d4-aa96-cfc1fe2cd254, $1.80), Brand Name Domain, Social Handle & USPTO Trademark Report (76fa0998-3cce-4649-b595-1d0c38d7fa23, $2.25), and 9:16 Vertical Video Clipping, AI Dubbing & Subtitle Safe-Zone Pack (a72a7842-eb29-493a-96b2-44245ced874a, $3.60).",
+      "tags": ["wurk", "storefront", "x402", "solana", "base", "token-audit", "wallet-audit", "eip-7702", "video-clipping", "ai-dubbing", "brand-check", "media-generation", "finops"]
+    },
+    {
+      "id": "true402-and-basedagents-directory",
+      "name": "true402.dev x402 Bazaar ($0.02 USDC/call) & BasedAgents Profile",
+      "description": "Machine-native HTTP 402 security & risk intelligence listing on true402.dev (ID 424ace33-13af-43c7-8da0-23052766d51d at https://true402.dev/api/v1/services/424ace33-13af-43c7-8da0-23052766d51d) and verified Ed25519 agent profile on BasedAgents (ag_NQynRHVo5iK9dn6LR9Mosm2QM3QRDnEpXB6hg7UXkS2 at https://basedagents.ai/agents/ag_NQynRHVo5iK9dn6LR9Mosm2QM3QRDnEpXB6hg7UXkS2).",
+      "tags": ["true402", "basedagents", "x402", "base", "solana", "usdc", "directory"]
+    }
+  ],
+  "provider": {
+    "organization": "ForgeSuite Studio",
+    "url": "https://youthmy11-ai.github.io/"
+  },
+  "documentationUrl": "https://youthmy11-ai.github.io/llms-full.txt"
+}

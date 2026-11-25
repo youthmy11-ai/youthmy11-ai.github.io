@@ -4079,3 +4079,19 @@ test("ForgeSuite MCP v1.6.0 Tool #11 (web_clean_extract) enforces SSRF guard, ex
   assert.equal(rpcWeb.result.structuredContent.tables.length, 1);
   assert.match(rpcWeb.result.content[0].text, /Token Savings:/);
 });
+
+test("smithery.yaml and /.well-known/agent.json are valid, LF-normalized, and synced with ForgeSuite MCP v1.6.0 (11 tools)", () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const smitheryRaw = fs.readFileSync(path.join(repoRoot, "smithery.yaml"), "utf8");
+  assert.equal(smitheryRaw.includes("\r"), false, "smithery.yaml must use LF line endings");
+  assert.match(smitheryRaw, /startCommand:\s*\n\s*type:\s*stdio/);
+  assert.match(smitheryRaw, /forgesuite-mcp v1\.6\.0/);
+  assert.match(smitheryRaw, /mcp\/forgesuite-mcp\.mjs/);
+  assert.match(smitheryRaw, /commandFunction:\s*\|-/);
+  assert.match(smitheryRaw, /exampleConfig:\s*\{\}/);
+
+  const agentJson = JSON.parse(fs.readFileSync(path.join(repoRoot, ".well-known", "agent.json"), "utf8"));
+  const agentCard = JSON.parse(fs.readFileSync(path.join(repoRoot, ".well-known", "agent-card.json"), "utf8"));
+  assert.deepEqual(agentJson, agentCard);
+  assert.ok(agentJson.skills.some((s) => s.id === "wurk-store-forge-ai-studio" && s.description.includes("38fafaa6-7c63-4010-9ab7-489957237b7b")));
+});
